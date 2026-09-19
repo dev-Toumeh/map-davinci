@@ -190,7 +190,13 @@ async function boot() {
   renderList();
   // convenience: Saudi Arabia highlighted by default for the first test
   const sau = allCountries.find(c => c.iso3 === "SAU");
-  if (sau) addCountry(sau);
+  if (sau) {
+    addCountry(sau);
+    // Make the default highlight immediately editable; the user should not
+    // need to click Saudi Arabia a second time just to change its color.
+    pending = sau.iso3;
+    renderList(); updateHbtn();
+  }
 }
 
 function renderList() {
@@ -222,6 +228,8 @@ async function drawOutline(c) {
 function addCountry(c) {
   const highlighted = { ...c, color: DEFAULT_COUNTRY_COLOR };
   selected.set(c.iso3, highlighted);
+  // The latest highlighted country becomes the active color target.
+  pending = c.iso3;
   drawOutline(highlighted);
   renderChips(); renderList(); updateHbtn(); updateButton();
 }
