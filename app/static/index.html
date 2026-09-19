@@ -134,7 +134,13 @@ const layers = {
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     { maxZoom: 19, attribution: "Esri, Maxar" }),
 };
-const map = L.map("map", { zoomControl: true }).setView([24.0, 45.0], 6);
+const map = L.map("map", {
+  zoomControl: true,
+  // Make +/− controls and wheel zoom movement more gradual for precise framing.
+  zoomDelta: 0.25,
+  zoomSnap: 0.05,
+  wheelPxPerZoomLevel: 120,
+}).setView([24.0, 45.0], 6);
 layers.google_satellite.addTo(map);
 
 // ---- state ----
@@ -184,7 +190,7 @@ async function drawOutline(c) {
   const d = await r.json();
   if (d.geometry && !outlineLayers[c.iso3]) {
     outlineLayers[c.iso3] = L.geoJSON(d.geometry, {
-      style: { color: "#4cc2ff", weight: 1.6, fill: false, interactive: false },
+      style: { color: "#4cc2ff", weight: 3.5, fill: false, interactive: false },
     }).addTo(map);
   }
 }
