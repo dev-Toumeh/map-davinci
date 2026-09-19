@@ -37,8 +37,8 @@ Then open **http://127.0.0.1:8787** in a browser.
 |---|---|
 | `satellite_detail.png` | Background at the framed extent |
 | `satellite_wide.png` | Same center, `wide_factor` × the extent, same pixel size |
-| `mask_<ISO>.png` | One per country — opaque white shape on transparent, exact same grid as the detail image |
-| `mask_<ISO>.svg` | Vector version of the same mask — viewBox matches the PNG pixels 1:1, holes and islands preserved |
+| `mask_<ISO>.png` | One per country — selected highlight color on transparent, exact same grid as the detail image |
+| `mask_<ISO>.svg` | Vector version of the same colored mask — viewBox matches the PNG pixels 1:1, holes and islands preserved |
 | `alignment_check.jpg` | Detail background with masks overlaid 50% red — quick visual QA |
 | `metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, SHA-256 hashes, attribution |
 

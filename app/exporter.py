@@ -45,6 +45,7 @@ TILE_SIZE = 256
 TILE_THREADS = 8
 TILE_RETRIES = 3
 SUPERSCALE = 2                          # mask supersampling for smooth edges
+DEFAULT_COUNTRY_COLOR = "#1689ff"       # editable in the browser UI
 
 APP_ROOT = Path(__file__).resolve().parent
 DATA_DIR = APP_ROOT / "data"
@@ -146,6 +147,18 @@ def choose_tile_zoom(target_mpp: float, lat: float, max_zoom: int) -> Tuple[int,
     native = ground_meters_per_pixel(z, lat)
     upscaled = native > target_mpp * (1.0 + 1e-6)
     return z, upscaled
+
+
+def parse_hex_color(value: str) -> Tuple[str, Tuple[int, int, int]]:
+    """Validate a UI color and return canonical #rrggbb plus its RGB tuple."""
+    value = str(value).strip()
+    if not value.startswith("#") or len(value) != 7:
+        raise ValueError(f"country color must use #RRGGBB format, got {value!r}")
+    try:
+        rgb = tuple(int(value[i:i + 2], 16) for i in (1, 3, 5))
+    except ValueError as exc:
+        raise ValueError(f"country color must use #RRGGBB format, got {value!r}") from exc
+    return value.lower(), rgb
 
 
 # --------------------------------------------------------------------------
@@ -316,6 +329,7 @@ def render_mask(
     geometry: dict,
     bbox: Tuple[float, float, float, float],
     out_size: Tuple[int, int],
+    color: Tuple[int, int, int] = (22, 137, 255),
 ) -> Tuple[Image.Image, Tuple[int, int, int, int]]:
     """
     Render one country as an RGBA image (opaque white shape, transparent
@@ -369,7 +383,9 @@ def render_mask(
         bounds_px = (0, 0, W, H)
 
     alpha = layer.resize(out_size, Image.LANCZOS)
-    rgba = Image.new("RGBA", out_size, (255, 255, 255, 0))
+    # RGB is the selected highlight color; alpha remains the actual mask.
+    # Fusion can therefore use this as a direct color layer or only its alpha.
+    rgba = Image.new("RGBA", out_size, (*color, 0))
     rgba.putalpha(alpha)
     return rgba, bounds_px
 
@@ -382,6 +398,7 @@ def render_mask_svg(
     geometry: dict,
     bbox: Tuple[float, float, float, float],
     out_size: Tuple[int, int],
+    color: str = DEFAULT_COUNTRY_COLOR,
 ) -> str:
     """
     Vector version of the country mask, generated directly from the boundary
@@ -415,7 +432,7 @@ def render_mask_svg(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
         f'viewBox="0 0 {W} {H}">\n'
-        '  <g fill="#ffffff" fill-rule="evenodd" stroke="none">\n    '
+        f'  <g fill="{color}" fill-rule="evenodd" stroke="none">\n    '
         + "\n    ".join(paths)
         + "\n  </g>\n</svg>\n"
     )
@@ -533,15 +550,18 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
     n = len(iso_list)
     for i, iso in enumerate(iso_list):
         progress("masks", 100.0 * i / n, f"rendering mask {iso}")
+        colors = config.get("country_colors") or {}
+        color, rgb = parse_hex_color(colors.get(iso, DEFAULT_COUNTRY_COLOR))
         geometry = get_geometry(iso)
-        mask_img, bounds_px = render_mask(geometry, detail_bbox, (W, H))
+        mask_img, bounds_px = render_mask(geometry, detail_bbox, (W, H), rgb)
         mask_path = out_dir / f"mask_{iso}.png"
         mask_img.save(mask_path)
-        svg_text = render_mask_svg(geometry, detail_bbox, (W, H))
+        svg_text = render_mask_svg(geometry, detail_bbox, (W, H), color)
         svg_path = out_dir / f"mask_{iso}.svg"
         svg_path.write_text(svg_text, encoding="utf-8")
         masks.append({
             "iso3": iso,
+            "color": color,
             "file": mask_path.name,
             "svg_file": svg_path.name,
             "bounds_px": {"x0": bounds_px[0], "y0": bounds_px[1],

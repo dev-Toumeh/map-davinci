@@ -28,6 +28,8 @@
   .crow .iso { color:var(--dim); font-size:11px; }
   #hbtn { width:100%; margin-top:8px; padding:8px; border:1px solid var(--acc); background:transparent; color:var(--acc); border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; }
   #hbtn:disabled { border-color:#3a4149; color:#7b828c; cursor:default; }
+  #countrycolor { width:100%; height:34px; padding:3px; background:#12141a; border:1px solid var(--line); border-radius:6px; cursor:pointer; }
+  #countrycolor:disabled { opacity:.45; cursor:default; }
   #chips { margin-top:6px; display:flex; flex-wrap:wrap; gap:5px; }
   .chip { background:#0e2a3a; border:1px solid #1c4a63; color:var(--acc); border-radius:20px; padding:2px 10px; font-size:12px; cursor:pointer; }
   .row2 { display:flex; gap:8px; } .row2 > * { flex:1; }
@@ -70,6 +72,9 @@
       <div id="clist"></div>
       <button id="hbtn" disabled>Select a country in the list</button>
       <div id="chips"></div>
+      <label>Highlighted country color</label>
+      <input type="color" id="countrycolor" value="#1689ff" disabled>
+      <div id="colorhint" style="color:var(--dim);font-size:11px;margin-top:4px">Select a highlighted country to edit its export color.</div>
     </div>
 
     <div class="sec">
@@ -159,13 +164,23 @@ let selected = new Map();         // iso3 -> {iso3, name}  (highlighted countrie
 const outlineLayers = {};         // iso3 -> Leaflet outline layer on the map
 let targetCrop = null;            // visible export crop in Leaflet container pixels
 let exporting = false;
+const DEFAULT_COUNTRY_COLOR = "#1689ff";
 
 // ---- country list ----
 const clist = document.getElementById("clist");
 const search = document.getElementById("search");
 const hbtn = document.getElementById("hbtn");
+const colorInput = document.getElementById("countrycolor");
+const colorHint = document.getElementById("colorhint");
 search.addEventListener("input", renderList);
 hbtn.addEventListener("click", highlightAction);
+colorInput.addEventListener("input", () => {
+  const c = pending && selected.get(pending);
+  if (!c) return;
+  c.color = colorInput.value;
+  if (outlineLayers[c.iso3]) outlineLayers[c.iso3].setStyle({ color: c.color });
+  renderChips();
+});
 
 async function boot() {
   const r = await fetch("/api/countries");
@@ -199,14 +214,15 @@ async function drawOutline(c) {
   const d = await r.json();
   if (d.geometry && !outlineLayers[c.iso3]) {
     outlineLayers[c.iso3] = L.geoJSON(d.geometry, {
-      style: { color: "#4cc2ff", weight: 3.5, fill: false, interactive: false },
+      style: { color: c.color, weight: 3.5, fill: false, interactive: false },
     }).addTo(map);
   }
 }
 
 function addCountry(c) {
-  selected.set(c.iso3, c);
-  drawOutline(c);
+  const highlighted = { ...c, color: DEFAULT_COUNTRY_COLOR };
+  selected.set(c.iso3, highlighted);
+  drawOutline(highlighted);
   renderChips(); renderList(); updateHbtn(); updateButton();
 }
 
@@ -225,10 +241,20 @@ async function highlightAction() {
 }
 
 function updateHbtn() {
-  if (!pending) { hbtn.disabled = true; hbtn.textContent = "Select a country in the list"; return; }
+  if (!pending) { hbtn.disabled = true; hbtn.textContent = "Select a country in the list"; updateColorPicker(); return; }
   const c = allCountries.find(x => x.iso3 === pending);
   hbtn.disabled = false;
   hbtn.textContent = selected.has(pending) ? `Remove ${c.name} highlight` : `Highlight ${c.name}`;
+  updateColorPicker();
+}
+
+function updateColorPicker() {
+  const c = pending && selected.get(pending);
+  colorInput.disabled = !c;
+  colorInput.value = c ? c.color : DEFAULT_COUNTRY_COLOR;
+  colorHint.textContent = c
+    ? `${c.name}: ${c.color} — used in the exported PNG and SVG.`
+    : "Select a highlighted country to edit its export color.";
 }
 
 function renderChips() {
@@ -238,6 +264,8 @@ function renderChips() {
     const chip = document.createElement("span");
     chip.className = "chip";
     chip.textContent = c.name + " ✕";
+    chip.style.borderColor = c.color;
+    chip.style.color = c.color;
     chip.title = "remove highlight";
     chip.onclick = () => removeCountry(iso);
     chips.appendChild(chip);
@@ -304,6 +332,7 @@ document.getElementById("exportbtn").addEventListener("click", async () => {
   const body = {
     name: document.getElementById("shotname").value.trim() || "shot",
     countries: [...selected.keys()],
+    country_colors: Object.fromEntries([...selected].map(([iso, country]) => [iso, country.color])),
     center: map.getCenter(),
     zoom: map.getZoom(),
     detail_bbox_mercator: { minx, miny, maxx, maxy },
