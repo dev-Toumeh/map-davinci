@@ -439,7 +439,10 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
       name         output folder name (sanitized)
       countries    list of ISO3 codes, e.g. ["SAU"]
       center       {"lat": float, "lng": float}
-      zoom         float (Leaflet-style zoom of the requested framing)
+      zoom         Leaflet-style map zoom, recorded for reproducibility
+      detail_bbox_mercator  optional exact visible target-frame bounds:
+                            {minx, miny, maxx, maxy}; takes priority over
+                            center/zoom and is used by the browser UI
       orientation  "landscape" (3840x2160) | "vertical" (2160x3840)
       wide_factor  float, default 2.0
       source       key in SOURCES, default google_satellite
@@ -476,16 +479,31 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     progress("extents", 5.0, "computing shared grid")
-    cx, cy = ll_to_merc(lng, lat)
-    # Extents are calculated in projected Web Mercator coordinates. Do not
-    # use local ground resolution here: that would make the export tighter
-    # than the Leaflet browser framing by cos(latitude).
-    detail_mpp = mercator_meters_per_pixel(zoom)
-    detail_ground_mpp = ground_meters_per_pixel(zoom, lat)
-    detail_span_x = W * detail_mpp
-    detail_span_y = H * detail_mpp
-    detail_bbox = (cx - detail_span_x / 2, cy - detail_span_y / 2,
-                   cx + detail_span_x / 2, cy + detail_span_y / 2)
+    explicit_bbox = config.get("detail_bbox_mercator")
+    if explicit_bbox:
+        try:
+            detail_bbox = tuple(float(explicit_bbox[k]) for k in ("minx", "miny", "maxx", "maxy"))
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError("detail_bbox_mercator must contain numeric minx, miny, maxx, maxy") from exc
+        minx, miny, maxx, maxy = detail_bbox
+        if not (minx < maxx and miny < maxy):
+            raise ValueError("detail_bbox_mercator must have min values below max values")
+        cx, cy = (minx + maxx) / 2, (miny + maxy) / 2
+        lng, lat = merc_to_ll(cx, cy)
+        detail_span_x, detail_span_y = maxx - minx, maxy - miny
+        detail_mpp = detail_span_x / W
+        # The target frame's CSS aspect ratio must match the export ratio.
+        if abs(detail_span_y / H - detail_mpp) > detail_mpp * 0.001:
+            raise ValueError("target frame aspect ratio does not match output dimensions")
+    else:
+        # Legacy/API fallback: construct an extent from a Leaflet zoom level.
+        cx, cy = ll_to_merc(lng, lat)
+        detail_mpp = mercator_meters_per_pixel(zoom)
+        detail_span_x = W * detail_mpp
+        detail_span_y = H * detail_mpp
+        detail_bbox = (cx - detail_span_x / 2, cy - detail_span_y / 2,
+                       cx + detail_span_x / 2, cy + detail_span_y / 2)
+    detail_ground_mpp = detail_mpp * math.cos(math.radians(lat))
     wide_mpp = detail_mpp * wide_factor
     wide_ground_mpp = detail_ground_mpp * wide_factor
     wide_span_x = detail_span_x * wide_factor
