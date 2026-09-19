@@ -70,6 +70,7 @@
   .exportrow .exportmeta { color:var(--dim); font-size:11px; margin:2px 0 6px; }
   .smallbtn { display:inline-block; padding:5px 8px; border:1px solid var(--line); border-radius:5px; color:var(--txt); text-decoration:none; background:#20252e; font-size:11px; cursor:pointer; margin-right:5px; }
   .smallbtn:hover { border-color:var(--acc); color:var(--acc); }
+  .smallbtn.delete:hover { border-color:var(--err); color:var(--err); }
 </style>
 </head>
 <body>
@@ -299,6 +300,11 @@ function updateButton() {
 }
 
 // ---- previous exports / re-edit -----------------------------------------
+function exportDate(value) {
+  if (!value) return "Export date unavailable";
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? `Exported ${value}` : `Exported ${date.toLocaleString()}`;
+}
 async function showLibrary() {
   const body = document.getElementById("resultbody");
   showResult(`<div><b>Export library</b><div class="exportmeta">Choose a previous package to animate or restore into the asset-preparation map.</div><div id="librarylist">Loading…</div></div>`);
@@ -311,12 +317,22 @@ async function showLibrary() {
     const name = document.createElement("div"); name.className = "exportname"; name.textContent = item.name;
     const info = document.createElement("div"); info.className = "exportmeta";
     const out = item.output || {};
-    info.textContent = `${out.width || "?"}×${out.height || "?"} · ${(item.countries || []).join(", ") || "no countries"}${item.has_animation ? " · animation saved" : ""}`;
+    info.textContent = `${exportDate(item.generated_at)} · ${out.width || "?"}×${out.height || "?"} · ${(item.countries || []).join(", ") || "no countries"}${item.has_animation ? " · animation saved" : ""}`;
     const edit = document.createElement("button"); edit.className = "smallbtn"; edit.textContent = "Re-edit assets";
     edit.onclick = () => restoreExport(item.name);
     const animate = document.createElement("a"); animate.className = "smallbtn"; animate.textContent = "Animate";
     animate.href = `/static/animation.html?export=${encodeURIComponent(item.name)}`;
-    row.append(name, info, edit, animate); list.appendChild(row);
+    const del = document.createElement("button"); del.className = "smallbtn delete"; del.textContent = "Delete";
+    del.onclick = async () => {
+      if (!confirm(`Delete export “${item.name}”?\n\nThis permanently removes its images, masks, animation, and Fusion composition.`)) return;
+      try {
+        const response = await fetch(`/api/export/${encodeURIComponent(item.name)}/delete`, { method: "POST" });
+        const result = await response.json();
+        if (!response.ok || result.error) throw new Error(result.error || "delete failed");
+        showLibrary();
+      } catch (err) { showResult(`<div class="err">Could not delete export: ${err.message}</div>`); }
+    };
+    row.append(name, info, edit, animate, del); list.appendChild(row);
   }
 }
 

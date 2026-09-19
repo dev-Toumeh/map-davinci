@@ -17,12 +17,14 @@ Endpoints:
    GET  /api/exports                -> available export packages
    GET/POST /api/animation/<name>   -> read/save a shot animation
    POST /api/animation/<name>/fusion -> generate scene.comp
+   POST /api/export/<name>/delete     -> permanently remove one package
 """
 
 from __future__ import annotations
 
 import json
 import re
+import shutil
 import threading
 import traceback
 import uuid
@@ -179,6 +181,13 @@ class Handler(BaseHTTPRequestHandler):
                 target = fusion_generator.generate(package, metadata, animation)
                 relative = target.relative_to(EXPORTS_DIR)
                 self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative)})
+                return
+            if (m := re.fullmatch(r"/api/export/([A-Za-z0-9_.-]+)/delete", path)):
+                package = self._package(m.group(1))
+                # _package verifies this is one direct child of EXPORTS_DIR;
+                # never accept a client-supplied filesystem path here.
+                shutil.rmtree(package)
+                self._json({"ok": True, "deleted": m.group(1)})
                 return
             if path != "/api/export":
                 self._json({"error": "not found"}, 404)
