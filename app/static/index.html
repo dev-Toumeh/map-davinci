@@ -124,7 +124,10 @@ function llToMerc(lng, lat) {
   return [R * rad(lng), R * Math.log(Math.tan(Math.PI / 4 + rad(lat) / 2))];
 }
 function mercToLL(x, y) { return [deg(x / R), deg(2 * Math.atan(Math.exp(y / R)) - Math.PI / 2)]; }
-const mpp = (zoom, lat) => 156543.03392804097 * Math.cos(rad(lat)) / Math.pow(2, zoom);
+// Leaflet places EPSG:3857 tiles on this projected pixel grid. This must stay
+// in sync with exporter.mercator_meters_per_pixel() so the yellow frame is
+// exactly the exported image extent.
+const mpp = zoom => 156543.03392804097 / Math.pow(2, zoom);
 
 // ---- map ----
 const layers = {
@@ -245,7 +248,7 @@ function updateButton() {
 function updateFrame() {
   const [W, H] = getDims();
   const c = map.getCenter(), z = map.getZoom();
-  const m = mpp(z, c.lat);
+  const m = mpp(z);
   const [cx, cy] = llToMerc(c.lng, c.lat);
   const w = W * m, h = H * m;
   const [x0, y0] = mercToLL(cx - w / 2, cy + h / 2);

@@ -109,9 +109,19 @@ def merc_to_ll(x: float, y: float) -> Tuple[float, float]:
     return lon, lat
 
 
-def meters_per_pixel(zoom: float, lat: float) -> float:
-    """Ground resolution (m/px) at the given latitude for a 256px XYZ zoom."""
-    return 156543.03392804097 * math.cos(math.radians(lat)) / (2.0 ** zoom)
+def mercator_meters_per_pixel(zoom: float) -> float:
+    """EPSG:3857 projected meters per pixel for a 256px XYZ zoom.
+
+    This is the scale Leaflet uses to place tiles and geometry. It must be
+    used for export extents so the browser's yellow frame and generated image
+    cover the identical geographic area.
+    """
+    return 156543.03392804097 / (2.0 ** zoom)
+
+
+def ground_meters_per_pixel(zoom: float, lat: float) -> float:
+    """Local ground resolution (m/px), useful for imagery-detail reporting."""
+    return mercator_meters_per_pixel(zoom) * math.cos(math.radians(lat))
 
 
 def global_pixel(merc_x: float, merc_y: float, zoom: float) -> Tuple[float, float]:
@@ -133,7 +143,7 @@ def choose_tile_zoom(target_mpp: float, lat: float, max_zoom: int) -> Tuple[int,
     need = math.log2(156543.03392804097 * math.cos(math.radians(lat)) / target_mpp)
     z = int(math.ceil(need - 1e-9))
     z = max(0, min(z, max_zoom))
-    native = meters_per_pixel(z, lat)
+    native = ground_meters_per_pixel(z, lat)
     upscaled = native > target_mpp * (1.0 + 1e-6)
     return z, upscaled
 
@@ -467,19 +477,24 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
 
     progress("extents", 5.0, "computing shared grid")
     cx, cy = ll_to_merc(lng, lat)
-    detail_mpp = meters_per_pixel(zoom, lat)
+    # Extents are calculated in projected Web Mercator coordinates. Do not
+    # use local ground resolution here: that would make the export tighter
+    # than the Leaflet browser framing by cos(latitude).
+    detail_mpp = mercator_meters_per_pixel(zoom)
+    detail_ground_mpp = ground_meters_per_pixel(zoom, lat)
     detail_span_x = W * detail_mpp
     detail_span_y = H * detail_mpp
     detail_bbox = (cx - detail_span_x / 2, cy - detail_span_y / 2,
                    cx + detail_span_x / 2, cy + detail_span_y / 2)
     wide_mpp = detail_mpp * wide_factor
+    wide_ground_mpp = detail_ground_mpp * wide_factor
     wide_span_x = detail_span_x * wide_factor
     wide_span_y = detail_span_y * wide_factor
     wide_bbox = (cx - wide_span_x / 2, cy - wide_span_y / 2,
                  cx + wide_span_x / 2, cy + wide_span_y / 2)
 
-    z_detail, up_detail = choose_tile_zoom(detail_mpp, lat, source["max_zoom"])
-    z_wide, up_wide = choose_tile_zoom(wide_mpp, lat, source["max_zoom"])
+    z_detail, up_detail = choose_tile_zoom(detail_ground_mpp, lat, source["max_zoom"])
+    z_wide, up_wide = choose_tile_zoom(wide_ground_mpp, lat, source["max_zoom"])
 
     # ---- satellite backgrounds ------------------------------------------
     progress("tiles", 0.0, "starting satellite downloads")
@@ -561,6 +576,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
             "bbox_mercator": {"minx": detail_bbox[0], "miny": detail_bbox[1],
                               "maxx": detail_bbox[2], "maxy": detail_bbox[3]},
             "meters_per_pixel": detail_mpp,
+            "ground_meters_per_pixel_at_center": detail_ground_mpp,
             "tile_zoom": z_detail,
             "tile_zoom_upscaled": up_detail,
             "pixel_transform": {
@@ -578,6 +594,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
             "bbox_mercator": {"minx": wide_bbox[0], "miny": wide_bbox[1],
                               "maxx": wide_bbox[2], "maxy": wide_bbox[3]},
             "meters_per_pixel": wide_mpp,
+            "ground_meters_per_pixel_at_center": wide_ground_mpp,
             "tile_zoom": z_wide,
             "tile_zoom_upscaled": up_wide,
             "covers_factor": wide_factor,
