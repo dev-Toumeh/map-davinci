@@ -50,6 +50,8 @@
     background:var(--acc); color:#04202e; font-weight:700; font-size:14px; cursor:pointer;
   }
   #exportbtn:disabled { background:#3a4149; color:#7b828c; cursor:default; }
+  #librarybtn { width:calc(100% - 32px); margin:0 16px 10px; padding:8px; border:1px solid var(--line); border-radius:7px; background:transparent; color:var(--txt); cursor:pointer; }
+  #librarybtn:hover { border-color:var(--acc); color:var(--acc); }
   #progress { margin:0 16px 8px; }
   #pbar { height:8px; background:#12141a; border:1px solid var(--line); border-radius:5px; overflow:hidden; }
   #pfill { height:100%; width:0%; background:var(--acc); transition:width .3s; }
@@ -62,6 +64,12 @@
   #result img { width:100%; border-radius:6px; border:1px solid var(--line); margin-top:6px; display:block; }
   #result .ok { color:var(--ok); } #result .err { color:var(--err); white-space:pre-wrap; }
   #result code { color:var(--dim); word-break:break-all; }
+  .exportrow { border-top:1px solid var(--line); padding:9px 0; }
+  .exportrow:first-child { border-top:0; padding-top:0; }
+  .exportrow .exportname { font-weight:600; }
+  .exportrow .exportmeta { color:var(--dim); font-size:11px; margin:2px 0 6px; }
+  .smallbtn { display:inline-block; padding:5px 8px; border:1px solid var(--line); border-radius:5px; color:var(--txt); text-decoration:none; background:#20252e; font-size:11px; cursor:pointer; margin-right:5px; }
+  .smallbtn:hover { border-color:var(--acc); color:var(--acc); }
 </style>
 </head>
 <body>
@@ -119,6 +127,7 @@
     </div>
 
     <button id="exportbtn" disabled>Select a country first</button>
+    <button id="librarybtn">Open export library</button>
     <div id="progress">
       <div id="pbar"><div id="pfill"></div></div>
       <div id="pmsg"></div>
@@ -221,7 +230,7 @@ async function drawOutline(c) {
   if (outlineLayers[c.iso3]) return;
   const r = await fetch("/api/country/" + c.iso3);
   const d = await r.json();
-  if (d.geometry && !outlineLayers[c.iso3]) {
+  if (d.geometry && selected.has(c.iso3) && !outlineLayers[c.iso3]) {
     outlineLayers[c.iso3] = L.geoJSON(d.geometry, {
       style: { color: c.color, weight: 3.5, fill: false, interactive: false },
     }).addTo(map);
@@ -288,6 +297,68 @@ function updateButton() {
   b.disabled = !ok;
   b.textContent = exporting ? "Exporting…" : `Export assets (${selected.size} country${selected.size > 1 ? "s" : ""})`;
 }
+
+// ---- previous exports / re-edit -----------------------------------------
+async function showLibrary() {
+  const body = document.getElementById("resultbody");
+  showResult(`<div><b>Export library</b><div class="exportmeta">Choose a previous package to animate or restore into the asset-preparation map.</div><div id="librarylist">Loading…</div></div>`);
+  const r = await fetch("/api/exports"), data = await r.json();
+  if (data.error) { document.getElementById("librarylist").textContent = data.error; return; }
+  const list = document.getElementById("librarylist"); list.textContent = "";
+  if (!data.exports.length) { list.textContent = "No export packages found."; return; }
+  for (const item of data.exports) {
+    const row = document.createElement("div"); row.className = "exportrow";
+    const name = document.createElement("div"); name.className = "exportname"; name.textContent = item.name;
+    const info = document.createElement("div"); info.className = "exportmeta";
+    const out = item.output || {};
+    info.textContent = `${out.width || "?"}×${out.height || "?"} · ${(item.countries || []).join(", ") || "no countries"}${item.has_animation ? " · animation saved" : ""}`;
+    const edit = document.createElement("button"); edit.className = "smallbtn"; edit.textContent = "Re-edit assets";
+    edit.onclick = () => restoreExport(item.name);
+    const animate = document.createElement("a"); animate.className = "smallbtn"; animate.textContent = "Animate";
+    animate.href = `/static/animation.html?export=${encodeURIComponent(item.name)}`;
+    row.append(name, info, edit, animate); list.appendChild(row);
+  }
+}
+
+async function restoreExport(name) {
+  try {
+    const r = await fetch(`/api/animation/${encodeURIComponent(name)}`), data = await r.json();
+    if (data.error) throw new Error(data.error);
+    const meta = data.metadata, output = meta.output || {};
+    // Remove only current UI/map selection; old package files remain untouched.
+    for (const iso of [...selected.keys()]) removeCountry(iso);
+    document.getElementById("orient").value = output.orientation || "landscape";
+    document.getElementById("res").value = output.resolution || "4k";
+    document.getElementById("widefactor").value = output.wide_factor || 2;
+    document.getElementById("source").value = (meta.imagery || {}).source || "google_satellite";
+    document.getElementById("source").dispatchEvent(new Event("change"));
+    // Keep the base name. The exporter automatically appends a timestamp if it
+    // already exists, preserving the original package as a reproducible version.
+    document.getElementById("shotname").value = name.replace(/_\d{8}-\d{6}$/, "");
+    for (const mask of meta.countries || []) {
+      const country = allCountries.find(c => c.iso3 === mask.iso3);
+      if (!country) continue;
+      const restored = { ...country, color: mask.color || DEFAULT_COUNTRY_COLOR };
+      selected.set(restored.iso3, restored);
+      drawOutline(restored);
+    }
+    pending = meta.countries && meta.countries[0] ? meta.countries[0].iso3 : null;
+    renderChips(); renderList(); updateHbtn(); updateButton(); updateFrame();
+    const b = meta.detail && meta.detail.bbox_mercator;
+    if (b && targetCrop) {
+      const [west, north] = mercToLL(b.minx, b.maxy);
+      const [east, south] = mercToLL(b.maxx, b.miny);
+      const size = map.getSize();
+      const padding = L.point((size.x - targetCrop.width) / 2, (size.y - targetCrop.height) / 2);
+      map.fitBounds([[south, west], [north, east]], { paddingTopLeft: padding, paddingBottomRight: padding, animate: false });
+    }
+    document.getElementById("result").style.display = "none";
+    document.getElementById("pmsg").textContent = `Restored ${name}. Exporting changes creates a new dated version.`;
+  } catch (err) {
+    showResult(`<div class="err">Could not restore export: ${err.message}</div>`);
+  }
+}
+document.getElementById("librarybtn").addEventListener("click", showLibrary);
 
 // ---- visible export target ----
 function updateFrame() {
