@@ -1,0 +1,17 @@
+{
+  "atlas_scale": 0.00015037553494994362,
+  "atlas_offset": [
+    53.8472867045586,
+    -36.11567449195521
+  ],
+  "base_projection": "mercator",
+  "base_parameters": [
+    4.746156417278565,
+    1281.1088893197625,
+    271.7888003440312,
+    534.5785163281718
+  ],
+  "coastline_fit_rms_pixels_at_1600": 3.132075422806235,
+  "geometry_source": "National Atlas public-domain SVG",
+  "registration_reference": "Educational GIS used only to estimate map registration; no GIS vertices copied to output."
+}

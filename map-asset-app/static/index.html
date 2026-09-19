@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map Asset Prep — Fusion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root { --bg:#15171c; --panel:#1d2027; --line:#2c313b; --txt:#e8eaee; --dim:#9aa1ad; --acc:#4cc2ff; --ok:#43d17c; --err:#ff6b6b; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; font:13px/1.45 -apple-system, "SF Pro Text", Helvetica, Arial, sans-serif; background:var(--bg); color:var(--txt); }
+  #app { display:flex; height:100%; position:relative; }
+  #side { width:340px; min-width:340px; background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden; }
+  #side h1 { font-size:14px; margin:0; padding:14px 16px 10px; letter-spacing:.4px; }
+  #side h1 span { color:var(--acc); }
+  .sec { padding:0 16px 12px; border-bottom:1px solid var(--line); }
+  .sec label { display:block; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.6px; margin:10px 0 4px; }
+  input[type=text], input[type=number], select {
+    width:100%; background:#12141a; color:var(--txt); border:1px solid var(--line);
+    border-radius:6px; padding:7px 9px; font-size:13px; outline:none;
+  }
+  input:focus, select:focus { border-color:var(--acc); }
+  #clist { height:180px; overflow-y:auto; border:1px solid var(--line); border-radius:6px; margin-top:4px; background:#12141a; }
+  .crow { padding:5px 9px; cursor:pointer; display:flex; justify-content:space-between; }
+  .crow:hover { background:#232833; }
+  .crow.pend { background:#243043; }
+  .crow.sel { color:var(--acc); }
+  .crow .iso { color:var(--dim); font-size:11px; }
+  #hbtn { width:100%; margin-top:8px; padding:8px; border:1px solid var(--acc); background:transparent; color:var(--acc); border-radius:6px; font-weight:600; font-size:12px; cursor:pointer; }
+  #hbtn:disabled { border-color:#3a4149; color:#7b828c; cursor:default; }
+  #chips { margin-top:6px; display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { background:#0e2a3a; border:1px solid #1c4a63; color:var(--acc); border-radius:20px; padding:2px 10px; font-size:12px; cursor:pointer; }
+  .row2 { display:flex; gap:8px; } .row2 > * { flex:1; }
+  #map { flex:1; }
+  #frameinfo { color:var(--dim); font-size:11px; margin-top:6px; }
+  #exportbtn {
+    width:calc(100% - 32px); margin:12px 16px; padding:11px; border:0; border-radius:8px;
+    background:var(--acc); color:#04202e; font-weight:700; font-size:14px; cursor:pointer;
+  }
+  #exportbtn:disabled { background:#3a4149; color:#7b828c; cursor:default; }
+  #progress { margin:0 16px 8px; }
+  #pbar { height:8px; background:#12141a; border:1px solid var(--line); border-radius:5px; overflow:hidden; }
+  #pfill { height:100%; width:0%; background:var(--acc); transition:width .3s; }
+  #pmsg { color:var(--dim); font-size:11px; margin-top:4px; min-height:14px; }
+  #result { position:absolute; left:352px; bottom:12px; width:min(560px, calc(100% - 372px)); max-height:75%; overflow-y:auto;
+    background:rgba(24,27,33,.97); border:1px solid var(--line); border-radius:10px; padding:14px;
+    box-shadow:0 10px 34px rgba(0,0,0,.55); z-index:1200; display:none; font-size:12px; }
+  #result .close { float:right; cursor:pointer; color:var(--dim); font-size:15px; margin-left:8px; user-select:none; }
+  #result .close:hover { color:var(--txt); }
+  #result img { width:100%; border-radius:6px; border:1px solid var(--line); margin-top:6px; display:block; }
+  #result .ok { color:var(--ok); } #result .err { color:var(--err); white-space:pre-wrap; }
+  #result code { color:var(--dim); word-break:break-all; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="side">
+    <h1>Map Asset Prep <span>· Fusion</span></h1>
+
+    <div class="sec">
+      <label>Countries</label>
+      <input type="text" id="search" placeholder="filter… (e.g. Saudi)">
+      <div id="clist"></div>
+      <button id="hbtn" disabled>Select a country in the list</button>
+      <div id="chips"></div>
+    </div>
+
+    <div class="sec">
+      <div class="row2">
+        <div>
+          <label>Orientation</label>
+          <select id="orient">
+            <option value="landscape">Landscape</option>
+            <option value="vertical">Vertical</option>
+          </select>
+        </div>
+        <div>
+          <label>Resolution</label>
+          <select id="res">
+            <option value="4k">4K UHD</option>
+            <option value="fhd">Full HD</option>
+            <option value="hd">HD</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Imagery</label>
+          <select id="source">
+            <option value="google_satellite">Google Satellite</option>
+            <option value="esri_world_imagery">Esri World Imagery</option>
+          </select>
+        </div>
+        <div>
+          <label>Wide factor</label>
+          <input type="number" id="widefactor" value="2" min="1.2" max="4" step="0.5">
+        </div>
+      </div>
+      <div>
+        <label>Export name</label>
+        <input type="text" id="shotname" value="saudi_arabia">
+      </div>
+      <div id="frameinfo"></div>
+    </div>
+
+    <button id="exportbtn" disabled>Select a country first</button>
+    <div id="progress">
+      <div id="pbar"><div id="pfill"></div></div>
+      <div id="pmsg"></div>
+    </div>
+    <div style="flex:1"></div>
+  </div>
+  <div id="map"></div>
+  <div id="result"><span class="close" id="rclose" title="close">✕</span><div id="resultbody"></div></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+"use strict";
+const R = 6378137, MERC_MAX = 20037508.342789244;
+const rad = d => d * Math.PI / 180, deg = r => r * 180 / Math.PI;
+function llToMerc(lng, lat) {
+  lat = Math.max(-85.05112878, Math.min(85.05112878, lat));
+  return [R * rad(lng), R * Math.log(Math.tan(Math.PI / 4 + rad(lat) / 2))];
+}
+function mercToLL(x, y) { return [deg(x / R), deg(2 * Math.atan(Math.exp(y / R)) - Math.PI / 2)]; }
+const mpp = (zoom, lat) => 156543.03392804097 * Math.cos(rad(lat)) / Math.pow(2, zoom);
+
+// ---- map ----
+const layers = {
+  google_satellite: L.tileLayer("https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    { subdomains: ["0","1","2","3"], maxZoom: 20, attribution: "Imagery © Google" }),
+  esri_world_imagery: L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    { maxZoom: 19, attribution: "Esri, Maxar" }),
+};
+const map = L.map("map", { zoomControl: true }).setView([24.0, 45.0], 6);
+layers.google_satellite.addTo(map);
+
+// ---- state ----
+let allCountries = [];
+let pending = null;               // iso3 highlighted in the list (not yet on map)
+let selected = new Map();         // iso3 -> {iso3, name}  (highlighted countries)
+const outlineLayers = {};         // iso3 -> Leaflet outline layer on the map
+let frame = null;                 // L.rectangle
+let exporting = false;
+
+// ---- country list ----
+const clist = document.getElementById("clist");
+const search = document.getElementById("search");
+const hbtn = document.getElementById("hbtn");
+search.addEventListener("input", renderList);
+hbtn.addEventListener("click", highlightAction);
+
+async function boot() {
+  const r = await fetch("/api/countries");
+  const data = await r.json();
+  if (data.error) { clist.textContent = data.error; return; }
+  allCountries = data.countries;
+  renderList();
+  // convenience: Saudi Arabia highlighted by default for the first test
+  const sau = allCountries.find(c => c.iso3 === "SAU");
+  if (sau) addCountry(sau);
+}
+
+function renderList() {
+  const q = search.value.trim().toLowerCase();
+  clist.textContent = "";
+  for (const c of allCountries) {
+    if (q && !c.name.toLowerCase().includes(q) && !c.iso3.toLowerCase().includes(q)) continue;
+    const row = document.createElement("div");
+    row.className = "crow"
+      + (pending === c.iso3 ? " pend" : "")
+      + (selected.has(c.iso3) ? " sel" : "");
+    row.innerHTML = `<span>${c.name}${selected.has(c.iso3) ? " ●" : ""}</span><span class="iso">${c.iso2}</span>`;
+    row.onclick = () => { pending = (pending === c.iso3 ? null : c.iso3); renderList(); updateHbtn(); };
+    clist.appendChild(row);
+  }
+}
+
+async function drawOutline(c) {
+  if (outlineLayers[c.iso3]) return;
+  const r = await fetch("/api/country/" + c.iso3);
+  const d = await r.json();
+  if (d.geometry && !outlineLayers[c.iso3]) {
+    outlineLayers[c.iso3] = L.geoJSON(d.geometry, {
+      style: { color: "#4cc2ff", weight: 1.6, fill: false, interactive: false },
+    }).addTo(map);
+  }
+}
+
+function addCountry(c) {
+  selected.set(c.iso3, c);
+  drawOutline(c);
+  renderChips(); renderList(); updateHbtn(); updateButton();
+}
+
+function removeCountry(iso) {
+  selected.delete(iso);
+  if (outlineLayers[iso]) { map.removeLayer(outlineLayers[iso]); delete outlineLayers[iso]; }
+  renderChips(); renderList(); updateHbtn(); updateButton();
+}
+
+async function highlightAction() {
+  if (!pending) return;
+  const c = allCountries.find(x => x.iso3 === pending);
+  if (!c) return;
+  if (selected.has(pending)) removeCountry(pending);
+  else addCountry(c);
+}
+
+function updateHbtn() {
+  if (!pending) { hbtn.disabled = true; hbtn.textContent = "Select a country in the list"; return; }
+  const c = allCountries.find(x => x.iso3 === pending);
+  hbtn.disabled = false;
+  hbtn.textContent = selected.has(pending) ? `Remove ${c.name} highlight` : `Highlight ${c.name}`;
+}
+
+function renderChips() {
+  const chips = document.getElementById("chips");
+  chips.textContent = "";
+  for (const [iso, c] of selected) {
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = c.name + " ✕";
+    chip.title = "remove highlight";
+    chip.onclick = () => removeCountry(iso);
+    chips.appendChild(chip);
+  }
+}
+function updateButton() {
+  const b = document.getElementById("exportbtn");
+  const ok = selected.size > 0 && !exporting;
+  b.disabled = !ok;
+  b.textContent = exporting ? "Exporting…" : `Export assets (${selected.size} country${selected.size > 1 ? "s" : ""})`;
+}
+
+// ---- export frame rectangle ----
+function updateFrame() {
+  const [W, H] = getDims();
+  const c = map.getCenter(), z = map.getZoom();
+  const m = mpp(z, c.lat);
+  const [cx, cy] = llToMerc(c.lng, c.lat);
+  const w = W * m, h = H * m;
+  const [x0, y0] = mercToLL(cx - w / 2, cy + h / 2);
+  const [x1, y1] = mercToLL(cx + w / 2, cy - h / 2);
+  const b = L.latLngBounds([y0, x0], [y1, x1]);
+  if (!frame) {
+    frame = L.rectangle(b, { color: "#ffd24c", weight: 2, fill: false, interactive: false }).addTo(map);
+  } else frame.setBounds(b);
+  document.getElementById("frameinfo").textContent =
+    `Export frame: ${W}×${H} px @ z${z.toFixed(1)} — ${(w / 1000).toFixed(0)} × ${(h / 1000).toFixed(0)} km · pans stay centered`;
+}
+const DIMS = {
+  "4k":  { landscape: [3840, 2160], vertical: [2160, 3840] },
+  "fhd": { landscape: [1920, 1080], vertical: [1080, 1920] },
+  "hd":  { landscape: [1280, 720],  vertical: [720, 1280] },
+};
+const getDims = () => DIMS[document.getElementById("res").value][document.getElementById("orient").value];
+map.on("move zoomend", updateFrame);
+document.getElementById("orient").addEventListener("change", updateFrame);
+document.getElementById("res").addEventListener("change", updateFrame);
+
+// source switch
+document.getElementById("source").addEventListener("change", (e) => {
+  for (const k in layers) map.removeLayer(layers[k]);
+  layers[e.target.value].addTo(map);
+  if (frame) frame.addTo(map);
+});
+
+// ---- export ----
+document.getElementById("exportbtn").addEventListener("click", async () => {
+  if (exporting || selected.size === 0) return;
+  exporting = true; updateButton();
+  document.getElementById("result").style.display = "none";
+  const c = map.getCenter();
+  const body = {
+    name: document.getElementById("shotname").value.trim() || "shot",
+    countries: [...selected.keys()],
+    center: { lat: c.lat, lng: c.lng },
+    zoom: map.getZoom(),
+    orientation: document.getElementById("orient").value,
+    resolution: document.getElementById("res").value,
+    wide_factor: parseFloat(document.getElementById("widefactor").value) || 2,
+    source: document.getElementById("source").value,
+  };
+  const r = await fetch("/api/export", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json();
+  if (d.error) { showResult(`<div class="err">Export failed to start: ${d.error}</div>`); exporting = false; updateButton(); return; }
+  poll(d.job_id);
+});
+
+async function poll(id) {
+  const pmsg = document.getElementById("pmsg"), pfill = document.getElementById("pfill");
+  while (true) {
+    const r = await fetch("/api/export/status/" + id);
+    const d = await r.json();
+    const s = d.status || {};
+    pfill.style.width = (s.pct || 0) + "%";
+    pmsg.textContent = `[${s.stage}] ${s.message || ""}`;
+    if (s.stage === "done") { showResultHtml(d.result); break; }
+    if (s.stage === "error") {
+      showResult(`<div class="err">Export failed:\n${s.message}</div>`);
+      break;
+    }
+    await new Promise(res => setTimeout(res, 800));
+  }
+  exporting = false; updateButton();
+}
+
+function showResult(html) {
+  document.getElementById("resultbody").innerHTML = html;
+  document.getElementById("result").style.display = "block";
+}
+function showResultHtml(result) {
+  const dir = result.output_dir.split("/").slice(-1)[0];
+  const files = result.files.map(f => `<code>${f}</code>`).join("<br>");
+  showResult(`
+    <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>map-asset-app/exports/${dir}/</code></div>
+    <div style="margin-top:4px">${files}</div>
+    <div style="margin-top:6px">Red overlay = mask alignment on the detail background:</div>
+    <img src="/exports/${dir}/alignment_check.jpg">`);
+}
+
+document.getElementById("rclose").addEventListener("click", () => {
+  document.getElementById("result").style.display = "none";
+});
+
+boot(); updateFrame();
+</script>
+</body>
+</html>

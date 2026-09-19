@@ -1,0 +1,11 @@
+--- Fusion Clip 6_1 - Composition 1.comp
++++ Map_Test_Zoom_Output.comp
+@@ -17725,7 +17725,7 @@
+ 			Inputs = {
+ 				LayerOrder = Input { Value = ScriptVal { { [0] = 2, 3, 1 } }, },
+ 				Background = Input {
+-					SourceOp = "Transform1",
++					SourceOp = "MapVideoLab_ZoomPreview",
+ 					Source = "Output",
+ 				},
+ 				["Layer1.Foreground"] = Input {

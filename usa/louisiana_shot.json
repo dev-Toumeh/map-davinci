@@ -1,0 +1,40 @@
+{
+  "fps": 24,
+  "start_frame": 240,
+  "end_frame": 527,
+  "duration_seconds": 12,
+  "source_comp": "USA_linked_media.comp",
+  "output_comp": "USA_Louisiana_Arabic_Test.comp",
+  "camera_pivot": [
+    0.5004077163165583,
+    0.6377100478438792
+  ],
+  "captions": {
+    "title": "شراء لويزيانا",
+    "date": "١٨٠٣",
+    "price": "صفقة مع فرنسا مقابل ١٥ مليون دولار",
+    "expansion": "تضاعفت مساحة الولايات المتحدة"
+  },
+  "events": [
+    {
+      "time": 10,
+      "action": "Camera approaches region; title appears"
+    },
+    {
+      "time": 11.5,
+      "action": "Historical region highlight fully visible"
+    },
+    {
+      "time": 15,
+      "action": "Price caption fades in"
+    },
+    {
+      "time": 20,
+      "action": "Expansion caption appears"
+    },
+    {
+      "time": 22,
+      "action": "End of test shot"
+    }
+  ]
+}

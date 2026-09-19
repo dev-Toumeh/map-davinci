@@ -1,0 +1,26 @@
+{
+  "composition": "USA_linked_media.comp",
+  "assets": [
+    {
+      "source": "/Users/naseemtoumeh/edit-projects/davinvi-resolve/usa/us-4k.png",
+      "local_file": "assets/us-4k.png",
+      "sha256": "5e1ff43bae08073cdbafafd86aaebf475d4ae3f1eb72eb6f446d08a988a15881"
+    },
+    {
+      "source": "/Users/naseemtoumeh/edit-projects/general/graphics/شفاف-أفضل.webp",
+      "local_file": "assets/شفاف-أفضل.webp",
+      "sha256": "874ea5bbc0ba3a5a2ffe88026a9303b53c6951c7903074596af65b9bbf247fcd"
+    },
+    {
+      "source": "/System/Library/Fonts/Supplemental/Damascus.ttc",
+      "local_file": "fonts/Damascus.ttc",
+      "sha256": "7a7eb40a90e4adec2e02c6bb4936bdf5cb08db434612596f557a965b126d9e3b"
+    }
+  ],
+  "notes": [
+    "Country masks and animation are embedded in the composition.",
+    "Template history and cache paths are not source media.",
+    "Damascus font must be installed to use its family name.",
+    "Linked composition has not yet been visually verified in Resolve."
+  ]
+}

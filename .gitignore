@@ -1,0 +1,12 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Generated / re-downloadable app data
+map-asset-app/tilecache/
+map-asset-app/exports/
+map-asset-app/data/
+
+# macOS
+.DS_Store
