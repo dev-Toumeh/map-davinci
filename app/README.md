@@ -21,8 +21,8 @@ Then open **http://127.0.0.1:8787** in a browser.
 
 1. **Select countries** — filter the list, click to add (multi-select supported).
    Saudi Arabia is preselected by default.
-2. **Frame the shot** — pan/zoom the map. The yellow rectangle shows exactly what
-   the detailed background will cover (it always stays centered on the map).
+2. **Frame the shot** — pan/zoom the map underneath the fixed red **EXPORT TARGET**
+   frame. The target shows exactly what the detailed background will cover.
 3. Choose **orientation** (landscape or vertical), **resolution** (4K UHD,
    Full HD, or HD), **wide factor** (default 2 = the tutorial's zoomed-out export),
    and **imagery** (Google Satellite is the tutorial's basemap; Esri World Imagery
@@ -30,6 +30,9 @@ Then open **http://127.0.0.1:8787** in a browser.
 4. Click **Highlight** to draw a country's outline on the map (click the row
    first, then Highlight; clicking Highlight again removes it — same as the ✕ chip).
 5. Click **Export assets**.
+6. In the completed-export panel, choose **Animate this export**. In the 2D editor,
+   pan/zoom the real exported backgrounds, add timeline keyframes, select linear or
+   smooth movement, save `animation.json`, then generate `fusion/scene.comp`.
 
 ## Output package (`app/exports/<name>/`)
 
@@ -41,6 +44,20 @@ Then open **http://127.0.0.1:8787** in a browser.
 | `mask_<ISO>.svg` | Vector version of the same colored mask — viewBox matches the PNG pixels 1:1, holes and islands preserved |
 | `alignment_check.jpg` | Detail background with masks overlaid 50% red — quick visual QA |
 | `metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, SHA-256 hashes, attribution |
+| `animation.json` | Saved 2D view keyframes, timing, FPS, and easing (created in the Animation Editor) |
+| `fusion/scene.comp` | Generated editable 2D Fusion graph (created in the Animation Editor) |
+
+## 2D animation editor
+
+The editor is available after an export through **Animate this export**, or directly
+at `http://127.0.0.1:8787/static/animation.html`. It uses the exported wide map as
+its base canvas, places the detail background and country masks from metadata, and
+does not allow a view to extend beyond the wide background.
+
+Keyframes store a time, view center, zoom, and easing *into* that keyframe. Smooth
+uses the defined cubic `3t² − 2t³`; linear uses constant interpolation. The generated
+Fusion composition is intentionally a small editable 2D graph. Import and render it
+in Resolve to verify native node behaviour before using it in production.
 
 ## Using the assets in Fusion
 

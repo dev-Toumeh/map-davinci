@@ -13,7 +13,10 @@ Endpoints:
   GET  /api/countries             -> country index (downloads NE file on first call)
   GET  /api/country/<ISO3>        -> GeoJSON geometry for preview outline
   POST /api/export                -> start export job {json body}
-  GET  /api/export/status/<id>    -> job progress/result
+   GET  /api/export/status/<id>    -> job progress/result
+   GET  /api/exports                -> available export packages
+   GET/POST /api/animation/<name>   -> read/save a shot animation
+   POST /api/animation/<name>/fusion -> generate scene.comp
 """
 
 from __future__ import annotations
@@ -27,6 +30,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import exporter
+import animation_schema
+import fusion_generator
 
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_DIR = APP_ROOT / "static"
@@ -37,6 +42,7 @@ PORT = 8787
 
 JOBS: dict = {}          # job_id -> {"status": {...}, "result": {...} | None}
 JOBS_LOCK = threading.Lock()
+EXPORT_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,119}")
 
 MIME = {
     ".html": "text/html; charset=utf-8",
@@ -86,6 +92,22 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):  # quieter console
         pass
 
+    def _package(self, name: str) -> Path:
+        if not EXPORT_NAME.fullmatch(name):
+            raise ValueError("invalid export package name")
+        package = (EXPORTS_DIR / name).resolve()
+        if package.parent != EXPORTS_DIR.resolve() or not (package / "metadata.json").is_file():
+            raise FileNotFoundError("export package not found")
+        return package
+
+    def _metadata(self, package: Path) -> dict:
+        return json.loads((package / "metadata.json").read_text(encoding="utf-8"))
+
+    def _animation_response(self, package: Path) -> dict:
+        path = package / "animation.json"
+        return {"export": package.name, "metadata": self._metadata(package),
+                "animation": json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None}
+
     # ---- routing ---------------------------------------------------------
 
     def do_GET(self):  # noqa: N802
@@ -117,6 +139,19 @@ class Handler(BaseHTTPRequestHandler):
                         self._json({"error": "unknown job"}, 404)
                         return
                     self._json({"status": job["status"], "result": job["result"]})
+            elif path == "/api/exports":
+                packages = []
+                for candidate in sorted(EXPORTS_DIR.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
+                    if not candidate.is_dir() or not (candidate / "metadata.json").is_file():
+                        continue
+                    metadata = self._metadata(candidate)
+                    packages.append({"name": candidate.name, "generated_at": metadata.get("generated_at"),
+                                     "output": metadata.get("output"),
+                                     "countries": [c.get("iso3") for c in metadata.get("countries", [])],
+                                     "has_animation": (candidate / "animation.json").is_file()})
+                self._json({"exports": packages})
+            elif (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
+                self._json(self._animation_response(self._package(m.group(1))))
             else:
                 self._json({"error": "not found"}, 404)
         except Exception as exc:  # noqa: BLE001
@@ -125,11 +160,29 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):  # noqa: N802
         path = self.path.split("?", 1)[0]
         try:
+            length = int(self.headers.get("Content-Length", 0))
+            config = json.loads(self.rfile.read(length) or b"{}")
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
+                package = self._package(m.group(1))
+                animation = animation_schema.normalize_animation(config, self._metadata(package))
+                target = package / "animation.json"
+                temporary = target.with_suffix(".json.tmp")
+                temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
+                temporary.replace(target)
+                self._json({"ok": True, "animation": animation})
+                return
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/fusion", path)):
+                package = self._package(m.group(1))
+                metadata = self._metadata(package)
+                animation = animation_schema.normalize_animation(config, metadata)
+                (package / "animation.json").write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
+                target = fusion_generator.generate(package, metadata, animation)
+                relative = target.relative_to(EXPORTS_DIR)
+                self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative)})
+                return
             if path != "/api/export":
                 self._json({"error": "not found"}, 404)
                 return
-            length = int(self.headers.get("Content-Length", 0))
-            config = json.loads(self.rfile.read(length) or b"{}")
             job_id = str(uuid.uuid4())
             with JOBS_LOCK:
                 JOBS[job_id] = {"status": {"stage": "queued", "pct": 0.0, "message": "queued"},

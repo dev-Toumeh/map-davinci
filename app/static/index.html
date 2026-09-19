@@ -381,9 +381,10 @@ function showResultHtml(result) {
   const dir = result.output_dir.split("/").slice(-1)[0];
   const files = result.files.map(f => `<code>${f}</code>`).join("<br>");
   showResult(`
-    <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>app/exports/${dir}/</code></div>
-    <div style="margin-top:4px">${files}</div>
-    <div style="margin-top:6px">Red overlay = mask alignment on the detail background:</div>
+     <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>app/exports/${dir}/</code></div>
+     <div style="margin-top:4px">${files}</div>
+     <div style="margin-top:10px"><a href="/static/animation.html?export=${encodeURIComponent(dir)}" style="display:inline-block;padding:7px 10px;border-radius:6px;background:#4cc2ff;color:#04202e;text-decoration:none;font-weight:700">Animate this export →</a></div>
+     <div style="margin-top:6px">Red overlay = mask alignment on the detail background:</div>
     <img src="/exports/${dir}/alignment_check.jpg">`);
 }
 
