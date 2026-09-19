@@ -39,16 +39,16 @@ def _key_lines(keys: list[dict], component: str) -> str:
 def _path_points(keys: list[dict]) -> str:
     """Points used by PolyPath to produce Transform.Center's Position output.
 
-    PolyPath's Position output is expressed on its path control grid, where a
-    point at .5, .5 evaluates to Transform Center 1, 1.  Convert from normal
-    Transform center coordinates to that grid so a browser center of .5, .5
-    remains centred in Resolve.
+    PolyPath's Position output is an offset from the normal Transform center:
+    a point at 0, 0 evaluates to Center .5, .5. Convert from the browser's
+    normalized Transform center to that offset grid so a browser center of
+    .5, .5 remains centred in Resolve.
     """
     points = []
     for key in keys:
         center = key["fusion_center"]
         points.append("\t\t\t\t\t\t\t{ Linear = true, X = %.12g, Y = %.12g, LX = 0, LY = 0, RX = 0, RY = 0 },"
-                      % (center["x"] / 2, center["y"] / 2))
+                      % (center["x"] - 0.5, center["y"] - 0.5))
     if len(points) == 1:
         points.append(points[0])
     return "\n".join(points)
