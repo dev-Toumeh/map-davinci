@@ -316,7 +316,7 @@ function showResultHtml(result) {
   const dir = result.output_dir.split("/").slice(-1)[0];
   const files = result.files.map(f => `<code>${f}</code>`).join("<br>");
   showResult(`
-    <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>map-asset-app/exports/${dir}/</code></div>
+    <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>app/exports/${dir}/</code></div>
     <div style="margin-top:4px">${files}</div>
     <div style="margin-top:6px">Red overlay = mask alignment on the detail background:</div>
     <img src="/exports/${dir}/alignment_check.jpg">`);

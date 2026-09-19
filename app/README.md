@@ -12,7 +12,7 @@ python3 -m venv .venv
 .venv/bin/pip install Pillow numpy requests
 
 # start the app
-.venv/bin/python map-asset-app/server.py
+.venv/bin/python app/server.py
 ```
 
 Then open **http://127.0.0.1:8787** in a browser.
@@ -31,7 +31,7 @@ Then open **http://127.0.0.1:8787** in a browser.
    first, then Highlight; clicking Highlight again removes it — same as the ✕ chip).
 5. Click **Export assets**.
 
-## Output package (`map-asset-app/exports/<name>/`)
+## Output package (`app/exports/<name>/`)
 
 | File | Content |
 |---|---|
