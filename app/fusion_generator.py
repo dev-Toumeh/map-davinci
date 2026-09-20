@@ -228,6 +228,10 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\t\t["Layer{border_layer}.Foreground"] = Input {{ SourceOp = "{base}_Border", Source = "Output", }},
 \t\t\t\tLayerName{border_layer} = Input {{ Value = "{country['iso3']} vector border", }},''')
     layer_number = 2 + len(metadata.get("countries", [])) * 2
+    incomplete = [connection["name"] for connection in animation.get("connections", [])
+                  if not connection.get("start") or not connection.get("end")]
+    if incomplete:
+        raise ValueError("Complete or delete these connections before generating Fusion: " + ", ".join(incomplete))
     for number, connection in enumerate(animation.get("connections", [])):
         connection_tools, connection_layers = _connection_tools(
             connection, width, height, duration, 300 + (len(metadata.get("countries", [])) + number) * 180,

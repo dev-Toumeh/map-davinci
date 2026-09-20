@@ -94,8 +94,10 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
         if identifier in seen_ids:
             raise ValueError("connection IDs must be unique")
         seen_ids.add(identifier)
-        def point(key: str) -> dict:
+        def point(key: str, *, required: bool = False) -> dict | None:
             raw = connection.get(key) or {}
+            if not raw and not required:
+                return None
             x, y = _number(raw.get("x"), f"connection {index + 1} {key} x"), _number(raw.get("y"), f"connection {index + 1} {key} y")
             if not (0 <= x <= 1 and 0 <= y <= 1):
                 raise ValueError(f"connection {index + 1} {key} must be inside the map")
@@ -105,11 +107,11 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
         line_style = str(connection.get("line_style", "solid"))
         if path_type not in PATH_TYPES or line_style not in LINE_STYLES:
             raise ValueError(f"connection {index + 1} has an invalid path or line style")
-        bend = point("bend") if path_type == "curved" else None
+        bend = point("bend") if path_type == "curved" and start and end else None
         start_frame = int(_number(connection.get("start_frame", 0), f"connection {index + 1} start frame"))
         arrival_frame = int(_number(connection.get("arrival_frame", 1), f"connection {index + 1} arrival frame"))
         disappearance_frame = int(_number(connection.get("disappearance_frame", duration - 1), f"connection {index + 1} disappearance frame"))
-        if not (0 <= start_frame < arrival_frame < disappearance_frame < duration):
+        if start and end and not (0 <= start_frame < arrival_frame < disappearance_frame < duration):
             raise ValueError(f"connection {index + 1} timing must satisfy start < arrival < disappearance inside the shot")
         color = str(connection.get("color", "#ffffff"))
         if not __import__("re").fullmatch(r"#[0-9a-fA-F]{6}", color):
