@@ -55,8 +55,11 @@ def _polyline(ring: list[tuple[float, float]], bbox: dict) -> str:
     source = ring[:-1] if len(ring) > 1 and ring[0] == ring[-1] else ring
     for lon, lat in source:
         x, y = _merc(lon, lat)
-        px = (x - minx) / (maxx - minx)
-        py = (maxy - y) / (maxy - miny)
+        # Fusion polygon controls are centered at 0,0 and use Y-up. The
+        # geographic calculation above is normalized top-left 0..1, so convert
+        # it before emitting native MultiPoly points.
+        px = (x - minx) / (maxx - minx) - 0.5
+        py = 0.5 - (maxy - y) / (maxy - miny)
         points.append(f"{{ Linear = true, X = {px:.12g}, Y = {py:.12g}, LX = 0, LY = 0, RX = 0, RY = 0 }},")
     return " ".join(points)
 
