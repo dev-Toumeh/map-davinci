@@ -78,7 +78,7 @@ def _country_mask(name: str, geometry: dict, wide_bbox: dict, width: int, height
     for index, (level, ring) in enumerate(rings, 1):
         order.append(str(index))
         outline_inputs = (f'\n\t\t\t\t["PolyMask{index}.Solid"] = Input {{ Value = 0, }},'
-                          f'\n\t\t\t\t["PolyMask{index}.BorderWidth"] = Input {{ Value = 0.0025, }},') if outline else ""
+                          f'\n\t\t\t\t["PolyMask{index}.BorderWidth"] = Input {{ Value = 0.0005, }},') if outline else ""
         inputs.append(f'''\t\t\t\t["PolyMask{index}.Level"] = Input {{ Value = {level}, }},
 \t\t\t\t["PolyMask{index}.Filter"] = Input {{ Value = FuID {{ "Fast Gaussian" }}, }},
 \t\t\t\t["PolyMask{index}.Polyline"] = Input {{ Value = Polyline {{ Closed = true, Points = {{ {_polyline(ring, wide_bbox)} }} }}, }},
@@ -153,6 +153,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
         tools.append(_country_mask(base + "_Border", geometry, metadata["wide"]["bbox_mercator"], width, height,
                                    outline=True, pos=(-460, 370 + row)))
         red, green, blue = _rgb(country.get("color", "#1689ff"))
+        border_red, border_green, border_blue = _rgb(country.get("border_color", "#ffffff"))
         tools.append(f'''\t\t{base}_Fill = Background {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 1, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
@@ -160,7 +161,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t}},
 \t\t{base}_Border = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 1, }}, TopLeftRed = Input {{ Value = 1, }}, TopLeftGreen = Input {{ Value = 1, }}, TopLeftBlue = Input {{ Value = 1, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 1, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ -180, {370 + row} }} }},
 \t\t}},''')
         fill_layer, border_layer = number * 2 - 2, number * 2 - 1

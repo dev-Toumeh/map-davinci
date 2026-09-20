@@ -45,7 +45,21 @@ TILE_SIZE = 256
 TILE_THREADS = 8
 TILE_RETRIES = 3
 SUPERSCALE = 2                          # mask supersampling for smooth edges
-DEFAULT_COUNTRY_COLOR = "#1689ff"       # editable in the browser UI
+# Editable defaults used consistently by browser preview, exported masks, and
+# native Fusion fills. Add national/flag-derived colors here as they are agreed.
+DEFAULT_COUNTRY_COLOR = "#1689ff"
+NATIONAL_FILL_COLORS = {
+    "SAU": "#005430",  # Saudi Arabia flag green: RGB(0, 84, 48)
+    "USA": "#3c3b6e", "FRA": "#0055a4", "DEU": "#dd0000",
+    "ITA": "#009246", "JPN": "#bc002d", "GBR": "#012169",
+    "CAN": "#ff0000", "BRA": "#009c3b", "IND": "#ff9933",
+}
+DEFAULT_BORDER_COLOR = "#ffffff"
+
+
+def country_default_color(iso3: str) -> str:
+    """Default fill color for a country; generic blue remains a safe fallback."""
+    return NATIONAL_FILL_COLORS.get(str(iso3).upper(), DEFAULT_COUNTRY_COLOR)
 
 APP_ROOT = Path(__file__).resolve().parent
 DATA_DIR = APP_ROOT / "data"
@@ -551,7 +565,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
     for i, iso in enumerate(iso_list):
         progress("masks", 100.0 * i / n, f"rendering mask {iso}")
         colors = config.get("country_colors") or {}
-        color, rgb = parse_hex_color(colors.get(iso, DEFAULT_COUNTRY_COLOR))
+        color, rgb = parse_hex_color(colors.get(iso, country_default_color(iso)))
         geometry = get_geometry(iso)
         mask_img, bounds_px = render_mask(geometry, detail_bbox, (W, H), rgb)
         mask_path = out_dir / f"mask_{iso}.png"
@@ -567,6 +581,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         masks.append({
             "iso3": iso,
             "color": color,
+            "border_color": DEFAULT_BORDER_COLOR,
             "file": mask_path.name,
             "svg_file": svg_path.name,
             "geometry_file": geometry_path.name,
