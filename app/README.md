@@ -46,7 +46,7 @@ Then open **http://127.0.0.1:8787** in a browser.
 | `alignment_check.jpg` | Detail background with masks overlaid 50% red — quick visual QA |
 | `metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, SHA-256 hashes, attribution |
 | `animation.json` | Saved 2D view keyframes, timing, FPS, and easing (created in the Animation Editor) |
-| `fusion/scene.comp` | Generated editable 2D Fusion graph (created in the Animation Editor) |
+| `fusion/scene_vNNN.comp` | Versioned editable 2D Fusion graph; every Generate action creates a new version |
 
 ## 2D animation editor
 
