@@ -123,6 +123,58 @@ def _path_points(keys: list[dict]) -> str:
     return "\n".join(points if len(points) > 1 else points * 2)
 
 
+def _connection_points(connection: dict) -> str:
+    points = [connection["start"]]
+    if connection["path_type"] == "curved":
+        points.append(connection["bend"])
+    points.append(connection["end"])
+    return ", ".join("{ X = %.12g, Y = %.12g, LX = 0, LY = 0, RX = 0, RY = 0 }" %
+                     (point["x"] - .5, .5 - point["y"]) for point in points)
+
+
+def _connection_tools(connection: dict, width: int, height: int, duration: int, pos_y: int, layer_number: int) -> tuple[str, str]:
+    """Editable Text+ path line and traveling arrow for one saved connection."""
+    base = "Link_" + _name(connection["id"])
+    red, green, blue = _rgb(connection["color"])
+    # Text+ is used because its Path Start/End is Fusion's editable write-on
+    # control and supports both solid and dashed text strokes on the same path.
+    text = "━━━━━━━━━━━━━━━━━━━━" if connection["line_style"] == "solid" else "— — — — — — — — — —"
+    flags = ", Flags = { Linear = true }" if connection["easing"] == "linear" else ""
+    points = _connection_points(connection)
+    angle = math.degrees(math.atan2(connection["end"]["y"] - connection["start"]["y"],
+                                   connection["end"]["x"] - connection["start"]["x"]))
+    tools = f'''		{base}_WriteOn = BezierSpline {{ KeyFrames = {{
+				[{connection["start_frame"]}] = {{ 0{flags} }},
+				[{connection["arrival_frame"]}] = {{ 1{flags} }},
+				[{connection["disappearance_frame"]}] = {{ 1, Flags = {{ Linear = true }} }},
+			}} }},
+		{base}_Line = TextPlus {{
+			NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {connection["disappearance_frame"] - .001:.3f}, FrameLength = 1 }} }},
+			Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }},
+				LayoutType = Input {{ Value = 3, }}, Wrap = Input {{ Value = 1, }}, Center = Input {{ Value = {{ .5, .5 }}, }},
+				Path = Input {{ Value = Polyline {{ Points = {{ {points} }} }}, }},
+				Red1 = Input {{ Value = {red:.12g}, }}, Green1 = Input {{ Value = {green:.12g}, }}, Blue1 = Input {{ Value = {blue:.12g}, }},
+				StyledText = Input {{ Value = "{text}", }}, Font = Input {{ Value = "Open Sans", }}, Style = Input {{ Value = "Regular", }}, Size = Input {{ Value = {connection["thickness"] / 100:.12g}, }},
+				HorizontalJustificationNew = Input {{ Value = 3, }}, VerticalJustificationNew = Input {{ Value = 3, }},
+				Start = Input {{ Value = 0, }}, End = Input {{ SourceOp = "{base}_WriteOn", Source = "Value", }} }},
+			ViewInfo = OperatorInfo {{ Pos = {{ -180, {pos_y} }} }},
+		}},'''
+    layer = f'''				["Layer{layer_number}.Foreground"] = Input {{ SourceOp = "{base}_Line", Source = "Output", }},
+				LayerName{layer_number} = Input {{ Value = "{connection["name"]} line", }},'''
+    if connection["arrowhead"]:
+        tools += f'''
+		{base}_ArrowProgress = BezierSpline {{ KeyFrames = {{
+				[{connection["start_frame"]}] = {{ 0{flags} }},
+				[{connection["arrival_frame"]}] = {{ 1{flags} }},
+			}} }},
+		{base}_ArrowPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "{base}_ArrowProgress", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{ {points} }} }}, }} }}, }},
+		{base}_Arrow = TextPlus {{ NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {connection["disappearance_frame"] - .001:.3f}, FrameLength = 1 }} }}, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Center = Input {{ SourceOp = "{base}_ArrowPath", Source = "Position", }}, Angle = Input {{ Value = {angle:.12g}, }}, Red1 = Input {{ Value = {red:.12g}, }}, Green1 = Input {{ Value = {green:.12g}, }}, Blue1 = Input {{ Value = {blue:.12g}, }}, StyledText = Input {{ Value = "▶", }}, Size = Input {{ Value = {connection["arrow_size"] / 1000:.12g}, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 70, {pos_y} }} }}, }},'''
+        layer += f'''
+				["Layer{layer_number + 1}.Foreground"] = Input {{ SourceOp = "{base}_Arrow", Source = "Output", }},
+				LayerName{layer_number + 1} = Input {{ Value = "{connection["name"]} arrow", }},'''
+    return tools, layer
+
+
 def generate(package: Path, metadata: dict, animation: dict) -> Path:
     out, native = animation["output"], metadata["output"]
     source_aspect = native["width"] / native["height"]
@@ -175,6 +227,14 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\t\tLayerName{fill_layer} = Input {{ Value = "{country['iso3']} vector fill", }},
 \t\t\t\t["Layer{border_layer}.Foreground"] = Input {{ SourceOp = "{base}_Border", Source = "Output", }},
 \t\t\t\tLayerName{border_layer} = Input {{ Value = "{country['iso3']} vector border", }},''')
+    layer_number = 2 + len(metadata.get("countries", [])) * 2
+    for number, connection in enumerate(animation.get("connections", [])):
+        connection_tools, connection_layers = _connection_tools(
+            connection, width, height, duration, 300 + (len(metadata.get("countries", [])) + number) * 180,
+            layer_number)
+        tools.append(connection_tools)
+        layers.append(connection_layers)
+        layer_number += 2 if connection["arrowhead"] else 1
     tools.append(f'''\t\tMap_Layers = MultiMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{ Background = Input {{ SourceOp = "Map_Wide", Source = "Output", }},

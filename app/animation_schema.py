@@ -6,6 +6,8 @@ from typing import Any
 
 SCHEMA_VERSION = 2
 EASINGS = {"linear", "smooth"}
+LINE_STYLES = {"solid", "dashed"}
+PATH_TYPES = {"straight", "curved"}
 
 
 def _number(value: Any, name: str) -> float:
@@ -80,9 +82,52 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
         normalized.append({"frame": frame, "center": {"x": x, "y": y},
                            "view_width": view_width, "easing": easing})
     normalized.sort(key=lambda key: key["frame"])
+    connections = value.get("connections") or []
+    if not isinstance(connections, list):
+        raise ValueError("connections must be a list")
+    normalized_connections = []
+    seen_ids = set()
+    for index, connection in enumerate(connections):
+        if not isinstance(connection, dict):
+            raise ValueError(f"connection {index + 1} must be an object")
+        identifier = str(connection.get("id") or f"connection_{index + 1}")[:80]
+        if identifier in seen_ids:
+            raise ValueError("connection IDs must be unique")
+        seen_ids.add(identifier)
+        def point(key: str) -> dict:
+            raw = connection.get(key) or {}
+            x, y = _number(raw.get("x"), f"connection {index + 1} {key} x"), _number(raw.get("y"), f"connection {index + 1} {key} y")
+            if not (0 <= x <= 1 and 0 <= y <= 1):
+                raise ValueError(f"connection {index + 1} {key} must be inside the map")
+            return {"x": x, "y": y}
+        start, end = point("start"), point("end")
+        path_type = str(connection.get("path_type", "straight"))
+        line_style = str(connection.get("line_style", "solid"))
+        if path_type not in PATH_TYPES or line_style not in LINE_STYLES:
+            raise ValueError(f"connection {index + 1} has an invalid path or line style")
+        bend = point("bend") if path_type == "curved" else None
+        start_frame = int(_number(connection.get("start_frame", 0), f"connection {index + 1} start frame"))
+        arrival_frame = int(_number(connection.get("arrival_frame", 1), f"connection {index + 1} arrival frame"))
+        disappearance_frame = int(_number(connection.get("disappearance_frame", duration - 1), f"connection {index + 1} disappearance frame"))
+        if not (0 <= start_frame < arrival_frame < disappearance_frame < duration):
+            raise ValueError(f"connection {index + 1} timing must satisfy start < arrival < disappearance inside the shot")
+        color = str(connection.get("color", "#ffffff"))
+        if not __import__("re").fullmatch(r"#[0-9a-fA-F]{6}", color):
+            raise ValueError(f"connection {index + 1} color must be a hex color")
+        thickness = _number(connection.get("thickness", 2), f"connection {index + 1} thickness")
+        if not 0.25 <= thickness <= 30:
+            raise ValueError(f"connection {index + 1} thickness must be between 0.25 and 30")
+        easing = str(connection.get("easing", "linear"))
+        if easing not in EASINGS:
+            raise ValueError(f"connection {index + 1} easing must be linear or smooth")
+        normalized_connections.append({"id": identifier, "name": str(connection.get("name") or f"Connection {index + 1}")[:120],
+            "start": start, "end": end, "bend": bend, "path_type": path_type, "line_style": line_style,
+            "color": color, "thickness": thickness, "arrowhead": bool(connection.get("arrowhead", True)),
+            "arrow_size": max(1, min(100, _number(connection.get("arrow_size", 14), f"connection {index + 1} arrow size"))),
+            "start_frame": start_frame, "arrival_frame": arrival_frame, "disappearance_frame": disappearance_frame, "easing": easing})
     return {"schema_version": SCHEMA_VERSION,
             "name": str(value.get("name") or "Map animation")[:120],
             "assets_metadata": "metadata.json",
             "output": {"width": width, "height": height, "fps": fps,
                        "duration_frames": duration},
-            "keyframes": normalized}
+             "keyframes": normalized, "connections": normalized_connections}
