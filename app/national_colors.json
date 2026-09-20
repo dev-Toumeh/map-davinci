@@ -1,0 +1,1040 @@
+{
+  "source": "Flag Icons (https://github.com/lipis/flag-icons)",
+  "license": "MIT",
+  "selection": "first non-white SVG flag color, with curated overrides; curated territorial fallbacks for all Natural Earth entries",
+  "colors": {
+    "ABW": {
+      "fill": "#3399CC",
+      "border": "#FFFFFF"
+    },
+    "AFG": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "AGO": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "AIA": {
+      "fill": "#FF9900",
+      "border": "#FFFFFF"
+    },
+    "ALB": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "ALD": {
+      "fill": "#0053A5",
+      "border": "#FFFFFF"
+    },
+    "AND": {
+      "fill": "#D0103A",
+      "border": "#FFFFFF"
+    },
+    "ARE": {
+      "fill": "#00732F",
+      "border": "#FFFFFF"
+    },
+    "ARG": {
+      "fill": "#74ACDF",
+      "border": "#FFFFFF"
+    },
+    "ARM": {
+      "fill": "#D90012",
+      "border": "#FFFFFF"
+    },
+    "ASM": {
+      "fill": "#000066",
+      "border": "#FFFFFF"
+    },
+    "ATA": {
+      "fill": "#3A7DCE",
+      "border": "#FFFFFF"
+    },
+    "ATF": {
+      "fill": "#002395",
+      "border": "#FFFFFF"
+    },
+    "ATG": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "AUS": {
+      "fill": "#00008B",
+      "border": "#FFFFFF"
+    },
+    "AUT": {
+      "fill": "#C8102E",
+      "border": "#FFFFFF"
+    },
+    "AZE": {
+      "fill": "#3F9C35",
+      "border": "#FFFFFF"
+    },
+    "BDI": {
+      "fill": "#18B637",
+      "border": "#FFFFFF"
+    },
+    "BEL": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "BEN": {
+      "fill": "#319400",
+      "border": "#FFFFFF"
+    },
+    "BFA": {
+      "fill": "#DE0000",
+      "border": "#FFFFFF"
+    },
+    "BGD": {
+      "fill": "#006A4E",
+      "border": "#FFFFFF"
+    },
+    "BGR": {
+      "fill": "#00966E",
+      "border": "#FFFFFF"
+    },
+    "BHR": {
+      "fill": "#CE1126",
+      "border": "#FFFFFF"
+    },
+    "BHS": {
+      "fill": "#FFE900",
+      "border": "#FFFFFF"
+    },
+    "BIH": {
+      "fill": "#000099",
+      "border": "#FFFFFF"
+    },
+    "BLM": {
+      "fill": "#000091",
+      "border": "#FFFFFF"
+    },
+    "BLR": {
+      "fill": "#CE1720",
+      "border": "#FFFFFF"
+    },
+    "BLZ": {
+      "fill": "#FFEF5D",
+      "border": "#FFFFFF"
+    },
+    "BMU": {
+      "fill": "#CF142B",
+      "border": "#FFFFFF"
+    },
+    "BOL": {
+      "fill": "#007934",
+      "border": "#FFFFFF"
+    },
+    "BRA": {
+      "fill": "#009C3B",
+      "border": "#FFFFFF"
+    },
+    "BRB": {
+      "fill": "#00267F",
+      "border": "#FFFFFF"
+    },
+    "BRN": {
+      "fill": "#F7E017",
+      "border": "#FFFFFF"
+    },
+    "BTN": {
+      "fill": "#FFD520",
+      "border": "#FFFFFF"
+    },
+    "BWA": {
+      "fill": "#00CBFF",
+      "border": "#FFFFFF"
+    },
+    "CAF": {
+      "fill": "#0000FF",
+      "border": "#FFFFFF"
+    },
+    "CAN": {
+      "fill": "#FF0000",
+      "border": "#FFFFFF"
+    },
+    "CHL": {
+      "fill": "#0039A6",
+      "border": "#FFFFFF"
+    },
+    "CHN": {
+      "fill": "#FFFF00",
+      "border": "#FFFFFF"
+    },
+    "CIV": {
+      "fill": "#00CD00",
+      "border": "#FFFFFF"
+    },
+    "CMR": {
+      "fill": "#007A5E",
+      "border": "#FFFFFF"
+    },
+    "COD": {
+      "fill": "#007FFF",
+      "border": "#FFFFFF"
+    },
+    "COG": {
+      "fill": "#FFFF00",
+      "border": "#FFFFFF"
+    },
+    "COK": {
+      "fill": "#000066",
+      "border": "#FFFFFF"
+    },
+    "COL": {
+      "fill": "#FFE800",
+      "border": "#FFFFFF"
+    },
+    "COM": {
+      "fill": "#FFFF00",
+      "border": "#FFFFFF"
+    },
+    "CPV": {
+      "fill": "#081873",
+      "border": "#FFFFFF"
+    },
+    "CRI": {
+      "fill": "#0000B4",
+      "border": "#FFFFFF"
+    },
+    "CUB": {
+      "fill": "#002A8F",
+      "border": "#FFFFFF"
+    },
+    "CUW": {
+      "fill": "#002B7F",
+      "border": "#FFFFFF"
+    },
+    "CYM": {
+      "fill": "#000066",
+      "border": "#FFFFFF"
+    },
+    "CYP": {
+      "fill": "#435125",
+      "border": "#FFFFFF"
+    },
+    "CZE": {
+      "fill": "#D7141A",
+      "border": "#FFFFFF"
+    },
+    "DEU": {
+      "fill": "#DD0000",
+      "border": "#FFFFFF"
+    },
+    "DJI": {
+      "fill": "#00CC00",
+      "border": "#FFFFFF"
+    },
+    "DMA": {
+      "fill": "#108C00",
+      "border": "#FFFFFF"
+    },
+    "DNK": {
+      "fill": "#C8102E",
+      "border": "#FFFFFF"
+    },
+    "DOM": {
+      "fill": "#002D62",
+      "border": "#FFFFFF"
+    },
+    "DZA": {
+      "fill": "#006233",
+      "border": "#FFFFFF"
+    },
+    "ECU": {
+      "fill": "#FFE800",
+      "border": "#FFFFFF"
+    },
+    "EGY": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "ERI": {
+      "fill": "#BE0027",
+      "border": "#FFFFFF"
+    },
+    "ESP": {
+      "fill": "#AA151B",
+      "border": "#FFFFFF"
+    },
+    "EST": {
+      "fill": "#1791FF",
+      "border": "#FFFFFF"
+    },
+    "ETH": {
+      "fill": "#FFC621",
+      "border": "#FFFFFF"
+    },
+    "FIN": {
+      "fill": "#002F6C",
+      "border": "#FFFFFF"
+    },
+    "FJI": {
+      "fill": "#68BFE5",
+      "border": "#FFFFFF"
+    },
+    "FLK": {
+      "fill": "#A43907",
+      "border": "#FFFFFF"
+    },
+    "FRA": {
+      "fill": "#0055A4",
+      "border": "#FFFFFF"
+    },
+    "FRO": {
+      "fill": "#003897",
+      "border": "#FFFFFF"
+    },
+    "FSM": {
+      "fill": "#6797D6",
+      "border": "#FFFFFF"
+    },
+    "GAB": {
+      "fill": "#FFE700",
+      "border": "#FFFFFF"
+    },
+    "GBR": {
+      "fill": "#012169",
+      "border": "#FFFFFF"
+    },
+    "GGY": {
+      "fill": "#E8112D",
+      "border": "#FFFFFF"
+    },
+    "GHA": {
+      "fill": "#006B3F",
+      "border": "#FFFFFF"
+    },
+    "GIB": {
+      "fill": "#DA000C",
+      "border": "#FFFFFF"
+    },
+    "GIN": {
+      "fill": "#FFFF00",
+      "border": "#FFFFFF"
+    },
+    "GMB": {
+      "fill": "#000099",
+      "border": "#FFFFFF"
+    },
+    "GNB": {
+      "fill": "#CE1126",
+      "border": "#FFFFFF"
+    },
+    "GNQ": {
+      "fill": "#E32118",
+      "border": "#FFFFFF"
+    },
+    "GRC": {
+      "fill": "#0D5EAF",
+      "border": "#FFFFFF"
+    },
+    "GRD": {
+      "fill": "#FCD116",
+      "border": "#FFFFFF"
+    },
+    "GRL": {
+      "fill": "#D00C33",
+      "border": "#FFFFFF"
+    },
+    "GTM": {
+      "fill": "#F9F0AA",
+      "border": "#FFFFFF"
+    },
+    "GUM": {
+      "fill": "#BE0027",
+      "border": "#FFFFFF"
+    },
+    "GUY": {
+      "fill": "#399408",
+      "border": "#FFFFFF"
+    },
+    "HKG": {
+      "fill": "#EC1B2E",
+      "border": "#FFFFFF"
+    },
+    "HMD": {
+      "fill": "#00008B",
+      "border": "#FFFFFF"
+    },
+    "HND": {
+      "fill": "#18C3DF",
+      "border": "#FFFFFF"
+    },
+    "HRV": {
+      "fill": "#171796",
+      "border": "#FFFFFF"
+    },
+    "HTI": {
+      "fill": "#D21034",
+      "border": "#FFFFFF"
+    },
+    "HUN": {
+      "fill": "#D43516",
+      "border": "#FFFFFF"
+    },
+    "IDN": {
+      "fill": "#E70011",
+      "border": "#FFFFFF"
+    },
+    "IMN": {
+      "fill": "#BA0000",
+      "border": "#FFFFFF"
+    },
+    "IND": {
+      "fill": "#FF9933",
+      "border": "#FFFFFF"
+    },
+    "IOT": {
+      "fill": "#000063",
+      "border": "#FFFFFF"
+    },
+    "IRL": {
+      "fill": "#009A49",
+      "border": "#FFFFFF"
+    },
+    "IRN": {
+      "fill": "#DA0000",
+      "border": "#FFFFFF"
+    },
+    "IRQ": {
+      "fill": "#CE1126",
+      "border": "#FFFFFF"
+    },
+    "ISL": {
+      "fill": "#003897",
+      "border": "#FFFFFF"
+    },
+    "ISR": {
+      "fill": "#0038B8",
+      "border": "#FFFFFF"
+    },
+    "ITA": {
+      "fill": "#009246",
+      "border": "#FFFFFF"
+    },
+    "JAM": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "JEY": {
+      "fill": "#CF142B",
+      "border": "#FFFFFF"
+    },
+    "JOR": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "JPN": {
+      "fill": "#BC002D",
+      "border": "#FFFFFF"
+    },
+    "KAZ": {
+      "fill": "#00ABC2",
+      "border": "#FFFFFF"
+    },
+    "KEN": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "KGZ": {
+      "fill": "#FFFF00",
+      "border": "#FFFFFF"
+    },
+    "KHM": {
+      "fill": "#032EA1",
+      "border": "#FFFFFF"
+    },
+    "KIR": {
+      "fill": "#E73E2D",
+      "border": "#FFFFFF"
+    },
+    "KNA": {
+      "fill": "#FFE900",
+      "border": "#FFFFFF"
+    },
+    "KOR": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "KWT": {
+      "fill": "#F31830",
+      "border": "#FFFFFF"
+    },
+    "LAO": {
+      "fill": "#CE1126",
+      "border": "#FFFFFF"
+    },
+    "LBN": {
+      "fill": "#EE161F",
+      "border": "#FFFFFF"
+    },
+    "LBR": {
+      "fill": "#000066",
+      "border": "#FFFFFF"
+    },
+    "LBY": {
+      "fill": "#239E46",
+      "border": "#FFFFFF"
+    },
+    "LCA": {
+      "fill": "#65CFFF",
+      "border": "#FFFFFF"
+    },
+    "LIE": {
+      "fill": "#002B7F",
+      "border": "#FFFFFF"
+    },
+    "LKA": {
+      "fill": "#FFB700",
+      "border": "#FFFFFF"
+    },
+    "LSO": {
+      "fill": "#009543",
+      "border": "#FFFFFF"
+    },
+    "LTU": {
+      "fill": "#006A44",
+      "border": "#FFFFFF"
+    },
+    "LUX": {
+      "fill": "#ED2939",
+      "border": "#FFFFFF"
+    },
+    "LVA": {
+      "fill": "#981E32",
+      "border": "#FFFFFF"
+    },
+    "MAC": {
+      "fill": "#00785E",
+      "border": "#FFFFFF"
+    },
+    "MAF": {
+      "fill": "#000091",
+      "border": "#FFFFFF"
+    },
+    "MAR": {
+      "fill": "#C1272D",
+      "border": "#FFFFFF"
+    },
+    "MCO": {
+      "fill": "#F31830",
+      "border": "#FFFFFF"
+    },
+    "MDA": {
+      "fill": "#00319C",
+      "border": "#FFFFFF"
+    },
+    "MDG": {
+      "fill": "#FC3D32",
+      "border": "#FFFFFF"
+    },
+    "MDV": {
+      "fill": "#D21034",
+      "border": "#FFFFFF"
+    },
+    "MEX": {
+      "fill": "#F15770",
+      "border": "#FFFFFF"
+    },
+    "MHL": {
+      "fill": "#3B5AA3",
+      "border": "#FFFFFF"
+    },
+    "MKD": {
+      "fill": "#D20000",
+      "border": "#FFFFFF"
+    },
+    "MLI": {
+      "fill": "#009A00",
+      "border": "#FFFFFF"
+    },
+    "MLT": {
+      "fill": "#CF142B",
+      "border": "#FFFFFF"
+    },
+    "MMR": {
+      "fill": "#FECB00",
+      "border": "#FFFFFF"
+    },
+    "MNE": {
+      "fill": "#D3AE3B",
+      "border": "#FFFFFF"
+    },
+    "MNG": {
+      "fill": "#FFD900",
+      "border": "#FFFFFF"
+    },
+    "MNP": {
+      "fill": "#0071BC",
+      "border": "#FFFFFF"
+    },
+    "MOZ": {
+      "fill": "#009A00",
+      "border": "#FFFFFF"
+    },
+    "MRT": {
+      "fill": "#CD2A3E",
+      "border": "#FFFFFF"
+    },
+    "MSR": {
+      "fill": "#012169",
+      "border": "#FFFFFF"
+    },
+    "MUS": {
+      "fill": "#00A04D",
+      "border": "#FFFFFF"
+    },
+    "MWI": {
+      "fill": "#F41408",
+      "border": "#FFFFFF"
+    },
+    "MYS": {
+      "fill": "#CC0000",
+      "border": "#FFFFFF"
+    },
+    "NAM": {
+      "fill": "#3662A2",
+      "border": "#FFFFFF"
+    },
+    "NCL": {
+      "fill": "#009543",
+      "border": "#FFFFFF"
+    },
+    "NER": {
+      "fill": "#0DB02B",
+      "border": "#FFFFFF"
+    },
+    "NFK": {
+      "fill": "#198200",
+      "border": "#FFFFFF"
+    },
+    "NGA": {
+      "fill": "#008753",
+      "border": "#FFFFFF"
+    },
+    "NIC": {
+      "fill": "#510000",
+      "border": "#FFFFFF"
+    },
+    "NIU": {
+      "fill": "#FEDD00",
+      "border": "#FFFFFF"
+    },
+    "NLD": {
+      "fill": "#AE1C28",
+      "border": "#FFFFFF"
+    },
+    "NPL": {
+      "fill": "#CE0000",
+      "border": "#FFFFFF"
+    },
+    "NRU": {
+      "fill": "#002170",
+      "border": "#FFFFFF"
+    },
+    "NZL": {
+      "fill": "#00247D",
+      "border": "#FFFFFF"
+    },
+    "OMN": {
+      "fill": "#EF2D29",
+      "border": "#FFFFFF"
+    },
+    "PAK": {
+      "fill": "#0C590B",
+      "border": "#FFFFFF"
+    },
+    "PAN": {
+      "fill": "#DB0000",
+      "border": "#FFFFFF"
+    },
+    "PCN": {
+      "fill": "#00247D",
+      "border": "#FFFFFF"
+    },
+    "PER": {
+      "fill": "#D91023",
+      "border": "#FFFFFF"
+    },
+    "PHL": {
+      "fill": "#0038A8",
+      "border": "#FFFFFF"
+    },
+    "PLW": {
+      "fill": "#4AADD6",
+      "border": "#FFFFFF"
+    },
+    "PNG": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "POL": {
+      "fill": "#DC143C",
+      "border": "#FFFFFF"
+    },
+    "PRI": {
+      "fill": "#ED0000",
+      "border": "#FFFFFF"
+    },
+    "PRK": {
+      "fill": "#3E5698",
+      "border": "#FFFFFF"
+    },
+    "PRT": {
+      "fill": "#006600",
+      "border": "#FFFFFF"
+    },
+    "PRY": {
+      "fill": "#0038A8",
+      "border": "#FFFFFF"
+    },
+    "PSX": {
+      "fill": "#009639",
+      "border": "#FFFFFF"
+    },
+    "PYF": {
+      "fill": "#083D9C",
+      "border": "#FFFFFF"
+    },
+    "QAT": {
+      "fill": "#8D1B3D",
+      "border": "#FFFFFF"
+    },
+    "ROU": {
+      "fill": "#00319C",
+      "border": "#FFFFFF"
+    },
+    "RUS": {
+      "fill": "#0039A6",
+      "border": "#FFFFFF"
+    },
+    "RWA": {
+      "fill": "#20603D",
+      "border": "#FFFFFF"
+    },
+    "SAH": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "SAU": {
+      "fill": "#005430",
+      "border": "#FFFFFF"
+    },
+    "SDN": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "SDS": {
+      "fill": "#078930",
+      "border": "#FFFFFF"
+    },
+    "SEN": {
+      "fill": "#0B7226",
+      "border": "#FFFFFF"
+    },
+    "SGP": {
+      "fill": "#DF0000",
+      "border": "#FFFFFF"
+    },
+    "SGS": {
+      "fill": "#D5DFFF",
+      "border": "#FFFFFF"
+    },
+    "SHN": {
+      "fill": "#012169",
+      "border": "#FFFFFF"
+    },
+    "SLB": {
+      "fill": "#0000D6",
+      "border": "#FFFFFF"
+    },
+    "SLE": {
+      "fill": "#0000CD",
+      "border": "#FFFFFF"
+    },
+    "SLV": {
+      "fill": "#0F47AF",
+      "border": "#FFFFFF"
+    },
+    "SMR": {
+      "fill": "#19B6EF",
+      "border": "#FFFFFF"
+    },
+    "SOM": {
+      "fill": "#40A6FF",
+      "border": "#FFFFFF"
+    },
+    "SPM": {
+      "fill": "#000091",
+      "border": "#FFFFFF"
+    },
+    "SRB": {
+      "fill": "#0C4076",
+      "border": "#FFFFFF"
+    },
+    "STP": {
+      "fill": "#12AD2B",
+      "border": "#FFFFFF"
+    },
+    "SUR": {
+      "fill": "#377E3F",
+      "border": "#FFFFFF"
+    },
+    "SVK": {
+      "fill": "#EE1C25",
+      "border": "#FFFFFF"
+    },
+    "SVN": {
+      "fill": "#D50000",
+      "border": "#FFFFFF"
+    },
+    "SWE": {
+      "fill": "#005293",
+      "border": "#FFFFFF"
+    },
+    "SWZ": {
+      "fill": "#3E5EB9",
+      "border": "#FFFFFF"
+    },
+    "SXM": {
+      "fill": "#ED2939",
+      "border": "#FFFFFF"
+    },
+    "SYC": {
+      "fill": "#D92223",
+      "border": "#FFFFFF"
+    },
+    "SYR": {
+      "fill": "#007A3D",
+      "border": "#FFFFFF"
+    },
+    "TCA": {
+      "fill": "#002868",
+      "border": "#FFFFFF"
+    },
+    "TCD": {
+      "fill": "#002664",
+      "border": "#FFFFFF"
+    },
+    "TGO": {
+      "fill": "#FFE300",
+      "border": "#FFFFFF"
+    },
+    "THA": {
+      "fill": "#F4F5F8",
+      "border": "#FFFFFF"
+    },
+    "TJK": {
+      "fill": "#006600",
+      "border": "#FFFFFF"
+    },
+    "TKM": {
+      "fill": "#00843D",
+      "border": "#FFFFFF"
+    },
+    "TLS": {
+      "fill": "#CB000F",
+      "border": "#FFFFFF"
+    },
+    "TON": {
+      "fill": "#C10000",
+      "border": "#FFFFFF"
+    },
+    "TTO": {
+      "fill": "#E00000",
+      "border": "#FFFFFF"
+    },
+    "TUN": {
+      "fill": "#E70013",
+      "border": "#FFFFFF"
+    },
+    "TUR": {
+      "fill": "#E30A17",
+      "border": "#FFFFFF"
+    },
+    "TUV": {
+      "fill": "#009FCA",
+      "border": "#FFFFFF"
+    },
+    "TWN": {
+      "fill": "#000095",
+      "border": "#FFFFFF"
+    },
+    "TZA": {
+      "fill": "#0099FF",
+      "border": "#FFFFFF"
+    },
+    "UGA": {
+      "fill": "#FFE700",
+      "border": "#FFFFFF"
+    },
+    "UKR": {
+      "fill": "#0057B8",
+      "border": "#FFFFFF"
+    },
+    "UMI": {
+      "fill": "#BD3D44",
+      "border": "#FFFFFF"
+    },
+    "URY": {
+      "fill": "#0038A8",
+      "border": "#FFFFFF"
+    },
+    "USA": {
+      "fill": "#3C3B6E",
+      "border": "#FFFFFF"
+    },
+    "UZB": {
+      "fill": "#1EB53A",
+      "border": "#FFFFFF"
+    },
+    "VAT": {
+      "fill": "#FFE000",
+      "border": "#FFFFFF"
+    },
+    "VCT": {
+      "fill": "#F4F100",
+      "border": "#FFFFFF"
+    },
+    "VEN": {
+      "fill": "#CF142B",
+      "border": "#FFFFFF"
+    },
+    "VGB": {
+      "fill": "#FFFF00",
+      "border": "#FFFFFF"
+    },
+    "VIR": {
+      "fill": "#369443",
+      "border": "#FFFFFF"
+    },
+    "VNM": {
+      "fill": "#DA251D",
+      "border": "#FFFFFF"
+    },
+    "VUT": {
+      "fill": "#009543",
+      "border": "#FFFFFF"
+    },
+    "WLF": {
+      "fill": "#000091",
+      "border": "#FFFFFF"
+    },
+    "WSM": {
+      "fill": "#CE1126",
+      "border": "#FFFFFF"
+    },
+    "YEM": {
+      "fill": "#F10600",
+      "border": "#FFFFFF"
+    },
+    "ZAF": {
+      "fill": "#000001",
+      "border": "#FFFFFF"
+    },
+    "ZMB": {
+      "fill": "#198A00",
+      "border": "#FFFFFF"
+    },
+    "ZWE": {
+      "fill": "#0000FF",
+      "border": "#FFFFFF"
+    },
+    "WSB": {
+      "fill": "#012169",
+      "border": "#FFFFFF"
+    },
+    "ATC": {
+      "fill": "#00008B",
+      "border": "#FFFFFF"
+    },
+    "KAB": {
+      "fill": "#00A3DD",
+      "border": "#FFFFFF"
+    },
+    "BJN": {
+      "fill": "#003893",
+      "border": "#FFFFFF"
+    },
+    "BRT": {
+      "fill": "#6B7280",
+      "border": "#FFFFFF"
+    },
+    "BRI": {
+      "fill": "#009C3B",
+      "border": "#FFFFFF"
+    },
+    "CLP": {
+      "fill": "#003893",
+      "border": "#FFFFFF"
+    },
+    "CSI": {
+      "fill": "#00008B",
+      "border": "#FFFFFF"
+    },
+    "CNM": {
+      "fill": "#FFFFFF",
+      "border": "#FFFFFF"
+    },
+    "ESB": {
+      "fill": "#012169",
+      "border": "#FFFFFF"
+    },
+    "GEO": {
+      "fill": "#FF0000",
+      "border": "#FFFFFF"
+    },
+    "IOA": {
+      "fill": "#012169",
+      "border": "#FFFFFF"
+    },
+    "KOS": {
+      "fill": "#244AA5",
+      "border": "#FFFFFF"
+    },
+    "CYN": {
+      "fill": "#FFFFFF",
+      "border": "#FFFFFF"
+    },
+    "NOR": {
+      "fill": "#EF2B2D",
+      "border": "#FFFFFF"
+    },
+    "SCR": {
+      "fill": "#6B7280",
+      "border": "#FFFFFF"
+    },
+    "SER": {
+      "fill": "#003893",
+      "border": "#FFFFFF"
+    },
+    "KAS": {
+      "fill": "#FF671F",
+      "border": "#FFFFFF"
+    },
+    "SOL": {
+      "fill": "#006A4E",
+      "border": "#FFFFFF"
+    },
+    "SPI": {
+      "fill": "#75AADB",
+      "border": "#FFFFFF"
+    },
+    "PGA": {
+      "fill": "#003893",
+      "border": "#FFFFFF"
+    },
+    "CHE": {
+      "fill": "#D52B1E",
+      "border": "#FFFFFF"
+    },
+    "USG": {
+      "fill": "#3C3B6E",
+      "border": "#FFFFFF"
+    }
+  },
+  "license_notice": "Flag Icons copyright (c) 2013 Panayiotis Lipiridis; MIT License. See https://github.com/lipis/flag-icons"
+}

@@ -181,14 +181,7 @@ const outlineLayers = {};         // iso3 -> Leaflet outline layer on the map
 let targetCrop = null;            // visible export crop in Leaflet container pixels
 let exporting = false;
 const DEFAULT_COUNTRY_COLOR = "#1689ff";
-// Matches exporter.NATIONAL_FILL_COLORS. Countries without a curated national
-// color keep the established blue default until their palette is added.
-const NATIONAL_FILL_COLORS = {
-  SAU: "#005430", USA: "#3c3b6e", FRA: "#0055a4", DEU: "#dd0000",
-  ITA: "#009246", JPN: "#bc002d", GBR: "#012169", CAN: "#ff0000",
-  BRA: "#009c3b", IND: "#ff9933",
-};
-const countryDefaultColor = iso => NATIONAL_FILL_COLORS[iso] || DEFAULT_COUNTRY_COLOR;
+const countryDefaultColor = country => country.default_color || DEFAULT_COUNTRY_COLOR;
 
 // ---- country list ----
 const clist = document.getElementById("clist");
@@ -250,7 +243,7 @@ async function drawOutline(c) {
 }
 
 function addCountry(c) {
-  const highlighted = { ...c, color: countryDefaultColor(c.iso3) };
+  const highlighted = { ...c, color: countryDefaultColor(c) };
   selected.set(c.iso3, highlighted);
   // The latest highlighted country becomes the active color target.
   pending = c.iso3;

@@ -75,6 +75,9 @@ in Resolve to verify native node behaviour before using it in production.
 
 - Boundaries: [Natural Earth 10m admin-0 countries](https://www.naturalearthdata.com/)
   (public domain), downloaded once to `data/` (~13 MB).
+- Country default fills: flag-inspired ISO3 palette in `national_colors.json`,
+  derived from [Flag Icons](https://github.com/lipis/flag-icons) (MIT). Colors
+  remain editable before export; saved export colors always take precedence.
 - Imagery: Google Satellite tiles (no credentials; personal/educational use —
   check terms before publishing videos commercially) or Esri World Imagery
   (attribution recorded in metadata). Tiles are cached in `tilecache/`.

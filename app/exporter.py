@@ -45,23 +45,11 @@ TILE_SIZE = 256
 TILE_THREADS = 8
 TILE_RETRIES = 3
 SUPERSCALE = 2                          # mask supersampling for smooth edges
-# Editable defaults used consistently by browser preview, exported masks, and
-# native Fusion fills. Add national/flag-derived colors here as they are agreed.
 DEFAULT_COUNTRY_COLOR = "#1689ff"
-NATIONAL_FILL_COLORS = {
-    "SAU": "#005430",  # Saudi Arabia flag green: RGB(0, 84, 48)
-    "USA": "#3c3b6e", "FRA": "#0055a4", "DEU": "#dd0000",
-    "ITA": "#009246", "JPN": "#bc002d", "GBR": "#012169",
-    "CAN": "#ff0000", "BRA": "#009c3b", "IND": "#ff9933",
-}
 DEFAULT_BORDER_COLOR = "#ffffff"
 
-
-def country_default_color(iso3: str) -> str:
-    """Default fill color for a country; generic blue remains a safe fallback."""
-    return NATIONAL_FILL_COLORS.get(str(iso3).upper(), DEFAULT_COUNTRY_COLOR)
-
 APP_ROOT = Path(__file__).resolve().parent
+NATIONAL_COLORS_FILE = APP_ROOT / "national_colors.json"
 DATA_DIR = APP_ROOT / "data"
 TILE_CACHE = APP_ROOT / "tilecache"
 EXPORTS_DIR = APP_ROOT / "exports"
@@ -71,6 +59,26 @@ COUNTRIES_URL = (
     "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/"
     "master/geojson/ne_10m_admin_0_countries.geojson"
 )
+
+
+def _load_national_colors() -> Dict[str, dict]:
+    """Local, versioned ISO3 palette extracted from MIT-licensed Flag Icons."""
+    try:
+        return json.loads(NATIONAL_COLORS_FILE.read_text(encoding="utf-8")).get("colors", {})
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+NATIONAL_COLORS = _load_national_colors()
+
+
+def country_default_color(iso3: str) -> str:
+    """Flag-inspired fill color for every country selector entry."""
+    return NATIONAL_COLORS.get(str(iso3).upper(), {}).get("fill", DEFAULT_COUNTRY_COLOR)
+
+
+def country_default_border_color(iso3: str) -> str:
+    return NATIONAL_COLORS.get(str(iso3).upper(), {}).get("border", DEFAULT_BORDER_COLOR)
 
 RESOLUTIONS = {
     "4k":  {"landscape": (3840, 2160), "vertical": (2160, 3840)},
@@ -298,7 +306,9 @@ def load_countries() -> List[dict]:
         name = p.get("NAME_LONG") or p.get("ADMIN") or p.get("name") or iso3
         if iso2 in ("-99", None, ""):
             iso2 = iso3
-        out.append({"iso3": iso3, "iso2": iso2, "name": name})
+        out.append({"iso3": iso3, "iso2": iso2, "name": name,
+                    "default_color": country_default_color(iso3),
+                    "default_border_color": country_default_border_color(iso3)})
     out.sort(key=lambda c: c["name"])
     return out
 
@@ -581,7 +591,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         masks.append({
             "iso3": iso,
             "color": color,
-            "border_color": DEFAULT_BORDER_COLOR,
+            "border_color": country_default_border_color(iso),
             "file": mask_path.name,
             "svg_file": svg_path.name,
             "geometry_file": geometry_path.name,
