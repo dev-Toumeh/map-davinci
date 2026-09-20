@@ -56,12 +56,18 @@ def _path_points(keys: list[dict]) -> str:
 
 def generate(package: Path, metadata: dict, animation: dict) -> Path:
     out = animation["output"]
+    source_aspect = metadata["output"]["width"] / metadata["output"]["height"]
+    output_aspect = out["width"] / out["height"]
+    max_view_width = min(1.0, output_aspect / source_aspect)
     keys = []
     for key in animation["keyframes"]:
         # Fusion Transform's Center is where the source centre lands after
         # scaling. This converts the editor's camera/view centre to that value.
-        z, center = key["zoom"], key["center"]
-        keys.append({**key, "fusion_center": {
+        # V2 stores an aspect-aware geographic view width. Retain V1 support
+        # for existing saved animations.
+        z = key.get("zoom") or max_view_width / key["view_width"]
+        center = key["center"]
+        keys.append({**key, "zoom": z, "fusion_center": {
             "x": 0.5 + (0.5 - center["x"]) * z,
             "y": 0.5 + (0.5 - center["y"]) * z,
         }})
