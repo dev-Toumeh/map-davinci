@@ -42,6 +42,7 @@ Then open **http://127.0.0.1:8787** in a browser.
 | `satellite_wide.png` | Same center, `wide_factor` × the extent, same pixel size |
 | `mask_<ISO>.png` | One per country — selected highlight color on transparent, exact same grid as the detail image |
 | `mask_<ISO>.svg` | Vector version of the same colored mask — viewBox matches the PNG pixels 1:1, holes and islands preserved |
+| `geometry_<ISO>.geojson` | Original vector geometry saved with the package for editable native Fusion polygon masks |
 | `alignment_check.jpg` | Detail background with masks overlaid 50% red — quick visual QA |
 | `metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, SHA-256 hashes, attribution |
 | `animation.json` | Saved 2D view keyframes, timing, FPS, and easing (created in the Animation Editor) |
@@ -61,8 +62,9 @@ in Resolve to verify native node behaviour before using it in production.
 
 ## Using the assets in Fusion
 
-- Load `satellite_detail.png` and `mask_<ISO>.png`; the mask's alpha drives the
-  country fill/outline (e.g. Background node + mask, DeltaKeyer chain like the tutorial).
+- New generated compositions use `geometry_<ISO>.geojson` points to create editable
+  Fusion `MultiPoly` masks and colored Background layers. PNG masks remain available
+  for other workflows and old packages.
 - In the 3D scene, set the wide ImagePlane3D scale to **wide_factor** (default 2)
   and nudge it back slightly on Z (e.g. −0.001) behind the detail plane — same
   trick as the tutorial. `metadata.json → fusion_notes` records this.

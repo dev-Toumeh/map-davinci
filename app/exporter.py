@@ -559,11 +559,17 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         svg_text = render_mask_svg(geometry, detail_bbox, (W, H), color)
         svg_path = out_dir / f"mask_{iso}.svg"
         svg_path.write_text(svg_text, encoding="utf-8")
+        # Keep the original vector source with the package. Fusion generation
+        # can use these points directly instead of rasterising the PNG mask.
+        geometry_path = out_dir / f"geometry_{iso}.geojson"
+        geometry_path.write_text(json.dumps({"type": "Feature", "properties": {
+            "iso3": iso, "color": color}, "geometry": geometry}, indent=2), encoding="utf-8")
         masks.append({
             "iso3": iso,
             "color": color,
             "file": mask_path.name,
             "svg_file": svg_path.name,
+            "geometry_file": geometry_path.name,
             "bounds_px": {"x0": bounds_px[0], "y0": bounds_px[1],
                           "x1": bounds_px[2], "y1": bounds_px[3]},
         })
@@ -594,6 +600,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
     for m in masks:
         files[m["file"]] = out_dir / m["file"]
         files[m["svg_file"]] = out_dir / m["svg_file"]
+        files[m["geometry_file"]] = out_dir / m["geometry_file"]
     file_info = {fn: {"sha256": _sha256(p), "bytes": p.stat().st_size}
                  for fn, p in files.items()}
 
