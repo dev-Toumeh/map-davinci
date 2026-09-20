@@ -51,9 +51,10 @@ Then open **http://127.0.0.1:8787** in a browser.
 ## 2D animation editor
 
 The editor is available after an export through **Animate this export**, or directly
-at `http://127.0.0.1:8787/static/animation.html`. It uses the exported wide map as
-its base canvas, places the detail background and country masks from metadata, and
-does not allow a view to extend beyond the wide background.
+at `http://127.0.0.1:8787/static/animation.html`. It supports source-matched
+landscape output plus vertical Full HD (1080×1920) and 4K (2160×3840) targets.
+The Fusion generator creates an explicit final canvas at the selected dimensions,
+so the landscape source map cannot force a portrait timeline back to 16:9.
 
 Keyframes store a time, view center, zoom, and easing *into* that keyframe. Smooth
 uses the defined cubic `3t² − 2t³`; linear uses constant interpolation. The generated

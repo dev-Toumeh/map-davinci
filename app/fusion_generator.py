@@ -88,7 +88,7 @@ def _country_mask(name: str, geometry: dict, wide_bbox: dict, width: int, height
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
 \t\t\t\tMaskWidth = Input {{ Value = {width}, }}, MaskHeight = Input {{ Value = {height}, }},
-\t\t\t\tPixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 1, }},
+\t\t\t\tPixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }},
 \t\t\t\tClippingMode = Input {{ Value = FuID {{ "None" }}, }},
 \t\t\t\tPolyOrder = Input {{ Value = ScriptVal {{ {{ [0] = {', '.join(order)} }} }}, }},
 {chr(10).join(inputs)}
@@ -132,10 +132,16 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
     for key in animation["keyframes"]:
         z = key.get("zoom") or max_view_width / key["view_width"]
         center = key["center"]
-        keys.append({**key, "zoom": z, "fusion_center": {
-            "x": 0.5 + (0.5 - center["x"]) * z,
-            "y": 0.5 + (0.5 - center["y"]) * z}})
+        view_width = key.get("view_width") or max_view_width / z
+        # Scale the landscape source uniformly to the selected output canvas.
+        # X/Y use different normalized coefficients when source and output
+        # aspect ratios differ; this is the same geography model as the browser.
+        scale = out["width"] / native["width"] / view_width
+        keys.append({**key, "zoom": scale, "fusion_center": {
+            "x": 0.5 + (0.5 - center["x"]) / view_width,
+            "y": 0.5 + (0.5 - center["y"]) * max_view_width / view_width}})
     duration, width, height = out["duration_frames"] - 1, native["width"], native["height"]
+    output_width, output_height = out["width"], out["height"]
     tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_wide.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
     # Detail remains a raster layer, geographically placed over the wide map.
     factor = float(native["wide_factor"])
@@ -156,12 +162,12 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
         border_red, border_green, border_blue = _rgb(country.get("border_color", "#ffffff"))
         tools.append(f'''\t\t{base}_Fill = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 1, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ -180, {300 + row} }} }},
 \t\t}},
 \t\t{base}_Border = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 1, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ -180, {370 + row} }} }},
 \t\t}},''')
         fill_layer, border_layer = number * 2 - 2, number * 2 - 1
@@ -186,7 +192,9 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 {_path_points(keys)}
 \t\t\t\t\t\t}} }}, }} }}, }},
 \t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, Input = Input {{ SourceOp = "Map_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 0 }} }}, }},
-\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Map_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 820, 0 }} }}, }},''')
+\t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 130 }} }}, }},
+\t\tFinal_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Output_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "Map_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 820, 0 }} }}, }},
+\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Final_Composite", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1040, 0 }} }}, }},''')
     content = f'''Composition {{
 \tCurrentTime = 0, RenderRange = {{ 0, {duration} }}, GlobalRange = {{ 0, {duration} }},
 \tTools = {{
