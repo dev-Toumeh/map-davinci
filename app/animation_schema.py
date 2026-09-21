@@ -28,6 +28,21 @@ def _aspect(output: dict, native: dict) -> tuple[float, float]:
     return width, height
 
 
+def _commentary(value: Any) -> dict:
+    """Optional narration reference. The file lives inside the export package."""
+    if not value:
+        return {"file": None, "volume": 1.0}
+    if not isinstance(value, dict):
+        raise ValueError("commentary must be an object")
+    volume = max(0.0, min(1.0, _number(value.get("volume", 1.0), "commentary volume")))
+    file_name = value.get("file")
+    if file_name is not None:
+        file_name = str(file_name)
+        if "/" in file_name or "\\" in file_name or file_name.startswith("."):
+            raise ValueError("commentary file must be a package-local name")
+    return {"file": file_name, "volume": volume}
+
+
 def normalize_animation(value: Any, metadata: dict) -> dict:
     """Return a canonical V2 shot. V1 zoom keyframes are migrated safely."""
     if not isinstance(value, dict):
@@ -143,4 +158,5 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
             "assets_metadata": "metadata.json",
             "output": {"width": width, "height": height, "fps": fps,
                        "duration_frames": duration},
+             "commentary": _commentary(value.get("commentary")),
              "keyframes": normalized, "connections": normalized_connections}

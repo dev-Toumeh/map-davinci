@@ -128,6 +128,10 @@ class Handler(BaseHTTPRequestHandler):
         for key in animation["keyframes"]:
             if "fusion_path" not in key and key["frame"] in paths:
                 key["fusion_path"] = paths[key["frame"]]
+        # A tab opened before commentary existed sends no commentary field; keep
+        # the saved narration reference instead of erasing it.
+        if "commentary" not in config:
+            animation["commentary"] = existing["commentary"]
         return animation
 
     # ---- routing ---------------------------------------------------------
@@ -183,14 +187,54 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         try:
             length = int(self.headers.get("Content-Length", 0))
-            config = json.loads(self.rfile.read(length) or b"{}")
-            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
+            raw_body = self.rfile.read(length)
+            # The audio upload is multipart; only JSON routes parse JSON here.
+            config = json.loads(raw_body or b"{}") if path != "/api/export" and not path.endswith("/audio") else {}
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/audio", path)):
                 package = self._package(m.group(1))
-                animation = self._normalize_animation(package, config)
-                target = package / "animation.json"
-                temporary = target.with_suffix(".json.tmp")
+                # Multipart upload: store the narration inside the package and
+                # reference it from animation.json.
+                content_type = self.headers.get("Content-Type", "")
+                match = re.search(r'boundary="?([^";]+)"?', content_type)
+                if not match:
+                    raise ValueError("multipart boundary missing")
+                boundary = ("--" + match.group(1)).encode()
+                body = raw_body
+                audio, filename = None, "commentary.mp3"
+                for part in body.split(boundary):
+                    if b"filename=" in part and b"\r\n\r\n" in part:
+                        head, _, payload = part.partition(b"\r\n\r\n")
+                        name_match = re.search(rb'filename="([^"]+)"', head)
+                        if name_match:
+                            filename = name_match.group(1).decode("utf-8", "replace") or filename
+                        audio = payload.rstrip(b"\r\n")
+                if not audio:
+                    raise ValueError("audio file missing from upload")
+                safe_name = re.sub(r"[^A-Za-z0-9_.-]", "_", filename)[:80] or "commentary.mp3"
+                (package / safe_name).write_bytes(audio)
+                animation_path = package / "animation.json"
+                animation = animation_schema.normalize_animation(
+                    json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
+                    self._metadata(package))
+                animation["commentary"] = {"file": safe_name, "volume": 1.0}
+                temporary = animation_path.with_suffix(".json.tmp")
                 temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
-                temporary.replace(target)
+                temporary.replace(animation_path)
+                self._json({"ok": True, "file": safe_name})
+                return
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/audio/remove", path)):
+                package = self._package(m.group(1))
+                animation_path = package / "animation.json"
+                animation = animation_schema.normalize_animation(
+                    json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
+                    self._metadata(package))
+                removed = animation["commentary"].get("file")
+                animation["commentary"] = {"file": None, "volume": 1.0}
+                temporary = animation_path.with_suffix(".json.tmp")
+                temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
+                temporary.replace(animation_path)
+                if removed and "/" not in removed and "\\" not in removed:
+                    (package / removed).unlink(missing_ok=True)
                 self._json({"ok": True, "animation": animation})
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/fusion", path)):
