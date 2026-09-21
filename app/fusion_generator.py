@@ -108,18 +108,23 @@ def _rgb(hex_color: str) -> tuple[float, float, float]:
 def _key_lines(keys: list[dict], component: str) -> str:
     lines = []
     for index, key in enumerate(keys):
-        value = key["zoom"] if component == "size" else index / max(1, len(keys) - 1)
-        flag = ", Flags = { Linear = true }" if key["easing"] == "linear" else ""
-        lines.append(f"\t\t\t\t[{key['frame']}] = {{ {value:.12g}{flag} }},")
+        value = key["zoom"] if component == "size" else key["displacement"]
+        # Fusion's implicit Bézier handles add un-authored camera reversals
+        # between keys. Export each segment explicitly linear until browser
+        # smooth easing has a tested one-to-one Fusion representation.
+        lines.append(f"\t\t\t\t[{key['frame']}] = {{ {value:.12g}, Flags = {{ Linear = true }} }},")
     return "\n".join(lines)
 
 
 def _path_points(keys: list[dict]) -> str:
     points = []
     for key in keys:
-        center = key["fusion_center"]
+        center = key.get("fusion_path") or {
+            "x": key["fusion_center"]["x"] - 0.5,
+            "y": key["fusion_center"]["y"] - 0.5,
+        }
         points.append("\t\t\t\t\t\t\t{ Linear = true, X = %.12g, Y = %.12g, LX = 0, LY = 0, RX = 0, RY = 0 },"
-                      % (center["x"] - 0.5, center["y"] - 0.5))
+                      % (center["x"], center["y"]))
     return "\n".join(points if len(points) > 1 else points * 2)
 
 
@@ -191,7 +196,23 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
         scale = out["width"] / native["width"] / view_width
         keys.append({**key, "zoom": scale, "fusion_center": {
             "x": 0.5 + (0.5 - center["x"]) / view_width,
-            "y": 0.5 + (0.5 - center["y"]) * max_view_width / view_width}})
+            # Browser Y grows downward. Reverse it for Fusion's Y-up camera
+            # path so an upper browser target does not pan to the lower map.
+            "y": 0.5 + (center["y"] - 0.5) * max_view_width / view_width}})
+    # PolyPath is parameterized by cumulative path length, not key index. Map
+    # each authored frame to its exact path point, preventing hidden geometry
+    # points from being reached at an unintended time.
+    path_points = [key.get("fusion_path") or {
+        "x": key["fusion_center"]["x"] - 0.5,
+        "y": key["fusion_center"]["y"] - 0.5,
+    } for key in keys]
+    lengths = [0.0]
+    for previous, current in zip(path_points, path_points[1:]):
+        lengths.append(lengths[-1] + math.hypot(current["x"] - previous["x"],
+                                                  current["y"] - previous["y"]))
+    total_length = lengths[-1]
+    for key, length in zip(keys, lengths):
+        key["displacement"] = length / total_length if total_length else 0.0
     duration, width, height = out["duration_frames"] - 1, native["width"], native["height"]
     output_width, output_height = out["width"], out["height"]
     tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_wide.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']

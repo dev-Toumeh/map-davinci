@@ -79,8 +79,19 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
         easing = str(key.get("easing", "smooth"))
         if easing not in EASINGS:
             raise ValueError(f"keyframe {i + 1} easing must be linear or smooth")
-        normalized.append({"frame": frame, "center": {"x": x, "y": y},
-                           "view_width": view_width, "easing": easing})
+        normalized_key = {"frame": frame, "center": {"x": x, "y": y},
+                          "view_width": view_width, "easing": easing}
+        # An optional Fusion-path offset records a creator-approved camera
+        # calibration without changing the browser's geographic camera key.
+        fusion_path = key.get("fusion_path")
+        if fusion_path is not None:
+            if not isinstance(fusion_path, dict):
+                raise ValueError(f"keyframe {i + 1} fusion path must be an object")
+            normalized_key["fusion_path"] = {
+                "x": _number(fusion_path.get("x"), f"keyframe {i + 1} fusion path x"),
+                "y": _number(fusion_path.get("y"), f"keyframe {i + 1} fusion path y"),
+            }
+        normalized.append(normalized_key)
     normalized.sort(key=lambda key: key["frame"])
     connections = value.get("connections") or []
     if not isinstance(connections, list):

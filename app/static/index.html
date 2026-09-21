@@ -135,7 +135,7 @@
       </div>
       <div>
         <label>Export name</label>
-        <input type="text" id="shotname" value="saudi_arabia">
+        <input type="text" id="shotname" placeholder="Generated from selected country">
       </div>
       <div id="frameinfo"></div><label class="guide-toggle"><input type="checkbox" id="showguides" checked> Show alignment guides</label>
     </div>
@@ -190,6 +190,14 @@ let selected = new Map();         // iso3 -> {iso3, name}  (highlighted countrie
 const outlineLayers = {};         // iso3 -> Leaflet outline layer on the map
 let targetCrop = null;            // visible export crop in Leaflet container pixels
 let exporting = false;
+let exportNameIsAutomatic = true;
+const shotName = document.getElementById("shotname");
+shotName.addEventListener("input", () => { exportNameIsAutomatic = false; });
+function updateSuggestedExportName() {
+  if (!exportNameIsAutomatic) return;
+  shotName.value = [...selected.values()].map(c => c.name.toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")).join("_");
+}
 const DEFAULT_COUNTRY_COLOR = "#1689ff";
 const countryDefaultColor = country => country.default_color || DEFAULT_COUNTRY_COLOR;
 
@@ -215,15 +223,6 @@ async function boot() {
   if (data.error) { clist.textContent = data.error; return; }
   allCountries = data.countries;
   renderList();
-  // convenience: Saudi Arabia highlighted by default for the first test
-  const sau = allCountries.find(c => c.iso3 === "SAU");
-  if (sau) {
-    addCountry(sau);
-    // Make the default highlight immediately editable; the user should not
-    // need to click Saudi Arabia a second time just to change its color.
-    pending = sau.iso3;
-    renderList(); updateHbtn();
-  }
 }
 
 function renderList() {
@@ -258,13 +257,13 @@ function addCountry(c) {
   // The latest highlighted country becomes the active color target.
   pending = c.iso3;
   drawOutline(highlighted);
-  renderChips(); renderList(); updateHbtn(); updateButton();
+  renderChips(); renderList(); updateHbtn(); updateButton(); updateSuggestedExportName();
 }
 
 function removeCountry(iso) {
   selected.delete(iso);
   if (outlineLayers[iso]) { map.removeLayer(outlineLayers[iso]); delete outlineLayers[iso]; }
-  renderChips(); renderList(); updateHbtn(); updateButton();
+  renderChips(); renderList(); updateHbtn(); updateButton(); updateSuggestedExportName();
 }
 
 async function highlightAction() {
@@ -364,7 +363,7 @@ async function restoreExport(name) {
     document.getElementById("source").dispatchEvent(new Event("change"));
     // Keep the base name. The exporter automatically appends a timestamp if it
     // already exists, preserving the original package as a reproducible version.
-    document.getElementById("shotname").value = name.replace(/_\d{8}-\d{6}$/, "");
+    exportNameIsAutomatic = false; shotName.value = name.replace(/_\d{8}-\d{6}$/, "");
     for (const mask of meta.countries || []) {
       const country = allCountries.find(c => c.iso3 === mask.iso3);
       if (!country) continue;
@@ -443,7 +442,7 @@ document.getElementById("exportbtn").addEventListener("click", async () => {
   const [minx, maxy] = llToMerc(tl.lng, tl.lat);
   const [maxx, miny] = llToMerc(br.lng, br.lat);
   const body = {
-    name: document.getElementById("shotname").value.trim() || "shot",
+    name: shotName.value.trim() || [...selected.values()].map(c => c.iso3.toLowerCase()).join("_") || "shot",
     countries: [...selected.keys()],
     country_colors: Object.fromEntries([...selected].map(([iso, country]) => [iso, country.color])),
     center: map.getCenter(),

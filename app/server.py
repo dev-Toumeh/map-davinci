@@ -110,6 +110,26 @@ class Handler(BaseHTTPRequestHandler):
         return {"export": package.name, "metadata": self._metadata(package),
                 "animation": json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None}
 
+    def _normalize_animation(self, package: Path, config: dict) -> dict:
+        """Normalize a browser save without losing saved Fusion calibration.
+
+        A browser tab opened before a calibration was added has no fusion_path
+        field. Preserve the existing per-frame calibration in that case rather
+        than silently replacing it with the old browser payload.
+        """
+        animation = animation_schema.normalize_animation(config, self._metadata(package))
+        target = package / "animation.json"
+        if not target.is_file():
+            return animation
+        existing = animation_schema.normalize_animation(
+            json.loads(target.read_text(encoding="utf-8")), self._metadata(package))
+        paths = {key["frame"]: key["fusion_path"] for key in existing["keyframes"]
+                 if key.get("fusion_path")}
+        for key in animation["keyframes"]:
+            if "fusion_path" not in key and key["frame"] in paths:
+                key["fusion_path"] = paths[key["frame"]]
+        return animation
+
     # ---- routing ---------------------------------------------------------
 
     def do_GET(self):  # noqa: N802
@@ -166,7 +186,7 @@ class Handler(BaseHTTPRequestHandler):
             config = json.loads(self.rfile.read(length) or b"{}")
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
                 package = self._package(m.group(1))
-                animation = animation_schema.normalize_animation(config, self._metadata(package))
+                animation = self._normalize_animation(package, config)
                 target = package / "animation.json"
                 temporary = target.with_suffix(".json.tmp")
                 temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
@@ -176,7 +196,7 @@ class Handler(BaseHTTPRequestHandler):
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/fusion", path)):
                 package = self._package(m.group(1))
                 metadata = self._metadata(package)
-                animation = animation_schema.normalize_animation(config, metadata)
+                animation = self._normalize_animation(package, config)
                 (package / "animation.json").write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 target = fusion_generator.generate(package, metadata, animation)
                 relative = target.relative_to(EXPORTS_DIR)
