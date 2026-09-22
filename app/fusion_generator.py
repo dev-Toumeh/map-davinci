@@ -118,14 +118,70 @@ def _key_lines(keys: list[dict], component: str) -> str:
 
 def _path_points(keys: list[dict]) -> str:
     points = []
+    previous = None
     for key in keys:
         center = key.get("fusion_path") or {
             "x": key["fusion_center"]["x"] - 0.5,
             "y": key["fusion_center"]["y"] - 0.5,
         }
+        if center == previous:
+            continue
+        previous = center
         points.append("\t\t\t\t\t\t\t{ Linear = true, X = %.12g, Y = %.12g, LX = 0, LY = 0, RX = 0, RY = 0 },"
                       % (center["x"], center["y"]))
     return "\n".join(points if len(points) > 1 else points * 2)
+
+
+def _camera_samples(animation: dict, native: dict) -> list[dict]:
+    """Evaluate the browser camera before converting to source-space Transform values.
+
+    The browser interpolates view width, not its reciprocal (Fusion Size).
+    Sample every output frame so both linear and smooth shots match at render
+    times. Linear Fusion segments also avoid implicit Bezier overshoot.
+    """
+    out = animation["output"]
+    maximum = min(1.0, (out["width"] / out["height"]) /
+                  (native["width"] / native["height"]))
+    authored = sorted(animation["keyframes"], key=lambda key: key["frame"])
+
+    def width(key: dict) -> float:
+        return key.get("view_width") or maximum / key.get("zoom", 1.0)
+
+    def offset(key: dict) -> tuple[float, float]:
+        scale = out["width"] / native["width"] / width(key)
+        return ((0.5 - key["center"]["x"]) * scale,
+                (key["center"]["y"] - 0.5) * scale)
+
+    def correction(key: dict) -> tuple[float, float]:
+        if "fusion_path" not in key:
+            return (0.0, 0.0)
+        x, y = offset(key)
+        return (key["fusion_path"]["x"] - x, key["fusion_path"]["y"] - y)
+
+    samples = []
+    index = 0
+    for frame in range(authored[0]["frame"], authored[-1]["frame"] + 1):
+        while index < len(authored) - 1 and frame > authored[index + 1]["frame"]:
+            index += 1
+        a, b = authored[index], authored[min(index + 1, len(authored) - 1)]
+        t = (frame - a["frame"]) / (b["frame"] - a["frame"]) if b["frame"] != a["frame"] else 0.0
+        if b.get("easing", "smooth") == "smooth":
+            t = t * t * (3 - 2 * t)
+        w = width(a) + (width(b) - width(a)) * t
+        x = a["center"]["x"] + (b["center"]["x"] - a["center"]["x"]) * t
+        y = a["center"]["y"] + (b["center"]["y"] - a["center"]["y"]) * t
+        scale = out["width"] / native["width"] / w
+        ca, cb = correction(a), correction(b)
+        path = {"x": (0.5 - x) * scale + ca[0] + (cb[0] - ca[0]) * t,
+                "y": (y - 0.5) * scale + ca[1] + (cb[1] - ca[1]) * t}
+        samples.append({"frame": frame, "zoom": scale, "fusion_path": path})
+    lengths = [0.0]
+    for previous, current in zip(samples, samples[1:]):
+        p, q = previous["fusion_path"], current["fusion_path"]
+        lengths.append(lengths[-1] + math.hypot(q["x"] - p["x"], q["y"] - p["y"]))
+    for sample, length in zip(samples, lengths):
+        sample["displacement"] = length / lengths[-1] if lengths[-1] else 0.0
+    return samples
 
 
 def _connection_points(connection: dict) -> str:
@@ -183,37 +239,7 @@ def _connection_tools(connection: dict, width: int, height: int, duration: int, 
 
 def generate(package: Path, metadata: dict, animation: dict) -> Path:
     out, native = animation["output"], metadata["output"]
-    source_aspect = native["width"] / native["height"]
-    output_aspect = out["width"] / out["height"]
-    max_view_width = min(1.0, output_aspect / source_aspect)
-    keys = []
-    for key in animation["keyframes"]:
-        z = key.get("zoom") or max_view_width / key["view_width"]
-        center = key["center"]
-        view_width = key.get("view_width") or max_view_width / z
-        # Scale the landscape source uniformly to the selected output canvas.
-        # X/Y use different normalized coefficients when source and output
-        # aspect ratios differ; this is the same geography model as the browser.
-        scale = out["width"] / native["width"] / view_width
-        keys.append({**key, "zoom": scale, "fusion_center": {
-            "x": 0.5 + (0.5 - center["x"]) / view_width,
-            # Browser Y grows downward. Reverse it for Fusion's Y-up camera
-            # path so an upper browser target does not pan to the lower map.
-            "y": 0.5 + (center["y"] - 0.5) * max_view_width / view_width}})
-    # PolyPath is parameterized by cumulative path length, not key index. Map
-    # each authored frame to its exact path point, preventing hidden geometry
-    # points from being reached at an unintended time.
-    path_points = [key.get("fusion_path") or {
-        "x": key["fusion_center"]["x"] - 0.5,
-        "y": key["fusion_center"]["y"] - 0.5,
-    } for key in keys]
-    lengths = [0.0]
-    for previous, current in zip(path_points, path_points[1:]):
-        lengths.append(lengths[-1] + math.hypot(current["x"] - previous["x"],
-                                                  current["y"] - previous["y"]))
-    total_length = lengths[-1]
-    for key, length in zip(keys, lengths):
-        key["displacement"] = length / total_length if total_length else 0.0
+    keys = _camera_samples(animation, native)
     duration, width, height = out["duration_frames"] - 1, native["width"], native["height"]
     output_width, output_height = out["width"], out["height"]
     tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_wide.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
