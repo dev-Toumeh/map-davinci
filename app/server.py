@@ -62,6 +62,14 @@ MIME = {
     ".json": "application/json",
     ".svg": "image/svg+xml",
     ".ico": "image/x-icon",
+    ".mp3": "audio/mpeg",
+    ".wav": "audio/wav",
+    ".m4a": "audio/mp4",
+    ".aac": "audio/aac",
+    ".ogg": "audio/ogg",
+    ".opus": "audio/ogg",
+    ".webm": "audio/webm",
+    ".flac": "audio/flac",
 }
 
 
@@ -93,7 +101,14 @@ class Handler(BaseHTTPRequestHandler):
                 self._json({"error": "not found"}, 404)
                 return
             data = resolved.read_bytes()
-            self._send(200, data, MIME.get(resolved.suffix.lower(), "application/octet-stream"))
+            content_type = MIME.get(resolved.suffix.lower(), "application/octet-stream")
+            # Earlier uploads truncated long filenames, which also removed the
+            # extension. Recognize existing MP3 files so their media elements
+            # receive a playable content type.
+            if content_type == "application/octet-stream" and (
+                    data.startswith(b"ID3") or data[:2] in (b"\xff\xfb", b"\xff\xf3", b"\xff\xf2")):
+                content_type = "audio/mpeg"
+            self._send(200, data, content_type)
         except Exception as exc:  # noqa: BLE001
             self._json({"error": str(exc)}, 500)
 
@@ -224,7 +239,14 @@ class Handler(BaseHTTPRequestHandler):
                         audio = payload.rstrip(b"\r\n")
                 if not audio:
                     raise ValueError("audio file missing from upload")
-                safe_name = re.sub(r"[^A-Za-z0-9_.-]", "_", filename)[:80] or "commentary.mp3"
+                clean_name = re.sub(r"[^A-Za-z0-9_.-]", "_", filename)
+                suffix = Path(clean_name).suffix.lower()
+                # Keep a valid audio extension when shortening long filenames.
+                # Without it, browsers receive a generic binary response and
+                # cannot reliably play an otherwise valid upload.
+                if suffix not in MIME or not MIME[suffix].startswith("audio/"):
+                    suffix = ".mp3"
+                safe_name = f"{Path(clean_name).stem[:80 - len(suffix)]}{suffix}"
                 (package / safe_name).write_bytes(audio)
                 animation_path = package / "animation.json"
                 animation = animation_schema.normalize_animation(
