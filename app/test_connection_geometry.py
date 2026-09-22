@@ -1,4 +1,5 @@
 import math
+import re
 import unittest
 
 from connection_geometry import connection_shapes, connection_tools, dash_segments, path_at
@@ -49,10 +50,25 @@ class ConnectionGeometryTests(unittest.TestCase):
         out = {'width': 1080, 'height': 1920}
         text, layer = connection_tools(connection(arrowhead=True), 3840, 2160, 35, 0, 2, camera, out)
         self.assertIn('MultiPoly', text)
-        self.assertIn('time >= 10 and time < 36', text)
+        self.assertIn('SourceOp = "Link_test_Visibility", Source = "Value"', text)
         self.assertNotIn('TextPlus', text)
         self.assertNotIn('StyledText', text)
         self.assertIn('Layer2.Foreground', layer)
+
+    def test_visibility_before_start_and_after_disappearance(self):
+        for start, disappearance in [(10, None), (0, None), (10, 33)]:
+            text, _ = connection_tools(connection(start_frame=start, disappearance_frame=disappearance),
+                                       3840, 2160, 35, 0, 2,
+                                       [{'frame': 0, 'zoom': 2}], {'width': 1080, 'height': 1920})
+            spline = text.split('Link_test_Visibility = BezierSpline', 1)[1].split('Link_test_Mask', 1)[0]
+            keys = sorted((int(f), float(v)) for f, v in re.findall(r'\[(\d+)\] = \{ ([01]),', spline))
+            stop = 36 if disappearance is None else disappearance
+            for frame in range(37):
+                left = max((k for k in keys if k[0] <= frame), default=keys[0])
+                right = min((k for k in keys if k[0] >= frame), default=keys[-1])
+                value = left[1] if right[0] == left[0] else left[1]+(right[1]-left[1])*(frame-left[0])/(right[0]-left[0])
+                self.assertEqual(value, float(start <= frame < stop), (start, stop, frame))
+            self.assertNotIn('Expression =', text)
 
 
 if __name__ == '__main__':

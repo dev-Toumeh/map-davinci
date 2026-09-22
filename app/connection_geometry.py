@@ -96,6 +96,14 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
     start = connection['start_frame']
     stop = connection['disappearance_frame']
     stop = duration+1 if stop is None else stop
+    # Explicit opacity keys gate both the stroke and arrow. Shape splines hold
+    # their first value before their first key, so they cannot supply visibility.
+    visibility = {0: 0.0, start: 1.0, stop-1: 1.0, stop: 0.0}
+    if start > 0:
+        visibility[start-1] = 0.0
+    opacity_keys = ', '.join(
+        f'[{frame}] = {{ {value:g}, Flags = {{ Linear = true }} }}'
+        for frame, value in sorted(visibility.items()))
     samples, index = [], 0
     for frame in range(start, stop):
         while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
@@ -126,6 +134,7 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
     r, g, b = [int(color[i:i+2], 16)/255 for i in (0, 2, 4)]
     order = ', '.join(str(i+1) for i in range(slots))
     tools = f'''
+        {base}_Visibility = BezierSpline {{ KeyFrames = {{ {opacity_keys} }} }},
         {base}_Mask = MultiPoly {{ Inputs = {{
             MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
             PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
@@ -138,7 +147,7 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
             GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
             UseFrameFormatSettings = Input {{ Value = 0 }},
             TopLeftRed = Input {{ Value = {r} }}, TopLeftGreen = Input {{ Value = {g} }}, TopLeftBlue = Input {{ Value = {b} }},
-            TopLeftAlpha = Input {{ Expression = "iif(time >= {start} and time < {stop}, 1, 0)" }}
+            TopLeftAlpha = Input {{ Value = 0, SourceOp = "{base}_Visibility", Source = "Value" }}
         }}, ViewInfo = OperatorInfo {{ Pos = {{ -180, {pos_y} }} }} }},
         {''.join(splines)}
 '''
