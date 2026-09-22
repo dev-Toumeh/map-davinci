@@ -1,9 +1,11 @@
 """Camera projection regression checks; run with unittest discover -s app."""
 import math
 import re
+import tempfile
 import unittest
+from pathlib import Path
 
-from fusion_generator import _camera_samples, _path_points
+from fusion_generator import _camera_samples, _path_points, _key_lines, _camera_timing_keys, generate
 
 
 class CameraProjectionTests(unittest.TestCase):
@@ -63,6 +65,48 @@ class CameraProjectionTests(unittest.TestCase):
         for sample, key in [(samples[0], animation["keyframes"][0]), (samples[-1], animation["keyframes"][-1])]:
             for axis in ["x", "y"]:
                 self.assertAlmostEqual(sample["fusion_path"][axis], key["fusion_path"][axis])
+
+    def test_map_timing_is_sparse_while_arrow_shapes_keep_frame_samples(self):
+        animation = {"output": {"width": 2160, "height": 3840, "duration_frames": 90},
+                     "keyframes": [
+                         {"frame": 0, "center": {"x": .5, "y": .5}, "view_width": .3},
+                         {"frame": 24, "center": {"x": .51, "y": .4}, "view_width": .08, "easing": "smooth"},
+                         {"frame": 60, "center": {"x": .52, "y": .39}, "view_width": .05, "easing": "smooth"}],
+                     "connections": [{"id": "example", "name": "example", "start": {"x": .4, "y": .4},
+                                      "end": {"x": .6, "y": .35}, "bend": None,
+                                      "path_type": "straight", "line_style": "solid", "thickness": 2,
+                                      "color": "#ffffff", "arrowhead": True, "arrow_size": 14,
+                                      "start_frame": 10, "arrival_frame": 45,
+                                      "disappearance_frame": None, "easing": "linear"}]}
+        metadata = {"output": {"width": 3840, "height": 2160, "wide_factor": 2}, "countries": []}
+        with tempfile.TemporaryDirectory() as tmp:
+            text = generate(Path(tmp), metadata, animation).read_text()
+        for name in ("Map_AnimationDisplacement", "Map_AnimationSize"):
+            section = text.split(name + " = BezierSpline", 1)[1].split("Map_Animation", 1)[0]
+            frames = [int(f) for f in re.findall(r"\[(\d+)\] = \{", section)]
+            self.assertTrue({0, 24, 60}.issubset(frames))
+            self.assertLess(len(frames), 20)
+            self.assertIn("RH =", section)
+            self.assertNotIn("Linear = true", section)
+        arrow = text.split("Link_example_Shape2 = BezierSpline", 1)[1]
+        self.assertGreater(arrow.count("Value = Polyline"), 30)
+
+    def test_handles_approximate_smooth_zoom_with_authored_keys(self):
+        animation = {"output": {"width": 2160, "height": 3840}, "keyframes": [
+            {"frame": 0, "center": {"x": .5, "y": .5}, "view_width": .25},
+            {"frame": 52, "center": {"x": .55, "y": .4}, "view_width": .04, "easing": "smooth"}]}
+        samples = _camera_samples(animation, {"width": 3840, "height": 2160})
+        keys = _camera_timing_keys(samples, {0, 52})
+        self.assertLess(len(keys), 10)
+        for a, b in zip(keys, keys[1:]):
+            lines = _key_lines([a, b], samples, "size")
+            handles = re.findall(r"RH = \{ [^,]+, ([\d.e+-]+) \}|LH = \{ [^,]+, ([\d.e+-]+) \}", lines)
+            right, left = float(handles[0][0]), float(handles[1][1])
+            for frame in range(a["frame"], b["frame"] + 1):
+                t = (frame-a["frame"])/(b["frame"]-a["frame"])
+                size = ((1-t)**3*a["zoom"] + 3*(1-t)**2*t*right +
+                        3*(1-t)*t*t*left + t**3*b["zoom"])
+                self.assertLessEqual(abs(size-samples[frame]["zoom"])/samples[frame]["zoom"], .0201)
 
 
 if __name__ == "__main__":

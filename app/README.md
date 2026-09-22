@@ -58,9 +58,12 @@ so the landscape source map cannot force a portrait timeline back to 16:9.
 
 Keyframes store a time, view center, zoom, and easing *into* that keyframe. Smooth
 uses the defined cubic `3t² − 2t³`; linear uses constant interpolation. The generated
-Fusion composition uses per-frame camera keys to reproduce the browser's view-width
-interpolation and easing at integer output frames. This produces denser editable
-curves; subframe motion-blur samples are linearly approximated between those keys.
+Fusion composition retains the authored camera keys and adds keys where fitted
+Bezier curves need them to reproduce the browser's motion. Dense per-frame camera
+samples still define the spatial path, while connections retain their per-frame
+line and arrow geometry. The camera fit allows up to 2% zoom difference and a
+small displacement difference at integer output frames; verify the resulting
+motion in Resolve, especially with motion blur.
 Camera position is converted in the landscape Transform's source coordinates before
 the centered merge onto the output canvas. Import and render it
 in Resolve to verify native node behaviour before using it in production.

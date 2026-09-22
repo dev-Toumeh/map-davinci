@@ -106,14 +106,92 @@ def _rgb(hex_color: str) -> tuple[float, float, float]:
     return tuple(int(value[i:i + 2], 16) / 255 for i in (0, 2, 4))
 
 
-def _key_lines(keys: list[dict], component: str) -> str:
+def _fit_camera_handles(samples: list[dict], start: dict, end: dict,
+                        component: str) -> tuple[float, float]:
+    """Fit a cubic segment and constrain its handles to avoid reversals."""
+    def value(key: dict) -> float:
+        return key["zoom"] if component == "size" else key["displacement"]
+    y0, y3 = value(start), value(end)
+    if abs(y3 - y0) < 1e-12:
+        return y0, y3
+    a = b = c = d = e = 0.0
+    first, last = start["frame"], end["frame"]
+    offset = samples[0]["frame"]
+    for sample in samples[first - offset + 1:last - offset]:
+        t = (sample["frame"] - first) / (last - first)
+        u = 1 - t
+        b1, b2 = 3 * u * u * t, 3 * u * t * t
+        residual = value(sample) - y0 * u ** 3 - y3 * t ** 3
+        a += b1 * b1
+        b += b1 * b2
+        c += b2 * b2
+        d += b1 * residual
+        e += b2 * residual
+    det = a * c - b * b
+    if abs(det) < 1e-15:
+        return y0 + (y3 - y0) / 3, y0 + (y3 - y0) * 2 / 3
+    low, high = sorted((y0, y3))
+    return (max(low, min(high, (d * c - e * b) / det)),
+            max(low, min(high, (e * a - d * b) / det)))
+
+
+def _camera_timing_keys(samples: list[dict], authored_frames: set[int]) -> list[dict]:
+    """Keep authored keys; add a few only where a cubic is visibly inaccurate.
+
+    The dense samples remain the spatial path and the input to connection
+    geometry. Only the editable camera timing curves are simplified.
+    """
+    offset = samples[0]["frame"]
+    retained = {frame - offset for frame in authored_frames}
+
+    def split(i: int, j: int) -> None:
+        if j - i < 2:
+            return
+        handles = {part: _fit_camera_handles(samples, samples[i], samples[j], part)
+                   for part in ("size", "displacement")}
+        travel = abs(samples[j]["displacement"] - samples[i]["displacement"])
+        largest, worst = 0.0, None
+        for k in range(i + 1, j):
+            t, u = (k - i) / (j - i), (j - k) / (j - i)
+            score = 0.0
+            for part in ("size", "displacement"):
+                field = "zoom" if part == "size" else "displacement"
+                right, left = handles[part]
+                predicted = (samples[i][field] * u**3 + 3 * right * u*u*t +
+                             3 * left * u*t*t + samples[j][field] * t**3)
+                allowed = .02 * samples[k]["zoom"] if part == "size" else max(.001, .01 * travel)
+                score = max(score, abs(predicted - samples[k][field]) / allowed)
+            if score > largest:
+                largest, worst = score, k
+        if largest > 1 and worst is not None:
+            retained.add(worst)
+            split(i, worst)
+            split(worst, j)
+
+    anchors = sorted(retained)
+    for i, j in zip(anchors, anchors[1:]):
+        split(i, j)
+    return [samples[i] for i in sorted(retained)]
+
+
+def _key_lines(keys: list[dict], samples: list[dict], component: str) -> str:
+    def value(key: dict) -> float:
+        return key["zoom"] if component == "size" else key["displacement"]
+    handles = {}
+    for a, b in zip(keys, keys[1:]):
+        right, left = _fit_camera_handles(samples, a, b, component)
+        third = (b["frame"] - a["frame"]) / 3
+        handles[a["frame"], "RH"] = (a["frame"] + third, right)
+        handles[b["frame"], "LH"] = (b["frame"] - third, left)
     lines = []
-    for index, key in enumerate(keys):
-        value = key["zoom"] if component == "size" else key["displacement"]
-        # Fusion's implicit Bézier handles add un-authored camera reversals
-        # between keys. Export each segment explicitly linear until browser
-        # smooth easing has a tested one-to-one Fusion representation.
-        lines.append(f"\t\t\t\t[{key['frame']}] = {{ {value:.12g}, Flags = {{ Linear = true }} }},")
+    for key in keys:
+        frame = key["frame"]
+        parts = [f"{value(key):.12g}"]
+        for side in ("LH", "RH"):
+            if (frame, side) in handles:
+                x, y = handles[frame, side]
+                parts.append(f"{side} = {{ {x:.12g}, {y:.12g} }}")
+        lines.append(f"\t\t\t\t[{frame}] = {{ {', '.join(parts)} }},")
     return "\n".join(lines)
 
 
@@ -189,7 +267,9 @@ def _camera_samples(animation: dict, native: dict) -> list[dict]:
 
 def generate(package: Path, metadata: dict, animation: dict) -> Path:
     out, native = animation["output"], metadata["output"]
-    keys = _camera_samples(animation, native)
+    samples = _camera_samples(animation, native)
+    authored_frames = {key["frame"] for key in animation["keyframes"]}
+    keys = _camera_timing_keys(samples, authored_frames)
     duration, width, height = out["duration_frames"] - 1, native["width"], native["height"]
     output_width, output_height = out["width"], out["height"]
     tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_wide.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
@@ -233,7 +313,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
     for number, connection in enumerate(animation.get("connections", [])):
         connection_nodes, connection_layers = connection_tools(
             connection, width, height, duration, 300 + (len(metadata.get("countries", [])) + number) * 180,
-            layer_number, keys, out)
+            layer_number, samples, out)
         tools.append(connection_nodes)
         layers.append(connection_layers)
         layer_number += 1
@@ -245,13 +325,13 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ 120, 0 }} }},
 \t\t}},''')
     tools.append(f'''\t\tMap_AnimationDisplacement = BezierSpline {{ KeyFrames = {{
-{_key_lines(keys, 'displacement')}
+{_key_lines(keys, samples, 'displacement')}
 \t\t\t}} }},
 \t\tMap_AnimationSize = BezierSpline {{ KeyFrames = {{
-{_key_lines(keys, 'size')}
+{_key_lines(keys, samples, 'size')}
 \t\t\t}} }},
 \t\tMap_AnimationPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "Map_AnimationDisplacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
-{_path_points(keys)}
+{_path_points(samples)}
 \t\t\t\t\t\t}} }}, }} }}, }},
 \t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, Input = Input {{ SourceOp = "Map_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 0 }} }}, }},
 \t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 130 }} }}, }},
