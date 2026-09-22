@@ -144,7 +144,7 @@ def _connection_tools(connection: dict, width: int, height: int, duration: int, 
     red, green, blue = _rgb(connection["color"])
     # Text+ is used because its Path Start/End is Fusion's editable write-on
     # control and supports both solid and dashed text strokes on the same path.
-    text = "━━━━━━━━━━━━━━━━━━━━" if connection["line_style"] == "solid" else "— — — — — — — — — —"
+    text = "--------------------------------" if connection["line_style"] == "solid" else "--  --  --  --  --  --  --  --"
     flags = ", Flags = { Linear = true }" if connection["easing"] == "linear" else ""
     points = _connection_points(connection)
     angle = math.degrees(math.atan2(connection["end"]["y"] - connection["start"]["y"],
@@ -174,7 +174,7 @@ def _connection_tools(connection: dict, width: int, height: int, duration: int, 
 				[{connection["arrival_frame"]}] = {{ 1{flags} }},
 			}} }},
 		{base}_ArrowPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "{base}_ArrowProgress", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{ {points} }} }}, }} }}, }},
-		{base}_Arrow = TextPlus {{ NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {end_frame - .001:.3f}, FrameLength = 1 }} }}, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Center = Input {{ SourceOp = "{base}_ArrowPath", Source = "Position", }}, Angle = Input {{ Value = {angle:.12g}, }}, Red1 = Input {{ Value = {red:.12g}, }}, Green1 = Input {{ Value = {green:.12g}, }}, Blue1 = Input {{ Value = {blue:.12g}, }}, StyledText = Input {{ Value = "▶", }}, Size = Input {{ Value = {connection["arrow_size"] / 1000:.12g}, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 70, {pos_y} }} }}, }},'''
+		{base}_Arrow = TextPlus {{ NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {end_frame - .001:.3f}, FrameLength = 1 }} }}, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Center = Input {{ SourceOp = "{base}_ArrowPath", Source = "Position", }}, Angle = Input {{ Value = {angle:.12g}, }}, Red1 = Input {{ Value = {red:.12g}, }}, Green1 = Input {{ Value = {green:.12g}, }}, Blue1 = Input {{ Value = {blue:.12g}, }}, StyledText = Input {{ Value = ">", }}, Font = Input {{ Value = "Open Sans", }}, Style = Input {{ Value = "Bold", }}, Size = Input {{ Value = {connection["arrow_size"] / 1000:.12g}, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 70, {pos_y} }} }}, }},'''
         layer += f'''
 				["Layer{layer_number + 1}.Foreground"] = Input {{ SourceOp = "{base}_Arrow", Source = "Output", }},
 				LayerName{layer_number + 1} = Input {{ Value = "{connection["name"]} arrow", }},'''
