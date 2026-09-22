@@ -51,6 +51,8 @@ class ConnectionGeometryTests(unittest.TestCase):
         text, layer = connection_tools(connection(arrowhead=True), 3840, 2160, 35, 0, 2, camera, out)
         self.assertIn('MultiPoly', text)
         self.assertIn('SourceOp = "Link_test_Visibility", Source = "Value"', text)
+        self.assertIn('EnabledRegion = TimeRegion { { Start = 10, End = 35.999, FrameLength = 1 } }', text)
+        self.assertIn('["Layer2.Blend"] = Input { SourceOp = "Link_test_Visibility", Source = "Value" }', layer)
         self.assertNotIn('TextPlus', text)
         self.assertNotIn('StyledText', text)
         self.assertIn('Layer2.Foreground', layer)
@@ -69,6 +71,7 @@ class ConnectionGeometryTests(unittest.TestCase):
                 value = left[1] if right[0] == left[0] else left[1]+(right[1]-left[1])*(frame-left[0])/(right[0]-left[0])
                 self.assertEqual(value, float(start <= frame < stop), (start, stop, frame))
             self.assertNotIn('Expression =', text)
+            self.assertIn(f'Start = {start}, End = {stop - .001:.3f}', text)
 
 
 if __name__ == '__main__':

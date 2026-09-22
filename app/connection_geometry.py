@@ -142,7 +142,9 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
             PolyOrder = Input {{ Value = ScriptVal {{ {{ [0] = {order} }} }} }},
             {''.join(inputs)}
         }}, {''.join(definitions)} ViewInfo = OperatorInfo {{ Pos = {{ -400, {pos_y} }} }} }},
-        {base}_Line = Background {{ NameSet = true, Inputs = {{
+        {base}_Line = Background {{ NameSet = true,
+            EnabledRegion = TimeRegion {{ {{ Start = {start}, End = {stop - .001:.3f}, FrameLength = 1 }} }},
+            Inputs = {{
             EffectMask = Input {{ SourceOp = "{base}_Mask", Source = "Mask" }},
             GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
             UseFrameFormatSettings = Input {{ Value = 0 }},
@@ -151,5 +153,8 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
         }}, ViewInfo = OperatorInfo {{ Pos = {{ -180, {pos_y} }} }} }},
         {''.join(splines)}
 '''
-    layer = f'["Layer{layer_number}.Foreground"] = Input {{ SourceOp = "{base}_Line", Source = "Output" }},'
+    # Gate at the composite as well as at the Background: a mask's first
+    # polygon is held before its first shape key in Fusion.
+    layer = (f'["Layer{layer_number}.Foreground"] = Input {{ SourceOp = "{base}_Line", Source = "Output" }},'
+             f'["Layer{layer_number}.Blend"] = Input {{ SourceOp = "{base}_Visibility", Source = "Value" }},')
     return tools, layer
