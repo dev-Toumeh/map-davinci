@@ -138,6 +138,7 @@ def _connection_points(connection: dict) -> str:
 
 
 def _connection_tools(connection: dict, width: int, height: int, duration: int, pos_y: int, layer_number: int) -> tuple[str, str]:
+    end_frame = connection["disappearance_frame"] if connection["disappearance_frame"] is not None else duration - 1
     """Editable Text+ path line and traveling arrow for one saved connection."""
     base = "Link_" + _name(connection["id"])
     red, green, blue = _rgb(connection["color"])
@@ -151,10 +152,10 @@ def _connection_tools(connection: dict, width: int, height: int, duration: int, 
     tools = f'''		{base}_WriteOn = BezierSpline {{ KeyFrames = {{
 				[{connection["start_frame"]}] = {{ 0{flags} }},
 				[{connection["arrival_frame"]}] = {{ 1{flags} }},
-				[{connection["disappearance_frame"]}] = {{ 1, Flags = {{ Linear = true }} }},
+				[{end_frame}] = {{ 1, Flags = {{ Linear = true }} }},
 			}} }},
 		{base}_Line = TextPlus {{
-			NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {connection["disappearance_frame"] - .001:.3f}, FrameLength = 1 }} }},
+			NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {end_frame - .001:.3f}, FrameLength = 1 }} }},
 			Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }},
 				LayoutType = Input {{ Value = 3, }}, Wrap = Input {{ Value = 1, }}, Center = Input {{ Value = {{ .5, .5 }}, }},
 				Path = Input {{ Value = Polyline {{ Points = {{ {points} }} }}, }},
@@ -173,7 +174,7 @@ def _connection_tools(connection: dict, width: int, height: int, duration: int, 
 				[{connection["arrival_frame"]}] = {{ 1{flags} }},
 			}} }},
 		{base}_ArrowPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "{base}_ArrowProgress", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{ {points} }} }}, }} }}, }},
-		{base}_Arrow = TextPlus {{ NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {connection["disappearance_frame"] - .001:.3f}, FrameLength = 1 }} }}, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Center = Input {{ SourceOp = "{base}_ArrowPath", Source = "Position", }}, Angle = Input {{ Value = {angle:.12g}, }}, Red1 = Input {{ Value = {red:.12g}, }}, Green1 = Input {{ Value = {green:.12g}, }}, Blue1 = Input {{ Value = {blue:.12g}, }}, StyledText = Input {{ Value = "▶", }}, Size = Input {{ Value = {connection["arrow_size"] / 1000:.12g}, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 70, {pos_y} }} }}, }},'''
+		{base}_Arrow = TextPlus {{ NameSet = true, EnabledRegion = TimeRegion {{ {{ Start = {connection["start_frame"]}, End = {end_frame - .001:.3f}, FrameLength = 1 }} }}, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Center = Input {{ SourceOp = "{base}_ArrowPath", Source = "Position", }}, Angle = Input {{ Value = {angle:.12g}, }}, Red1 = Input {{ Value = {red:.12g}, }}, Green1 = Input {{ Value = {green:.12g}, }}, Blue1 = Input {{ Value = {blue:.12g}, }}, StyledText = Input {{ Value = "▶", }}, Size = Input {{ Value = {connection["arrow_size"] / 1000:.12g}, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 70, {pos_y} }} }}, }},'''
         layer += f'''
 				["Layer{layer_number + 1}.Foreground"] = Input {{ SourceOp = "{base}_Arrow", Source = "Output", }},
 				LayerName{layer_number + 1} = Input {{ Value = "{connection["name"]} arrow", }},'''

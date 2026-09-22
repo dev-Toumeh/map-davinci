@@ -138,6 +138,24 @@ class Handler(BaseHTTPRequestHandler):
         field. Preserve the existing per-frame calibration in that case rather
         than silently replacing it with the old browser payload.
         """
+        # A shot duration can be shortened after connections were authored.
+        # Keep those legacy connections editable by fitting their timing inside
+        # the new valid frame range before schema validation.
+        config = dict(config)
+        duration = int((config.get("output") or {}).get("duration_frames", 0) or 0)
+        if duration >= 3 and isinstance(config.get("connections"), list):
+            repaired = []
+            for connection in config["connections"]:
+                connection = dict(connection)
+                start = max(0, min(int(connection.get("start_frame", 0)), duration - 3))
+                arrival = max(start + 1, min(int(connection.get("arrival_frame", start + 1)), duration - 2))
+                pinned_to_end = connection.get("disappearance_frame") is None
+                raw_disappearance = duration - 1 if pinned_to_end else connection.get("disappearance_frame")
+                disappearance = max(arrival + 1, min(int(raw_disappearance), duration - 1))
+                connection.update(start_frame=start, arrival_frame=arrival,
+                                  disappearance_frame=None if pinned_to_end else disappearance)
+                repaired.append(connection)
+            config["connections"] = repaired
         animation = animation_schema.normalize_animation(config, self._metadata(package))
         target = package / "animation.json"
         if not target.is_file():
@@ -248,15 +266,8 @@ class Handler(BaseHTTPRequestHandler):
                     suffix = ".mp3"
                 safe_name = f"{Path(clean_name).stem[:80 - len(suffix)]}{suffix}"
                 (package / safe_name).write_bytes(audio)
-                animation_path = package / "animation.json"
-                animation = animation_schema.normalize_animation(
-                    json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
-                    self._metadata(package))
-                animation["commentary"] = {"file": safe_name, "volume": 1.0,
-                                            "start_frame": 0, "trim_in": 0.0, "trim_out": None}
-                temporary = animation_path.with_suffix(".json.tmp")
-                temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
-                temporary.replace(animation_path)
+                # The editor adds this file as a clip, then saves the complete
+                # clip list. Do not overwrite existing sections here.
                 self._json({"ok": True, "file": safe_name})
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/audio/remove", path)):
@@ -265,9 +276,8 @@ class Handler(BaseHTTPRequestHandler):
                 animation = animation_schema.normalize_animation(
                     json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
                     self._metadata(package))
-                removed = animation["commentary"].get("file")
-                animation["commentary"] = {"file": None, "volume": 1.0,
-                                            "start_frame": 0, "trim_in": 0.0, "trim_out": None}
+                removed = None  # Clip files may be shared by split sections.
+                animation["commentary"] = {"clips": []}
                 temporary = animation_path.with_suffix(".json.tmp")
                 temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 temporary.replace(animation_path)

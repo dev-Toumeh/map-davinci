@@ -29,27 +29,40 @@ def _aspect(output: dict, native: dict) -> tuple[float, float]:
 
 
 def _commentary(value: Any) -> dict:
-    """Optional narration reference. The file lives inside the export package."""
+    """Optional, non-destructive narration clips in the export package."""
     if not value:
-        return {"file": None, "volume": 1.0, "start_frame": 0,
-                "trim_in": 0.0, "trim_out": None}
+        return {"clips": []}
     if not isinstance(value, dict):
         raise ValueError("commentary must be an object")
-    volume = max(0.0, min(1.0, _number(value.get("volume", 1.0), "commentary volume")))
-    file_name = value.get("file")
-    if file_name is not None:
-        file_name = str(file_name)
-        if "/" in file_name or "\\" in file_name or file_name.startswith("."):
+    # Migrate the original single-commentary shape when an old shot is saved.
+    clips = value.get("clips")
+    if clips is None:
+        clips = [] if not value.get("file") else [value]
+    if not isinstance(clips, list):
+        raise ValueError("commentary clips must be a list")
+    normalized = []
+    ids = set()
+    for index, clip in enumerate(clips):
+        if not isinstance(clip, dict):
+            raise ValueError("commentary clip must be an object")
+        file_name = str(clip.get("file", ""))
+        if not file_name or "/" in file_name or "\\" in file_name or file_name.startswith("."):
             raise ValueError("commentary file must be a package-local name")
-    start_frame = int(_number(value.get("start_frame", 0), "commentary start frame"))
-    trim_in = max(0.0, _number(value.get("trim_in", 0), "commentary trim in"))
-    trim_out = value.get("trim_out")
-    if trim_out is not None:
-        trim_out = _number(trim_out, "commentary trim out")
-        if trim_out <= trim_in:
-            raise ValueError("commentary trim out must be after trim in")
-    return {"file": file_name, "volume": volume, "start_frame": max(0, start_frame),
-            "trim_in": trim_in, "trim_out": trim_out}
+        clip_id = str(clip.get("id") or f"commentary_{index + 1}")
+        if clip_id in ids:
+            raise ValueError("commentary clip ids must be unique")
+        ids.add(clip_id)
+        trim_in = max(0.0, _number(clip.get("trim_in", 0), "commentary trim in"))
+        trim_out = clip.get("trim_out")
+        if trim_out is not None:
+            trim_out = _number(trim_out, "commentary trim out")
+            if trim_out <= trim_in:
+                raise ValueError("commentary trim out must be after trim in")
+        normalized.append({"id": clip_id, "file": file_name,
+                           "volume": max(0.0, min(1.0, _number(clip.get("volume", 1), "commentary volume"))),
+                           "start_frame": max(0, int(_number(clip.get("start_frame", 0), "commentary start frame"))),
+                           "trim_in": trim_in, "trim_out": trim_out})
+    return {"clips": normalized}
 
 
 def normalize_animation(value: Any, metadata: dict) -> dict:
@@ -145,8 +158,11 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
         bend = point("bend") if path_type == "curved" and start and end else None
         start_frame = int(_number(connection.get("start_frame", 0), f"connection {index + 1} start frame"))
         arrival_frame = int(_number(connection.get("arrival_frame", 1), f"connection {index + 1} arrival frame"))
-        disappearance_frame = int(_number(connection.get("disappearance_frame", duration - 1), f"connection {index + 1} disappearance frame"))
-        if start and end and not (0 <= start_frame < arrival_frame < disappearance_frame < duration):
+        raw_disappearance = connection.get("disappearance_frame")
+        disappearance_frame = None if raw_disappearance is None else int(_number(
+            raw_disappearance, f"connection {index + 1} disappearance frame"))
+        effective_end = duration - 1 if disappearance_frame is None else disappearance_frame
+        if start and end and not (0 <= start_frame < arrival_frame < effective_end < duration):
             raise ValueError(f"connection {index + 1} timing must satisfy start < arrival < disappearance inside the shot")
         color = str(connection.get("color", "#ffffff"))
         if not __import__("re").fullmatch(r"#[0-9a-fA-F]{6}", color):
