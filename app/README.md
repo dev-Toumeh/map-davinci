@@ -67,6 +67,15 @@ in Resolve to verify native node behaviour before using it in production.
 
 ## Using the assets in Fusion
 
+Connections export as animated native MultiPoly masks and colored Backgrounds,
+including filled arrowheads; no fonts or hyphen strings are used. The curved
+path uses the browser's quadratic Bezier geometry and reveal timing. Line widths,
+dash spacing and arrow sizes use a 1080-pixel output short edge as their reference,
+scaled for other resolutions, and remain constant during camera zoom. The preview
+uses the same units, so existing lines may look thinner than the older window-pixel
+preview. Adjust the connection thickness/arrow controls if desired. Geometry is
+sampled at integer frames; native Resolve import/render remains a verification step.
+
 - New generated compositions use `geometry_<ISO>.geojson` points to create editable
   Fusion `MultiPoly` masks and colored Background layers. PNG masks remain available
   for other workflows and old packages.
