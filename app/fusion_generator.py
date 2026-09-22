@@ -316,7 +316,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
             layer_number, samples, out)
         tools.append(connection_nodes)
         layers.append(connection_layers)
-        layer_number += 1
+        layer_number += 2 if connection['line_style'] == 'solid' and connection['arrowhead'] else 1
     tools.append(f'''\t\tMap_Layers = MultiMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{ Background = Input {{ SourceOp = "Map_Wide", Source = "Output", }},

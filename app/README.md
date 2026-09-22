@@ -60,8 +60,8 @@ Keyframes store a time, view center, zoom, and easing *into* that keyframe. Smoo
 uses the defined cubic `3t² − 2t³`; linear uses constant interpolation. The generated
 Fusion composition retains the authored camera keys and adds keys where fitted
 Bezier curves need them to reproduce the browser's motion. Dense per-frame camera
-samples still define the spatial path, while connections retain their per-frame
-line and arrow geometry. The camera fit allows up to 2% zoom difference and a
+samples still define the spatial path, while arrow geometry and dashed connections
+retain their per-frame samples. The camera fit allows up to 2% zoom difference and a
 small displacement difference at integer output frames; verify the resulting
 motion in Resolve, especially with motion blur.
 Camera position is converted in the landscape Transform's source coordinates before
@@ -70,14 +70,15 @@ in Resolve to verify native node behaviour before using it in production.
 
 ## Using the assets in Fusion
 
-Connections export as animated native MultiPoly masks and colored Backgrounds,
-including filled arrowheads; no fonts or hyphen strings are used. The curved
+Solid connections export as native Polygon strokes with animated WriteLength;
+filled arrowheads and dashed connections retain polygon geometry. No fonts or
+hyphen strings are used. The curved
 path uses the browser's quadratic Bezier geometry and reveal timing. Line widths,
 dash spacing and arrow sizes use a 1080-pixel output short edge as their reference,
 scaled for other resolutions, and remain constant during camera zoom. The preview
 uses the same units, so existing lines may look thinner than the older window-pixel
 preview. Adjust the connection thickness/arrow controls if desired. Geometry is
-sampled at integer frames; native Resolve import/render remains a verification step.
+sampled at integer frames where needed; native Resolve import/render remains a verification step.
 
 - New generated compositions use `geometry_<ISO>.geojson` points to create editable
   Fusion `MultiPoly` masks and colored Background layers. PNG masks remain available

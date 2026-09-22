@@ -88,7 +88,7 @@ class CameraProjectionTests(unittest.TestCase):
             self.assertLess(len(frames), 20)
             self.assertIn("RH =", section)
             self.assertNotIn("Linear = true", section)
-        arrow = text.split("Link_example_Shape2 = BezierSpline", 1)[1]
+        arrow = text.split("Link_example_ArrowShape = BezierSpline", 1)[1]
         self.assertGreater(arrow.count("Value = Polyline"), 30)
 
     def test_handles_approximate_smooth_zoom_with_authored_keys(self):

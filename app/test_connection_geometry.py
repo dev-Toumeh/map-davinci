@@ -49,13 +49,27 @@ class ConnectionGeometryTests(unittest.TestCase):
         camera = [{'frame': 0, 'zoom': 2}]
         out = {'width': 1080, 'height': 1920}
         text, layer = connection_tools(connection(arrowhead=True), 3840, 2160, 35, 0, 2, camera, out)
-        self.assertIn('MultiPoly', text)
+        self.assertIn('Link_test_StrokeMask = PolylineMask', text)
+        self.assertIn('WriteLength = Input { Value = 0, SourceOp = "Link_test_WriteLength"', text)
+        self.assertIn('[10] = { 0, Flags = { Linear = true } }, [30] = { 1, Flags = { Linear = true } }', text)
+        self.assertIn('Link_test_ArrowMask = PolylineMask', text)
         self.assertIn('SourceOp = "Link_test_Visibility", Source = "Value"', text)
         self.assertIn('EnabledRegion = TimeRegion { { Start = 10, End = 35.999, FrameLength = 1 } }', text)
         self.assertIn('["Layer2.Blend"] = Input { SourceOp = "Link_test_Visibility", Source = "Value" }', layer)
         self.assertNotIn('TextPlus', text)
         self.assertNotIn('StyledText', text)
         self.assertIn('Layer2.Foreground', layer)
+        self.assertIn('Layer3.Foreground', layer)
+
+    def test_curved_stroke_reveal_keeps_bezier_handles_and_smooth_easing(self):
+        text, _ = connection_tools(connection(path_type='curved', easing='smooth', arrowhead=False),
+                                   3840, 2160, 35, 0, 2,
+                                   [{'frame': 0, 'zoom': 2}], {'width': 1080, 'height': 1920})
+        self.assertIn('RX =', text)
+        self.assertIn('LX =', text)
+        self.assertIn('RH = { 16.6666666667, 0 }', text)
+        self.assertIn('LH = { 23.3333333333, 1 }', text)
+        self.assertNotIn('Link_test_ArrowMask', text)
 
     def test_visibility_before_start_and_after_disappearance(self):
         for start, disappearance in [(10, None), (0, None), (10, 33)]:

@@ -104,6 +104,10 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
     opacity_keys = ', '.join(
         f'[{frame}] = {{ {value:g}, Flags = {{ Linear = true }} }}'
         for frame, value in sorted(visibility.items()))
+    if connection['line_style'] == 'solid':
+        return _solid_connection_tools(connection, width, height, duration, pos_y,
+                                       layer_number, camera, output, base, start,
+                                       stop, opacity_keys)
     samples, index = [], 0
     for frame in range(start, stop):
         while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
@@ -157,4 +161,97 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
     # polygon is held before its first shape key in Fusion.
     layer = (f'["Layer{layer_number}.Foreground"] = Input {{ SourceOp = "{base}_Line", Source = "Output" }},'
              f'["Layer{layer_number}.Blend"] = Input {{ SourceOp = "{base}_Visibility", Source = "Value" }},')
+    return tools, layer
+
+
+def _solid_connection_tools(connection, width, height, duration, pos_y,
+                            layer_number, camera, output, base, start, stop,
+                            opacity_keys):
+    """Reveal a stable Polygon stroke through its scalar WriteLength control.
+
+    Resolve can discard geometry-only keys in a MultiPoly shape spline when
+    loading/saving a comp. Keep arrow geometry separate from the stroke so a
+    lost shape key cannot expose the complete line at its start frame.
+    """
+    a, b = connection['start'], connection['end']
+    def point(p):
+        return p['x'] - .5, .5 - p['y']
+    x0, y0 = point(a)
+    x1, y1 = point(b)
+    if connection['path_type'] == 'curved' and connection.get('bend'):
+        qx, qy = point(connection['bend'])
+        path = (f'{{ X = {x0:.12g}, Y = {y0:.12g}, RX = {2*(qx-x0)/3:.12g}, RY = {2*(qy-y0)/3:.12g} }}, '
+                f'{{ X = {x1:.12g}, Y = {y1:.12g}, LX = {2*(qx-x1)/3:.12g}, LY = {2*(qy-y1)/3:.12g} }}')
+    else:
+        path = (f'{{ Linear = true, X = {x0:.12g}, Y = {y0:.12g} }}, '
+                f'{{ Linear = true, X = {x1:.12g}, Y = {y1:.12g} }}')
+    if connection['easing'] == 'smooth':
+        third = (connection['arrival_frame'] - start) / 3
+        write_keys = (f'[{start}] = {{ 0, RH = {{ {start+third:.12g}, 0 }} }}, '
+                      f'[{connection["arrival_frame"]}] = {{ 1, LH = {{ {connection["arrival_frame"]-third:.12g}, 1 }} }}')
+    else:
+        write_keys = (f'[{start}] = {{ 0, Flags = {{ Linear = true }} }}, '
+                      f'[{connection["arrival_frame"]}] = {{ 1, Flags = {{ Linear = true }} }}')
+    unit = min(output['width'], output['height']) / 1080
+    size = max(1, connection['thickness'] * 1.5) * unit
+    index, widths = 0, []
+    for frame in range(start, stop):
+        while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
+            index += 1
+        widths.append(f'[{frame}] = {{ {size/(width*camera[index]["zoom"]):.12g}, Flags = {{ Linear = true }} }}')
+    color = connection['color'].lstrip('#')
+    r, g, blue = [int(color[i:i+2], 16)/255 for i in (0, 2, 4)]
+    tools = f'''
+        {base}_Visibility = BezierSpline {{ KeyFrames = {{ {opacity_keys} }} }},
+        {base}_WriteLength = BezierSpline {{ KeyFrames = {{ {write_keys} }} }},
+        {base}_StrokeWidth = BezierSpline {{ KeyFrames = {{ {', '.join(widths)} }} }},
+        {base}_StrokeMask = PolylineMask {{ DrawMode = "InsertAndModify", Inputs = {{
+            MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
+            PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
+            ClippingMode = Input {{ Value = FuID {{ "None" }} }},
+            Solid = Input {{ Value = 0 }},
+            BorderWidth = Input {{ SourceOp = "{base}_StrokeWidth", Source = "Value" }},
+            WriteLength = Input {{ Value = 0, SourceOp = "{base}_WriteLength", Source = "Value" }},
+            Polyline = Input {{ Value = Polyline {{ Points = {{ {path} }} }} }}
+        }}, ViewInfo = OperatorInfo {{ Pos = {{ -400, {pos_y} }} }} }},
+        {base}_Line = Background {{ NameSet = true,
+            EnabledRegion = TimeRegion {{ {{ Start = {start}, End = {stop - .001:.3f}, FrameLength = 1 }} }},
+            Inputs = {{ EffectMask = Input {{ SourceOp = "{base}_StrokeMask", Source = "Mask" }},
+            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
+            UseFrameFormatSettings = Input {{ Value = 0 }},
+            TopLeftRed = Input {{ Value = {r} }}, TopLeftGreen = Input {{ Value = {g} }}, TopLeftBlue = Input {{ Value = {blue} }},
+            TopLeftAlpha = Input {{ Value = 0, SourceOp = "{base}_Visibility", Source = "Value" }}
+        }}, ViewInfo = OperatorInfo {{ Pos = {{ -180, {pos_y} }} }} }},
+'''
+    layer = (f'["Layer{layer_number}.Foreground"] = Input {{ SourceOp = "{base}_Line", Source = "Output" }},'
+             f'["Layer{layer_number}.Blend"] = Input {{ SourceOp = "{base}_Visibility", Source = "Value" }},')
+    if connection['arrowhead']:
+        entries = []
+        index = 0
+        for frame in range(start, stop):
+            while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
+                index += 1
+            shape = connection_shapes(connection, frame, camera[index]['zoom'],
+                                      width, height, output)[-1]
+            points = ', '.join('{ Linear = true, X = %.12g, Y = %.12g, LX = 0, LY = 0, RX = 0, RY = 0 }' % p for p in shape)
+            entries.append(f'[{frame}] = {{ 0, Flags = {{ Linear = true, LockedY = true }}, Value = Polyline {{ Closed = true, Points = {{ {points} }} }} }}')
+        tools += f'''
+        {base}_ArrowShape = BezierSpline {{ KeyFrames = {{ {', '.join(entries)} }} }},
+        {base}_ArrowMask = PolylineMask {{ DrawMode = "InsertAndModify", Inputs = {{
+            MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
+            PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
+            ClippingMode = Input {{ Value = FuID {{ "None" }} }},
+            Polyline = Input {{ SourceOp = "{base}_ArrowShape", Source = "Value" }}
+        }}, ViewInfo = OperatorInfo {{ Pos = {{ -400, {pos_y+70} }} }} }},
+        {base}_Arrow = Background {{ NameSet = true,
+            EnabledRegion = TimeRegion {{ {{ Start = {start}, End = {stop - .001:.3f}, FrameLength = 1 }} }},
+            Inputs = {{ EffectMask = Input {{ SourceOp = "{base}_ArrowMask", Source = "Mask" }},
+            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
+            UseFrameFormatSettings = Input {{ Value = 0 }},
+            TopLeftRed = Input {{ Value = {r} }}, TopLeftGreen = Input {{ Value = {g} }}, TopLeftBlue = Input {{ Value = {blue} }},
+            TopLeftAlpha = Input {{ Value = 0, SourceOp = "{base}_Visibility", Source = "Value" }}
+        }}, ViewInfo = OperatorInfo {{ Pos = {{ -180, {pos_y+70} }} }} }},
+'''
+        layer += (f'["Layer{layer_number+1}.Foreground"] = Input {{ SourceOp = "{base}_Arrow", Source = "Output" }},'
+                  f'["Layer{layer_number+1}.Blend"] = Input {{ SourceOp = "{base}_Visibility", Source = "Value" }},')
     return tools, layer
