@@ -31,7 +31,8 @@ def _aspect(output: dict, native: dict) -> tuple[float, float]:
 def _commentary(value: Any) -> dict:
     """Optional narration reference. The file lives inside the export package."""
     if not value:
-        return {"file": None, "volume": 1.0}
+        return {"file": None, "volume": 1.0, "start_frame": 0,
+                "trim_in": 0.0, "trim_out": None}
     if not isinstance(value, dict):
         raise ValueError("commentary must be an object")
     volume = max(0.0, min(1.0, _number(value.get("volume", 1.0), "commentary volume")))
@@ -40,7 +41,15 @@ def _commentary(value: Any) -> dict:
         file_name = str(file_name)
         if "/" in file_name or "\\" in file_name or file_name.startswith("."):
             raise ValueError("commentary file must be a package-local name")
-    return {"file": file_name, "volume": volume}
+    start_frame = int(_number(value.get("start_frame", 0), "commentary start frame"))
+    trim_in = max(0.0, _number(value.get("trim_in", 0), "commentary trim in"))
+    trim_out = value.get("trim_out")
+    if trim_out is not None:
+        trim_out = _number(trim_out, "commentary trim out")
+        if trim_out <= trim_in:
+            raise ValueError("commentary trim out must be after trim in")
+    return {"file": file_name, "volume": volume, "start_frame": max(0, start_frame),
+            "trim_in": trim_in, "trim_out": trim_out}
 
 
 def normalize_animation(value: Any, metadata: dict) -> dict:

@@ -23,6 +23,7 @@ Endpoints:
 from __future__ import annotations
 
 import json
+import logging
 import re
 import shutil
 import threading
@@ -38,6 +39,11 @@ import fusion_generator
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_DIR = APP_ROOT / "static"
 EXPORTS_DIR = APP_ROOT / "exports"
+LOG_DIR = APP_ROOT / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+logging.basicConfig(filename=LOG_DIR / "animation-errors.log", level=logging.INFO,
+                    format="%(asctime)s %(levelname)s %(message)s")
+LOGGER = logging.getLogger("map-asset-app")
 
 HOST = "127.0.0.1"
 PORT = 8787
@@ -181,6 +187,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._json({"error": "not found"}, 404)
         except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("GET %s failed", path)
             self._json({"error": str(exc)}, 500)
 
     def do_POST(self):  # noqa: N802
@@ -189,7 +196,14 @@ class Handler(BaseHTTPRequestHandler):
             length = int(self.headers.get("Content-Length", 0))
             raw_body = self.rfile.read(length)
             # The audio upload is multipart; only JSON routes parse JSON here.
-            config = json.loads(raw_body or b"{}") if path != "/api/export" and not path.endswith("/audio") else {}
+            config = json.loads(raw_body or b"{}") if not path.endswith("/audio") else {}
+            if path == "/api/client-log":
+                LOGGER.error("CLIENT package=%s message=%s stack=%s",
+                             str(config.get("package", ""))[:120],
+                             str(config.get("message", ""))[:1000],
+                             str(config.get("stack", ""))[:4000])
+                self._json({"ok": True})
+                return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/audio", path)):
                 package = self._package(m.group(1))
                 # Multipart upload: store the narration inside the package and
@@ -216,7 +230,8 @@ class Handler(BaseHTTPRequestHandler):
                 animation = animation_schema.normalize_animation(
                     json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
                     self._metadata(package))
-                animation["commentary"] = {"file": safe_name, "volume": 1.0}
+                animation["commentary"] = {"file": safe_name, "volume": 1.0,
+                                            "start_frame": 0, "trim_in": 0.0, "trim_out": None}
                 temporary = animation_path.with_suffix(".json.tmp")
                 temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 temporary.replace(animation_path)
@@ -229,12 +244,22 @@ class Handler(BaseHTTPRequestHandler):
                     json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
                     self._metadata(package))
                 removed = animation["commentary"].get("file")
-                animation["commentary"] = {"file": None, "volume": 1.0}
+                animation["commentary"] = {"file": None, "volume": 1.0,
+                                            "start_frame": 0, "trim_in": 0.0, "trim_out": None}
                 temporary = animation_path.with_suffix(".json.tmp")
                 temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 temporary.replace(animation_path)
                 if removed and "/" not in removed and "\\" not in removed:
                     (package / removed).unlink(missing_ok=True)
+                self._json({"ok": True, "animation": animation})
+                return
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
+                package = self._package(m.group(1))
+                animation = self._normalize_animation(package, config)
+                target = package / "animation.json"
+                temporary = target.with_suffix(".json.tmp")
+                temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
+                temporary.replace(target)
                 self._json({"ok": True, "animation": animation})
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/fusion", path)):
@@ -264,6 +289,7 @@ class Handler(BaseHTTPRequestHandler):
             t.start()
             self._json({"job_id": job_id})
         except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("POST %s failed", path)
             self._json({"error": str(exc)}, 500)
 
     # ---- job runner ------------------------------------------------------
