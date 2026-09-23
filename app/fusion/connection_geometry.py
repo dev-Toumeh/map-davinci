@@ -60,12 +60,15 @@ def ribbon(points, thickness):
     return left + list(reversed(right))
 
 
-def connection_shapes(connection, frame, scale, width, height, output):
+def connection_shapes(connection, frame, scale, width, height, output,
+                      canvas_width=None, canvas_height=None):
     """Return filled source-space polygons, including the traveling arrow.
 
     Style units refer to a 1080-pixel output short edge, shared with the UI.
     Geometry is built in pixel space to avoid aspect-ratio distortion.
     """
+    canvas_width = width if canvas_width is None else canvas_width
+    canvas_height = height if canvas_height is None else canvas_height
     t = max(0.0, min(1.0, (frame-connection['start_frame']) /
                          (connection['arrival_frame']-connection['start_frame'])))
     if connection['easing'] == 'smooth':
@@ -86,12 +89,17 @@ def connection_shapes(connection, frame, scale, width, height, output):
         radius = connection['arrow_size']*unit
         shapes.append([(tip[0]+math.cos(angle+a)*radius, tip[1]+math.sin(angle+a)*radius)
                        for a in (0, 2.5, -2.5)])
-    return [[(x/(width*scale)-.5, .5-y/(height*scale)) for x, y in shape] for shape in shapes]
+    x_scale, y_scale = width/canvas_width, height/canvas_height
+    return [[((x/(width*scale)-.5)*x_scale, (.5-y/(height*scale))*y_scale)
+             for x, y in shape] for shape in shapes]
 
 
-def connection_tools(connection, width, height, duration, pos_y, layer_number, camera, output):
+def connection_tools(connection, width, height, duration, pos_y, layer_number, camera, output,
+                     canvas_width=None, canvas_height=None):
     """Native animated MultiPoly masks, with no font or text-layout dependency."""
     import re
+    canvas_width = width if canvas_width is None else canvas_width
+    canvas_height = height if canvas_height is None else canvas_height
     base = 'Link_' + re.sub(r'[^A-Za-z0-9_]', '_', connection['id'])
     start = connection['start_frame']
     stop = connection['disappearance_frame']
@@ -107,12 +115,13 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
     if connection['line_style'] == 'solid':
         return _solid_connection_tools(connection, width, height, duration, pos_y,
                                        layer_number, camera, output, base, start,
-                                       stop, opacity_keys)
+                                       stop, opacity_keys, canvas_width, canvas_height)
     samples, index = [], 0
     for frame in range(start, stop):
         while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
             index += 1
-        shapes = connection_shapes(connection, frame, camera[index]['zoom'], width, height, output)
+        shapes = connection_shapes(connection, frame, camera[index]['zoom'], width, height, output,
+                                   canvas_width, canvas_height)
         samples.append((frame, shapes))
     slots = max((len(shapes) for _, shapes in samples), default=0)
     inputs, definitions, splines = [], [], []
@@ -132,7 +141,7 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
                 previous, last_frame = value, frame
         splines.append(f'{name} = BezierSpline {{ KeyFrames = {{ {", ".join(entries)} }} }},')
         inputs.append(f'["PolyMask{slot+1}.Level"] = Input {{ Value = 1 }}, '
-                      f'["PolyMask{slot+1}.Center"] = Input {{ SourceOp = "Map_AnimationPath", Source = "Position" }}, '
+                      f'["PolyMask{slot+1}.Center"] = Input {{ SourceOp = "Vector_AnimationPath", Source = "Position" }}, '
                       f'["PolyMask{slot+1}.Size"] = Input {{ SourceOp = "Map_AnimationSize", Source = "Value" }}, '
                       f'["PolyMask{slot+1}.Polyline"] = Input {{ SourceOp = "{name}", Source = "Value" }},')
         definitions.append(f'PolyMask{slot+1} = PolyMaskInputs {{ DrawMode = "InsertAndModify" }},')
@@ -142,7 +151,7 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
     tools = f'''
         {base}_Visibility = BezierSpline {{ KeyFrames = {{ {opacity_keys} }} }},
         {base}_Mask = MultiPoly {{ Inputs = {{
-            MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
+            MaskWidth = Input {{ Value = {canvas_width} }}, MaskHeight = Input {{ Value = {canvas_height} }},
             PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
             ClippingMode = Input {{ Value = FuID {{ "None" }} }},
             PolyOrder = Input {{ Value = ScriptVal {{ {{ [0] = {order} }} }} }},
@@ -152,7 +161,7 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
             EnabledRegion = TimeRegion {{ {{ Start = {start}, End = {stop - .001:.3f}, FrameLength = 1 }} }},
             Inputs = {{
             EffectMask = Input {{ SourceOp = "{base}_Mask", Source = "Mask" }},
-            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
+            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {canvas_width} }}, Height = Input {{ Value = {canvas_height} }},
             UseFrameFormatSettings = Input {{ Value = 0 }},
             TopLeftRed = Input {{ Value = {r} }}, TopLeftGreen = Input {{ Value = {g} }}, TopLeftBlue = Input {{ Value = {b} }},
             TopLeftAlpha = Input {{ Value = 0, SourceOp = "{base}_Visibility", Source = "Value" }}
@@ -168,7 +177,7 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
 
 def _solid_connection_tools(connection, width, height, duration, pos_y,
                             layer_number, camera, output, base, start, stop,
-                            opacity_keys):
+                            opacity_keys, canvas_width, canvas_height):
     """Reveal a stable Polygon stroke through its scalar WriteLength control.
 
     Resolve can discard geometry-only keys in a MultiPoly shape spline when
@@ -177,7 +186,8 @@ def _solid_connection_tools(connection, width, height, duration, pos_y,
     """
     a, b = connection['start'], connection['end']
     def point(p):
-        return p['x'] - .5, .5 - p['y']
+        return ((p['x'] - .5) * width/canvas_width,
+                (.5 - p['y']) * height/canvas_height)
     x0, y0 = point(a)
     x1, y1 = point(b)
     if connection['path_type'] == 'curved' and connection.get('bend'):
@@ -196,17 +206,17 @@ def _solid_connection_tools(connection, width, height, duration, pos_y,
                       f'[{connection["arrival_frame"]}] = {{ 1, Flags = {{ Linear = true }} }}')
     unit = min(output['width'], output['height']) / 1080
     size = max(1, connection['thickness'] * 1.5) * unit
-    stroke_width = size / width
+    stroke_width = size / canvas_width
     color = connection['color'].lstrip('#')
     r, g, blue = [int(color[i:i+2], 16)/255 for i in (0, 2, 4)]
     tools = f'''
         {base}_Visibility = BezierSpline {{ KeyFrames = {{ {opacity_keys} }} }},
         {base}_WriteLength = BezierSpline {{ KeyFrames = {{ {write_keys} }} }},
         {base}_StrokeMask = PolylineMask {{ DrawMode = "InsertAndModify", Inputs = {{
-            MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
+            MaskWidth = Input {{ Value = {canvas_width} }}, MaskHeight = Input {{ Value = {canvas_height} }},
             PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
             ClippingMode = Input {{ Value = FuID {{ "None" }} }},
-            Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position" }},
+            Center = Input {{ SourceOp = "Vector_AnimationPath", Source = "Position" }},
             Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value" }},
             Solid = Input {{ Value = 0 }},
             BorderWidth = Input {{ Value = {stroke_width:.12g} }},
@@ -216,7 +226,7 @@ def _solid_connection_tools(connection, width, height, duration, pos_y,
         {base}_Line = Background {{ NameSet = true,
             EnabledRegion = TimeRegion {{ {{ Start = {start}, End = {stop - .001:.3f}, FrameLength = 1 }} }},
             Inputs = {{ EffectMask = Input {{ SourceOp = "{base}_StrokeMask", Source = "Mask" }},
-            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
+            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {canvas_width} }}, Height = Input {{ Value = {canvas_height} }},
             UseFrameFormatSettings = Input {{ Value = 0 }},
             TopLeftRed = Input {{ Value = {r} }}, TopLeftGreen = Input {{ Value = {g} }}, TopLeftBlue = Input {{ Value = {blue} }},
             TopLeftAlpha = Input {{ Value = 0, SourceOp = "{base}_Visibility", Source = "Value" }}
@@ -231,23 +241,23 @@ def _solid_connection_tools(connection, width, height, duration, pos_y,
             while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
                 index += 1
             shape = connection_shapes(connection, frame, camera[index]['zoom'],
-                                      width, height, output)[-1]
+                                      width, height, output, canvas_width, canvas_height)[-1]
             points = ', '.join('{ Linear = true, X = %.12g, Y = %.12g, LX = 0, LY = 0, RX = 0, RY = 0 }' % p for p in shape)
             entries.append(f'[{frame}] = {{ 0, Flags = {{ Linear = true, LockedY = true }}, Value = Polyline {{ Closed = true, Points = {{ {points} }} }} }}')
         tools += f'''
         {base}_ArrowShape = BezierSpline {{ KeyFrames = {{ {', '.join(entries)} }} }},
         {base}_ArrowMask = PolylineMask {{ DrawMode = "InsertAndModify", Inputs = {{
-            MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
+            MaskWidth = Input {{ Value = {canvas_width} }}, MaskHeight = Input {{ Value = {canvas_height} }},
             PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
             ClippingMode = Input {{ Value = FuID {{ "None" }} }},
-            Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position" }},
+            Center = Input {{ SourceOp = "Vector_AnimationPath", Source = "Position" }},
             Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value" }},
             Polyline = Input {{ SourceOp = "{base}_ArrowShape", Source = "Value" }}
         }}, ViewInfo = OperatorInfo {{ Pos = {{ -400, {pos_y+70} }} }} }},
         {base}_Arrow = Background {{ NameSet = true,
             EnabledRegion = TimeRegion {{ {{ Start = {start}, End = {stop - .001:.3f}, FrameLength = 1 }} }},
             Inputs = {{ EffectMask = Input {{ SourceOp = "{base}_ArrowMask", Source = "Mask" }},
-            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {width} }}, Height = Input {{ Value = {height} }},
+            GlobalOut = Input {{ Value = {duration} }}, Width = Input {{ Value = {canvas_width} }}, Height = Input {{ Value = {canvas_height} }},
             UseFrameFormatSettings = Input {{ Value = 0 }},
             TopLeftRed = Input {{ Value = {r} }}, TopLeftGreen = Input {{ Value = {g} }}, TopLeftBlue = Input {{ Value = {blue} }},
             TopLeftAlpha = Input {{ Value = 0, SourceOp = "{base}_Visibility", Source = "Value" }}

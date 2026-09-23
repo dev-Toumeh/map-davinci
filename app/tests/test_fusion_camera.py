@@ -84,6 +84,11 @@ class CameraProjectionTests(unittest.TestCase):
             text = generate(Path(tmp), metadata, animation).read_text()
         self.assertIn('Map_Raster_Layers = MultiMerge', text)
         self.assertIn('Input = Input { SourceOp = "Map_Raster_Layers"', text)
+        self.assertIn('ClippingMode = Input { Value = FuID { "None" }', text)
+        self.assertIn('Vector_AnimationDisplacement = BezierSpline', text)
+        self.assertIn('Vector_AnimationPath = PolyPath', text)
+        vector_timing = text.split('Vector_AnimationDisplacement = BezierSpline', 1)[1].split('Vector_AnimationPath', 1)[0]
+        self.assertEqual(len(re.findall(r'\[\d+\] = \{', vector_timing)), 61)
         self.assertIn('Vector_Layers = MultiMerge', text)
         self.assertIn('Input = Input { SourceOp = "Vector_Layers"', text)
         for name in ("Map_AnimationDisplacement", "Map_AnimationSize"):
@@ -102,7 +107,7 @@ class CameraProjectionTests(unittest.TestCase):
         ]]}
         bbox = {"minx": 0, "miny": 0, "maxx": 1, "maxy": 1}
         text = _country_mask("Country_TST_Fill", geometry, bbox, 3840, 2160, outline=True)
-        self.assertIn('["PolyMask1.Center"] = Input { SourceOp = "Map_AnimationPath"', text)
+        self.assertIn('["PolyMask1.Center"] = Input { SourceOp = "Vector_AnimationPath"', text)
         self.assertIn('["PolyMask1.Size"] = Input { SourceOp = "Map_AnimationSize"', text)
         self.assertIn('["PolyMask1.BorderWidth"] = Input { SourceOp = "Map_CountryBorderWidth"', text)
 

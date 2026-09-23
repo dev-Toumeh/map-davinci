@@ -50,7 +50,7 @@ class ConnectionGeometryTests(unittest.TestCase):
         out = {'width': 1080, 'height': 1920}
         text, layer = connection_tools(connection(arrowhead=True), 3840, 2160, 35, 0, 2, camera, out)
         self.assertIn('Link_test_StrokeMask = PolylineMask', text)
-        self.assertEqual(text.count('Center = Input { SourceOp = "Map_AnimationPath"'), 2)
+        self.assertEqual(text.count('Center = Input { SourceOp = "Vector_AnimationPath"'), 2)
         self.assertEqual(text.count('Size = Input { SourceOp = "Map_AnimationSize"'), 2)
         self.assertIn('BorderWidth = Input { Value = 0.00078125 }', text)
         self.assertNotIn('StrokeWidth = BezierSpline', text)
@@ -64,6 +64,14 @@ class ConnectionGeometryTests(unittest.TestCase):
         self.assertNotIn('StyledText', text)
         self.assertIn('Layer2.Foreground', layer)
         self.assertIn('Layer3.Foreground', layer)
+
+    def test_shapes_are_remapped_without_changing_pixel_positions(self):
+        out = {'width': 2160, 'height': 3840}
+        source = connection_shapes(connection(), 30, 2, 3840, 2160, out)[0]
+        extended = connection_shapes(connection(), 30, 2, 3840, 2160, out, 3840, 3840)[0]
+        for original, remapped in zip(source, extended):
+            self.assertAlmostEqual(remapped[0] * 3840, original[0] * 3840)
+            self.assertAlmostEqual(remapped[1] * 3840, original[1] * 2160)
 
     def test_curved_stroke_reveal_keeps_bezier_handles_and_smooth_easing(self):
         text, _ = connection_tools(connection(path_type='curved', easing='smooth', arrowhead=False),
