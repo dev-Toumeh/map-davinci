@@ -7,15 +7,16 @@ references that inform its future workflow.
 
 | Folder | Purpose |
 | --- | --- |
-| `app/` | The map-asset preparation application: server, exporter, UI, and its instructions. |
+| `app/` | The map-asset preparation application: entry point, core services, Fusion generation, UI, tests, resources, and documentation. |
 | `references/` | Existing Fusion compositions, USA reference assets, and archived scripts. These are reference material, not app source. |
 | `docs/` | Project specification and handoff notes. |
 
 Generated data stays local and is ignored by Git:
 
-- `app/data/` — downloaded Natural Earth country data
-- `app/tilecache/` — downloaded imagery tiles
-- `app/exports/` — generated asset packages
+- `app/runtime/data/` — downloaded Natural Earth country data
+- `app/runtime/tilecache/` — downloaded imagery tiles
+- `app/runtime/logs/` and `app/runtime/settings.json` — local logs and settings
+- `exports/` — generated asset packages
 
 ## Run the app
 

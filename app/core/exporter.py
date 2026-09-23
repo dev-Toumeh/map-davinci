@@ -48,11 +48,11 @@ SUPERSCALE = 2                          # mask supersampling for smooth edges
 DEFAULT_COUNTRY_COLOR = "#1689ff"
 DEFAULT_BORDER_COLOR = "#ffffff"
 
-APP_ROOT = Path(__file__).resolve().parent
-NATIONAL_COLORS_FILE = APP_ROOT / "national_colors.json"
-DATA_DIR = APP_ROOT / "data"
-TILE_CACHE = APP_ROOT / "tilecache"
-EXPORTS_DIR = APP_ROOT / "exports"
+APP_ROOT = Path(__file__).resolve().parents[1]
+NATIONAL_COLORS_FILE = APP_ROOT / "resources" / "national_colors.json"
+RUNTIME_DIR = APP_ROOT / "runtime"
+DATA_DIR = RUNTIME_DIR / "data"
+TILE_CACHE = RUNTIME_DIR / "tilecache"
 
 COUNTRIES_FILE = DATA_DIR / "ne_10m_admin_0_countries.geojson"
 COUNTRIES_URL = (
@@ -512,11 +512,13 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         raise ValueError(f"unknown imagery source: {source_key}")
     source = SOURCES[source_key]
 
-    out_dir = EXPORTS_DIR / name
+    from core import settings
+    exports_dir = settings.exports_dir()
+    out_dir = exports_dir / name
     if out_dir.exists():
         # keep every export reproducible & separate
         stamp = time.strftime("%Y%m%d-%H%M%S")
-        out_dir = EXPORTS_DIR / f"{name}_{stamp}"
+        out_dir = exports_dir / f"{name}_{stamp}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     progress("extents", 5.0, "computing shared grid")

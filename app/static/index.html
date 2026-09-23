@@ -11,8 +11,11 @@
   html, body { margin:0; height:100%; font:13px/1.45 -apple-system, "SF Pro Text", Helvetica, Arial, sans-serif; background:var(--bg); color:var(--txt); }
   #app { display:flex; height:100%; position:relative; }
   #side { width:340px; min-width:340px; background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden; }
-  #side h1 { font-size:14px; margin:0; padding:14px 16px 10px; letter-spacing:.4px; }
+  .side-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-bottom:1px solid var(--line); }
+  #side h1 { font-size:14px; margin:0; padding:0; letter-spacing:.4px; }
   #side h1 span { color:var(--acc); }
+  #settingsbtn { display:flex; align-items:center; gap:5px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:#20252e; color:var(--dim); font-size:11px; cursor:pointer; }
+  #settingsbtn:hover { border-color:var(--acc); color:var(--acc); }
   .sec { padding:0 16px 12px; border-bottom:1px solid var(--line); }
   .sec label { display:block; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.6px; margin:10px 0 4px; }
   input[type=text], input[type=number], select {
@@ -84,12 +87,34 @@
   .smallbtn { display:inline-block; padding:5px 8px; border:1px solid var(--line); border-radius:5px; color:var(--txt); text-decoration:none; background:#20252e; font-size:11px; cursor:pointer; margin-right:5px; }
   .smallbtn:hover { border-color:var(--acc); color:var(--acc); }
   .smallbtn.delete:hover { border-color:var(--err); color:var(--err); }
+
+  .modal { position:fixed; inset:0; padding:16px; background:rgba(7,9,13,.76); display:none; align-items:center; justify-content:center; z-index:2000; backdrop-filter:blur(3px); }
+  .modal.open { display:flex; }
+  .modal-box { width:min(480px,100%); background:#1d2027; border:1px solid #39404c; border-radius:10px; box-shadow:0 18px 55px rgba(0,0,0,.55); overflow:hidden; }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--line); }
+  .modal-head h2 { margin:0; font-size:14px; letter-spacing:.3px; }
+  .modal-close { width:28px; height:28px; padding:0; border:1px solid transparent; border-radius:5px; background:transparent; color:var(--dim); font-size:19px; line-height:1; cursor:pointer; }
+  .modal-close:hover { color:var(--txt); background:#272c35; border-color:var(--line); }
+  .modal-body { padding:14px; }
+  .settings-field > label { display:block; margin-bottom:5px; color:var(--dim); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }
+  .settings-path-row { display:flex; gap:8px; }
+  .settings-path-row input { flex:1; min-width:0; }
+  .ui-button { padding:7px 10px; border:1px solid var(--line); border-radius:6px; background:#20252e; color:var(--txt); font-size:12px; cursor:pointer; white-space:nowrap; }
+  .ui-button:hover:not(:disabled) { border-color:var(--acc); color:var(--acc); }
+  .ui-button.primary { background:var(--acc); border-color:var(--acc); color:#04202e; font-weight:700; }
+  .ui-button.primary:hover:not(:disabled) { color:#04202e; filter:brightness(1.08); }
+  .ui-button:disabled { opacity:.55; cursor:default; }
+  .modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; padding-top:12px; border-top:1px solid var(--line); }
+  .setnote { min-height:16px; margin-top:6px; color:var(--dim); font-size:11px; word-break:break-word; }
 </style>
 </head>
 <body>
 <div id="app">
   <div id="side">
-    <h1>Map Asset Prep <span>· Fusion</span></h1>
+    <div class="side-head">
+      <h1>Map Asset Prep <span>· Fusion</span></h1>
+      <button id="settingsbtn" type="button"><span aria-hidden="true">⚙</span> Settings</button>
+    </div>
 
     <div class="sec">
       <label>Countries</label>
@@ -485,7 +510,7 @@ function showResultHtml(result) {
   const dir = result.output_dir.split("/").slice(-1)[0];
   const files = result.files.map(f => `<code>${f}</code>`).join("<br>");
   showResult(`
-     <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>app/exports/${dir}/</code></div>
+     <div class="ok">✔ Export complete in ${result.elapsed_sec}s — <code>${result.output_dir}</code></div>
      <div style="margin-top:4px">${files}</div>
      <div style="margin-top:10px"><a href="/static/animation.html?export=${encodeURIComponent(dir)}" style="display:inline-block;padding:7px 10px;border-radius:6px;background:#4cc2ff;color:#04202e;text-decoration:none;font-weight:700">Animate this export →</a></div>
      <div style="margin-top:6px">Red overlay = mask alignment on the detail background:</div>
@@ -498,5 +523,105 @@ document.getElementById("rclose").addEventListener("click", () => {
 
 boot(); updateFrame();
 </script>
-</body>
+
+<div id="settingsmodal" class="modal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="settingstitle">
+    <div class="modal-head">
+      <h2 id="settingstitle">Settings</h2>
+      <button id="settingsclose" class="modal-close" type="button" aria-label="Close settings">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-field">
+        <label for="exportsdir">Exports path</label>
+        <div class="settings-path-row">
+          <input type="text" id="exportsdir" placeholder="/path/to/my/app/exports">
+          <button id="settingsbrowse" class="ui-button" type="button">Choose folder…</button>
+        </div>
+        <div class="setnote" id="exportsdirnote"></div>
+      </div>
+      <div id="settingsstatus" class="setnote" aria-live="polite"></div>
+      <div class="modal-actions">
+        <button id="settingssave" class="ui-button primary" type="button">Save settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+"use strict";
+const settingsElement = id => document.getElementById(id);
+let settingsBuiltInDefault = "";
+
+async function openSettings() {
+  const modal = settingsElement("settingsmodal");
+  settingsElement("settingsstatus").textContent = "";
+  modal.classList.add("open");
+  try {
+    const response = await fetch("/api/settings");
+    const settings = await response.json();
+    if (!response.ok || settings.error) throw new Error(settings.error || "Could not load settings");
+    settingsBuiltInDefault = settings.default_exports_path || "";
+    settingsElement("exportsdir").value = settings.exports_path || "";
+    settingsElement("exportsdirnote").textContent = "Default: " + settingsBuiltInDefault;
+  } catch (error) {
+    settingsElement("exportsdirnote").textContent = "Failed to load settings: " + error.message;
+  }
+}
+
+settingsElement("settingssave").addEventListener("click", async () => {
+  const button = settingsElement("settingssave");
+  button.disabled = true;
+  settingsElement("settingsstatus").textContent = "Saving...";
+  try {
+    const response = await fetch("/api/settings", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        path: settingsElement("exportsdir").value.trim(),
+        use_default: settingsElement("exportsdir").value.trim() === settingsBuiltInDefault,
+      }),
+    });
+    const result = await response.json();
+    if (!response.ok || result.error) throw new Error(result.error || "Save failed");
+    settingsElement("settingsstatus").textContent = "Saved.";
+    location.reload();
+  } catch (error) {
+    settingsElement("settingsstatus").textContent = "Failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+settingsElement("settingsbtn").addEventListener("click", openSettings);
+settingsElement("settingsbrowse").addEventListener("click", async () => {
+  const button = settingsElement("settingsbrowse");
+  button.disabled = true;
+  settingsElement("settingsstatus").textContent = "Choose a folder in Finder…";
+  try {
+    const response = await fetch("/api/settings/select-folder", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: "{}",
+    });
+    const result = await response.json();
+    if (!response.ok || result.error) throw new Error(result.error || "Folder picker failed");
+    if (!result.cancelled && result.path) settingsElement("exportsdir").value = result.path;
+    settingsElement("settingsstatus").textContent = "";
+  } catch (error) {
+    settingsElement("settingsstatus").textContent = "Failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+settingsElement("settingsclose").addEventListener("click", () => {
+  settingsElement("settingsmodal").classList.remove("open");
+});
+settingsElement("settingsmodal").addEventListener("click", event => {
+  if (event.target === settingsElement("settingsmodal")) {
+    settingsElement("settingsmodal").classList.remove("open");
+  }
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") settingsElement("settingsmodal").classList.remove("open");
+});
+</script></body>
 </html>

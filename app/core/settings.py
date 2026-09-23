@@ -1,0 +1,42 @@
+"""Persistent app settings shared by the HTTP server and the exporter.
+
+Settings live in ``app/runtime/settings.json`` so custom choices survive restarts. With
+no override, exports are stored in ``exports/`` at the application root. The
+main page can select a different folder, and both pages use that shared path.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+APP_ROOT = Path(__file__).resolve().parents[1]
+SETTINGS_FILE = APP_ROOT / "runtime" / "settings.json"
+DEFAULT_EXPORTS_DIR = APP_ROOT.parent / "exports"
+
+
+def load() -> dict:
+    try:
+        value = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+        return value if isinstance(value, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def save(settings: dict) -> None:
+    temporary = SETTINGS_FILE.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(SETTINGS_FILE)
+
+
+def has_exports_override() -> bool:
+    """Return whether the user selected a custom export folder."""
+    return bool(str(load().get("exports_path") or "").strip())
+
+
+def exports_dir() -> Path:
+    """Current export folder. Relative paths resolve against the repo root."""
+    custom = str(load().get("exports_path") or "").strip()
+    path = Path(custom).expanduser() if custom else DEFAULT_EXPORTS_DIR
+    if not path.is_absolute():
+        path = (APP_ROOT.parent / path)
+    return path

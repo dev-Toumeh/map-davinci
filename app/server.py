@@ -26,21 +26,20 @@ import json
 import logging
 import re
 import shutil
+import subprocess
 import threading
 import traceback
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-import exporter
-import animation_schema
-import fusion_generator
+from core import animation_schema, exporter, settings as app_settings
+from fusion import generator as fusion_generator
 
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_DIR = APP_ROOT / "static"
-EXPORTS_DIR = APP_ROOT / "exports"
-LOG_DIR = APP_ROOT / "logs"
-LOG_DIR.mkdir(exist_ok=True)
+LOG_DIR = APP_ROOT / "runtime" / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(filename=LOG_DIR / "animation-errors.log", level=logging.INFO,
                     format="%(asctime)s %(levelname)s %(message)s")
 LOGGER = logging.getLogger("map-asset-app")
@@ -115,11 +114,80 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):  # quieter console
         pass
 
+    def _save_settings(self, config: dict) -> None:
+        """Persist a new export folder, optionally migrating existing packages.
+
+        Fusion comps embed absolute asset paths, so a move rewrites those
+        references (with a .comp.bak backup next to each updated file).
+        """
+        use_default = bool(config.get("use_default"))
+        raw = str(config.get("path") or "").strip()
+        if use_default:
+            target = app_settings.DEFAULT_EXPORTS_DIR.resolve()
+        else:
+            if not raw:
+                raise ValueError("export folder path is required")
+            target = Path(raw).expanduser()
+            if not target.is_absolute():
+                target = (APP_ROOT.parent / target)
+            target = target.resolve()
+        current = app_settings.exports_dir()
+        if target != current and (target == APP_ROOT or APP_ROOT in target.parents):
+            # The legacy default lives inside app/ and stays selectable; new
+            # locations must move out so code and user data stay separated.
+            raise ValueError("export folder cannot be inside the app folder")
+        move = bool(config.get("move_existing"))
+        moved = 0
+        if move and current != target:
+            if not current.is_dir():
+                raise ValueError(f"current export folder does not exist: {current}")
+            if target.exists() and any(target.iterdir()):
+                raise ValueError(f"target folder is not empty: {target}")
+            target.mkdir(parents=True, exist_ok=True)
+            old_text = str(current)
+            for child in sorted(current.iterdir()):
+                shutil.move(str(child), str(target / child.name))
+                moved += 1
+            try:
+                current.rmdir()
+            except OSError:
+                pass
+            # Rewrite absolute asset paths inside moved Fusion compositions.
+            for comp in target.rglob("*.comp"):
+                try:
+                    text = comp.read_text(encoding="utf-8")
+                except UnicodeDecodeError:
+                    continue
+                if old_text in text:
+                    backup = comp.with_suffix(comp.suffix + ".bak")
+                    if not backup.exists():
+                        backup.write_text(text, encoding="utf-8")
+                    comp.write_text(text.replace(old_text, str(target)), encoding="utf-8")
+        app_settings.save({} if use_default else {"exports_path": str(target)})
+        LOGGER.info("Export folder set to %s (moved %d packages)", target, moved)
+        self._json({"ok": True, "exports_path": str(target), "moved": moved,
+                    "using_default": use_default})
+
+    def _choose_exports_folder(self) -> None:
+        """Open the macOS folder picker for this local desktop application."""
+        script = 'POSIX path of (choose folder with prompt "Choose exports folder")'
+        result = subprocess.run(
+            ["osascript", "-e", script], capture_output=True, text=True, check=False
+        )
+        if result.returncode:
+            if "User canceled" in result.stderr or "(-128)" in result.stderr:
+                self._json({"cancelled": True})
+                return
+            raise RuntimeError(result.stderr.strip() or "Could not open the folder picker")
+        selected = Path(result.stdout.strip()).expanduser().resolve()
+        self._json({"path": str(selected)})
+
     def _package(self, name: str) -> Path:
         if not EXPORT_NAME.fullmatch(name):
             raise ValueError("invalid export package name")
-        package = (EXPORTS_DIR / name).resolve()
-        if package.parent != EXPORTS_DIR.resolve() or not (package / "metadata.json").is_file():
+        exports_dir = app_settings.exports_dir()
+        package = (exports_dir / name).resolve()
+        if package.parent != exports_dir.resolve() or not (package / "metadata.json").is_file():
             raise FileNotFoundError("export package not found")
         return package
 
@@ -183,7 +251,8 @@ class Handler(BaseHTTPRequestHandler):
             elif path.startswith("/static/"):
                 self._file(STATIC_DIR / path[len("/static/"):], STATIC_DIR)
             elif path.startswith("/exports/"):
-                self._file(EXPORTS_DIR / path[len("/exports/"):], EXPORTS_DIR)
+                exports_dir = app_settings.exports_dir()
+                self._file(exports_dir / path[len("/exports/"):], exports_dir)
             elif path == "/api/health":
                 self._json({"ok": True})
             elif path == "/api/countries":
@@ -204,9 +273,13 @@ class Handler(BaseHTTPRequestHandler):
                         self._json({"error": "unknown job"}, 404)
                         return
                     self._json({"status": job["status"], "result": job["result"]})
+            elif path == "/api/settings":
+                self._json({"exports_path": str(app_settings.exports_dir()),
+                            "default_exports_path": str(app_settings.DEFAULT_EXPORTS_DIR),
+                            "using_default": not app_settings.has_exports_override()})
             elif path == "/api/exports":
                 packages = []
-                for candidate in sorted(EXPORTS_DIR.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
+                for candidate in sorted(app_settings.exports_dir().iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
                     if not candidate.is_dir() or not (candidate / "metadata.json").is_file():
                         continue
                     metadata = self._metadata(candidate)
@@ -300,15 +373,21 @@ class Handler(BaseHTTPRequestHandler):
                 animation = self._normalize_animation(package, config)
                 (package / "animation.json").write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 target = fusion_generator.generate(package, metadata, animation)
-                relative = target.relative_to(EXPORTS_DIR)
+                relative = target.relative_to(app_settings.exports_dir())
                 self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative)})
                 return
             if (m := re.fullmatch(r"/api/export/([A-Za-z0-9_.-]+)/delete", path)):
                 package = self._package(m.group(1))
-                # _package verifies this is one direct child of EXPORTS_DIR;
+                # _package verifies this is one direct child of the export folder;
                 # never accept a client-supplied filesystem path here.
                 shutil.rmtree(package)
                 self._json({"ok": True, "deleted": m.group(1)})
+                return
+            if path == "/api/settings":
+                self._save_settings(config)
+                return
+            if path == "/api/settings/select-folder":
+                self._choose_exports_folder()
                 return
             if path != "/api/export":
                 self._json({"error": "not found"}, 404)
@@ -346,7 +425,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    EXPORTS_DIR.mkdir(exist_ok=True)
+    app_settings.exports_dir().mkdir(parents=True, exist_ok=True)
     print(f"map-asset-app running at http://{HOST}:{PORT}")
     ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
 

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from fusion_generator import _camera_samples, _path_points, _key_lines, _camera_timing_keys, generate
+from fusion.generator import _camera_samples, _path_points, _key_lines, _camera_timing_keys, generate
 
 
 class CameraProjectionTests(unittest.TestCase):

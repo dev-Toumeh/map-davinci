@@ -4,9 +4,9 @@ __pycache__/
 *.pyc
 
 # Generated / re-downloadable app data
-app/tilecache/
+app/runtime/
 app/exports/
-app/data/
+/exports/
 
 # macOS
 .DS_Store

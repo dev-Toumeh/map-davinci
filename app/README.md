@@ -34,7 +34,7 @@ Then open **http://127.0.0.1:8787** in a browser.
    pan/zoom the real exported backgrounds, add timeline keyframes, select linear or
    smooth movement, save `animation.json`, then generate `fusion/scene.comp`.
 
-## Output package (`app/exports/<name>/`)
+## Output package (`exports/<name>/`)
 
 | File | Content |
 |---|---|
@@ -92,13 +92,13 @@ sampled at integer frames where needed; native Resolve import/render remains a v
 ## Sources & notes
 
 - Boundaries: [Natural Earth 10m admin-0 countries](https://www.naturalearthdata.com/)
-  (public domain), downloaded once to `data/` (~13 MB).
-- Country default fills: flag-inspired ISO3 palette in `national_colors.json`,
+  (public domain), downloaded once to `runtime/data/` (~13 MB).
+- Country default fills: flag-inspired ISO3 palette in `resources/national_colors.json`,
   derived from [Flag Icons](https://github.com/lipis/flag-icons) (MIT). Colors
   remain editable before export; saved export colors always take precedence.
 - Imagery: Google Satellite tiles (no credentials; personal/educational use —
   check terms before publishing videos commercially) or Esri World Imagery
-  (attribution recorded in metadata). Tiles are cached in `tilecache/`.
+  (attribution recorded in metadata). Tiles are cached in `runtime/tilecache/`.
 - Export resolution vs. zoom: the exporter picks the highest native tile zoom for
   your framing and records `tile_zoom_upscaled` if the source is coarser than
   requested. For deep zoom-ins, frame at a higher map zoom.

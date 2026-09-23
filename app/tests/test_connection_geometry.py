@@ -2,7 +2,7 @@ import math
 import re
 import unittest
 
-from connection_geometry import connection_shapes, connection_tools, dash_segments, path_at
+from fusion.connection_geometry import connection_shapes, connection_tools, dash_segments, path_at
 
 
 def connection(**changes):

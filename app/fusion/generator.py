@@ -9,7 +9,7 @@ import json
 import math
 import re
 from pathlib import Path
-from connection_geometry import connection_tools
+from .connection_geometry import connection_tools
 
 R = 6378137.0
 
@@ -44,7 +44,7 @@ def _geometry(package: Path, country: dict) -> dict:
         return json.loads((package / geometry_file).read_text(encoding="utf-8"))["geometry"]
     # Existing packages predate geometry_<ISO>.geojson. This fallback lets them
     # use native vectors but new exports are fully self-contained.
-    import exporter
+    from core import exporter
     return exporter.get_geometry(country["iso3"])
 
 
