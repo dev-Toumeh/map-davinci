@@ -79,9 +79,11 @@ def _country_mask(name: str, geometry: dict, wide_bbox: dict, width: int, height
     for index, (level, ring) in enumerate(rings, 1):
         order.append(str(index))
         outline_inputs = (f'\n\t\t\t\t["PolyMask{index}.Solid"] = Input {{ Value = 0, }},'
-                          f'\n\t\t\t\t["PolyMask{index}.BorderWidth"] = Input {{ Value = 0.0005, }},') if outline else ""
+                          f'\n\t\t\t\t["PolyMask{index}.BorderWidth"] = Input {{ SourceOp = "Map_CountryBorderWidth", Source = "Value", }},') if outline else ""
         inputs.append(f'''\t\t\t\t["PolyMask{index}.Level"] = Input {{ Value = {level}, }},
 \t\t\t\t["PolyMask{index}.Filter"] = Input {{ Value = FuID {{ "Fast Gaussian" }}, }},
+\t\t\t\t["PolyMask{index}.Center"] = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }},
+\t\t\t\t["PolyMask{index}.Size"] = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }},
 \t\t\t\t["PolyMask{index}.Polyline"] = Input {{ Value = Polyline {{ Closed = true, Points = {{ {_polyline(ring, wide_bbox)} }} }}, }},
 \t\t\t\t["PolyMask{index}.Polyline2"] = Input {{ Value = Polyline {{ }}, Disabled = true, }},{outline_inputs}''')
         definitions.append(f"\t\t\tPolyMask{index} = PolyMaskInputs {{ DrawMode = \"InsertAndModify\", DrawMode2 = \"InsertAndModify\" }},")
@@ -174,12 +176,14 @@ def _camera_timing_keys(samples: list[dict], authored_frames: set[int]) -> list[
     return [samples[i] for i in sorted(retained)]
 
 
-def _key_lines(keys: list[dict], samples: list[dict], component: str) -> str:
+def _key_lines(keys: list[dict], samples: list[dict], component: str, multiplier: float = 1.0) -> str:
     def value(key: dict) -> float:
-        return key["zoom"] if component == "size" else key["displacement"]
+        raw = key["zoom"] if component == "size" else key["displacement"]
+        return raw * multiplier
     handles = {}
     for a, b in zip(keys, keys[1:]):
         right, left = _fit_camera_handles(samples, a, b, component)
+        right, left = right * multiplier, left * multiplier
         third = (b["frame"] - a["frame"]) / 3
         handles[a["frame"], "RH"] = (a["frame"] + third, right)
         handles[b["frame"], "LH"] = (b["frame"] - third, left)
@@ -277,8 +281,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
     factor = float(native["wide_factor"])
     tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_detail.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 130 }} }}, }},
 \t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
-    layers = ['''\t\t\t\t["Layer1.Foreground"] = Input { SourceOp = "Place_Detail", Source = "Output", },
-\t\t\t\tLayerName1 = Input { Value = "Detailed satellite", },''']
+    vector_layers = []
     for number, country in enumerate(metadata.get("countries", []), 2):
         iso = _name(country["iso3"])
         base = f"Country_{iso}"
@@ -300,12 +303,12 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{base}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = Input {{ Value = 1, }} }},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ -180, {370 + row} }} }},
 \t\t}},''')
-        fill_layer, border_layer = number * 2 - 2, number * 2 - 1
-        layers.append(f'''\t\t\t\t["Layer{fill_layer}.Foreground"] = Input {{ SourceOp = "{base}_Fill", Source = "Output", }},
+        fill_layer, border_layer = number * 2 - 3, number * 2 - 2
+        vector_layers.append(f'''\t\t\t\t["Layer{fill_layer}.Foreground"] = Input {{ SourceOp = "{base}_Fill", Source = "Output", }},
 \t\t\t\tLayerName{fill_layer} = Input {{ Value = "{country['iso3']} vector fill", }},
 \t\t\t\t["Layer{border_layer}.Foreground"] = Input {{ SourceOp = "{base}_Border", Source = "Output", }},
 \t\t\t\tLayerName{border_layer} = Input {{ Value = "{country['iso3']} vector border", }},''')
-    layer_number = 2 + len(metadata.get("countries", [])) * 2
+    layer_number = 1 + len(metadata.get("countries", [])) * 2
     incomplete = [connection["name"] for connection in animation.get("connections", [])
                   if not connection.get("start") or not connection.get("end")]
     if incomplete:
@@ -315,12 +318,13 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
             connection, width, height, duration, 300 + (len(metadata.get("countries", [])) + number) * 180,
             layer_number, samples, out)
         tools.append(connection_nodes)
-        layers.append(connection_layers)
+        vector_layers.append(connection_layers)
         layer_number += 2 if connection['line_style'] == 'solid' and connection['arrowhead'] else 1
-    tools.append(f'''\t\tMap_Layers = MultiMerge {{
+    tools.append(f'''\t\tMap_Raster_Layers = MultiMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{ Background = Input {{ SourceOp = "Map_Wide", Source = "Output", }},
-{chr(10).join(layers)}
+\t\t\t\t["Layer1.Foreground"] = Input {{ SourceOp = "Place_Detail", Source = "Output", }},
+\t\t\t\tLayerName1 = Input {{ Value = "Detailed satellite", }},
 \t\t\t}},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ 120, 0 }} }},
 \t\t}},''')
@@ -330,13 +334,19 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\tMap_AnimationSize = BezierSpline {{ KeyFrames = {{
 {_key_lines(keys, samples, 'size')}
 \t\t\t}} }},
+\t\tMap_CountryBorderWidth = BezierSpline {{ KeyFrames = {{
+{_key_lines(keys, samples, 'size', 0.0005)}
+\t\t\t}} }},
 \t\tMap_AnimationPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "Map_AnimationDisplacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
 {_path_points(samples)}
 \t\t\t\t\t\t}} }}, }} }}, }},
-\t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, Input = Input {{ SourceOp = "Map_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 0 }} }}, }},
+\t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, Input = Input {{ SourceOp = "Map_Raster_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 0 }} }}, }},
 \t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 130 }} }}, }},
 \t\tFinal_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Output_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "Map_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 820, 0 }} }}, }},
-\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Final_Composite", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1040, 0 }} }}, }},''')
+\t\tVector_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Final_Composite", Source = "Output", }},
+{chr(10).join(vector_layers)}
+\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 1040, 0 }} }}, }},
+\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1260, 0 }} }}, }},''')
     content = f'''Composition {{
 \tCurrentTime = 0, RenderRange = {{ 0, {duration} }}, GlobalRange = {{ 0, {duration} }},
 \tTools = {{

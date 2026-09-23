@@ -35,7 +35,7 @@ class ConnectionGeometryTests(unittest.TestCase):
             arrow = connection_shapes(c, 15, zoom, 3840, 2160, out)[-1]
             tip = ((arrow[0][0]+.5)*3840*zoom, (.5-arrow[0][1])*2160*zoom)
             center = (p[0]*3840*zoom, p[1]*2160*zoom)
-            self.assertAlmostEqual(math.dist(tip, center), 14*.65)
+            self.assertAlmostEqual(math.dist(tip, center), 14)
             previous = path_at(c, t-.015)
             expected = math.atan2((p[1]-previous[1])*2160, (p[0]-previous[0])*3840)
             actual = math.atan2(tip[1]-center[1], tip[0]-center[0])
@@ -50,6 +50,10 @@ class ConnectionGeometryTests(unittest.TestCase):
         out = {'width': 1080, 'height': 1920}
         text, layer = connection_tools(connection(arrowhead=True), 3840, 2160, 35, 0, 2, camera, out)
         self.assertIn('Link_test_StrokeMask = PolylineMask', text)
+        self.assertEqual(text.count('Center = Input { SourceOp = "Map_AnimationPath"'), 2)
+        self.assertEqual(text.count('Size = Input { SourceOp = "Map_AnimationSize"'), 2)
+        self.assertIn('BorderWidth = Input { Value = 0.00078125 }', text)
+        self.assertNotIn('StrokeWidth = BezierSpline', text)
         self.assertIn('WriteLength = Input { Value = 0, SourceOp = "Link_test_WriteLength"', text)
         self.assertIn('[10] = { 0, Flags = { Linear = true } }, [30] = { 1, Flags = { Linear = true } }', text)
         self.assertIn('Link_test_ArrowMask = PolylineMask', text)

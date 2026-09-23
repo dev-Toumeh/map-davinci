@@ -83,7 +83,7 @@ def connection_shapes(connection, frame, scale, width, height, output):
         tip = points[-1]
         previous = pixel(path_at(connection, max(0, t-.015)))
         angle = math.atan2(tip[1]-previous[1], tip[0]-previous[0])
-        radius = connection['arrow_size']*.65*unit
+        radius = connection['arrow_size']*unit
         shapes.append([(tip[0]+math.cos(angle+a)*radius, tip[1]+math.sin(angle+a)*radius)
                        for a in (0, 2.5, -2.5)])
     return [[(x/(width*scale)-.5, .5-y/(height*scale)) for x, y in shape] for shape in shapes]
@@ -132,6 +132,8 @@ def connection_tools(connection, width, height, duration, pos_y, layer_number, c
                 previous, last_frame = value, frame
         splines.append(f'{name} = BezierSpline {{ KeyFrames = {{ {", ".join(entries)} }} }},')
         inputs.append(f'["PolyMask{slot+1}.Level"] = Input {{ Value = 1 }}, '
+                      f'["PolyMask{slot+1}.Center"] = Input {{ SourceOp = "Map_AnimationPath", Source = "Position" }}, '
+                      f'["PolyMask{slot+1}.Size"] = Input {{ SourceOp = "Map_AnimationSize", Source = "Value" }}, '
                       f'["PolyMask{slot+1}.Polyline"] = Input {{ SourceOp = "{name}", Source = "Value" }},')
         definitions.append(f'PolyMask{slot+1} = PolyMaskInputs {{ DrawMode = "InsertAndModify" }},')
     color = connection['color'].lstrip('#')
@@ -194,23 +196,20 @@ def _solid_connection_tools(connection, width, height, duration, pos_y,
                       f'[{connection["arrival_frame"]}] = {{ 1, Flags = {{ Linear = true }} }}')
     unit = min(output['width'], output['height']) / 1080
     size = max(1, connection['thickness'] * 1.5) * unit
-    index, widths = 0, []
-    for frame in range(start, stop):
-        while index < len(camera)-1 and camera[index+1]['frame'] <= frame:
-            index += 1
-        widths.append(f'[{frame}] = {{ {size/(width*camera[index]["zoom"]):.12g}, Flags = {{ Linear = true }} }}')
+    stroke_width = size / width
     color = connection['color'].lstrip('#')
     r, g, blue = [int(color[i:i+2], 16)/255 for i in (0, 2, 4)]
     tools = f'''
         {base}_Visibility = BezierSpline {{ KeyFrames = {{ {opacity_keys} }} }},
         {base}_WriteLength = BezierSpline {{ KeyFrames = {{ {write_keys} }} }},
-        {base}_StrokeWidth = BezierSpline {{ KeyFrames = {{ {', '.join(widths)} }} }},
         {base}_StrokeMask = PolylineMask {{ DrawMode = "InsertAndModify", Inputs = {{
             MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
             PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
             ClippingMode = Input {{ Value = FuID {{ "None" }} }},
+            Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position" }},
+            Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value" }},
             Solid = Input {{ Value = 0 }},
-            BorderWidth = Input {{ SourceOp = "{base}_StrokeWidth", Source = "Value" }},
+            BorderWidth = Input {{ Value = {stroke_width:.12g} }},
             WriteLength = Input {{ Value = 0, SourceOp = "{base}_WriteLength", Source = "Value" }},
             Polyline = Input {{ Value = Polyline {{ Points = {{ {path} }} }} }}
         }}, ViewInfo = OperatorInfo {{ Pos = {{ -400, {pos_y} }} }} }},
@@ -241,6 +240,8 @@ def _solid_connection_tools(connection, width, height, duration, pos_y,
             MaskWidth = Input {{ Value = {width} }}, MaskHeight = Input {{ Value = {height} }},
             PixelAspect = Input {{ Value = {{ 1, 1 }} }}, UseFrameFormatSettings = Input {{ Value = 0 }},
             ClippingMode = Input {{ Value = FuID {{ "None" }} }},
+            Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position" }},
+            Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value" }},
             Polyline = Input {{ SourceOp = "{base}_ArrowShape", Source = "Value" }}
         }}, ViewInfo = OperatorInfo {{ Pos = {{ -400, {pos_y+70} }} }} }},
         {base}_Arrow = Background {{ NameSet = true,
