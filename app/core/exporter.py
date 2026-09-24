@@ -26,6 +26,8 @@ import hashlib
 import io
 import json
 import math
+import re
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -50,9 +52,11 @@ DEFAULT_BORDER_COLOR = "#ffffff"
 
 APP_ROOT = Path(__file__).resolve().parents[1]
 NATIONAL_COLORS_FILE = APP_ROOT / "resources" / "national_colors.json"
+GOOGLE_SIMPLE_STYLE_FILE = APP_ROOT / "resources" / "google_simple_map_style.json"
 RUNTIME_DIR = APP_ROOT / "runtime"
 DATA_DIR = RUNTIME_DIR / "data"
 TILE_CACHE = RUNTIME_DIR / "tilecache"
+GOOGLE_TILE_USAGE_FILE = RUNTIME_DIR / "google_tile_usage.json"
 
 COUNTRIES_FILE = DATA_DIR / "ne_10m_admin_0_countries.geojson"
 COUNTRIES_URL = (
@@ -104,6 +108,12 @@ SOURCES: Dict[str, dict] = {
         "attribution": "Esri, Maxar, Earthstar Geographics",
         "note": "Max zoom varies by area; tiles may be missing in remote regions.",
     },
+    "google_simple_map": {
+        "provider": "google_map_tiles",
+        "max_zoom": 22,
+        "attribution": "Map data (c) Google",
+        "note": "Google roadmap tiles rendered with the configured simple-map style.",
+    },
 }
 
 HTTP_HEADERS = {
@@ -111,6 +121,11 @@ HTTP_HEADERS = {
 }
 
 ProgressFn = Callable[[str, float, str], None]
+_GOOGLE_SESSION_LOCK = threading.Lock()
+_GOOGLE_SESSION: dict = {}
+_GOOGLE_TILE_LOCKS_LOCK = threading.Lock()
+_GOOGLE_TILE_LOCKS: dict = {}
+_GOOGLE_USAGE_LOCK = threading.Lock()
 
 
 # --------------------------------------------------------------------------
@@ -187,12 +202,217 @@ def parse_hex_color(value: str) -> Tuple[str, Tuple[int, int, int]]:
 # Tile download + stitch
 # --------------------------------------------------------------------------
 
+def _google_simple_style() -> list:
+    style = json.loads(GOOGLE_SIMPLE_STYLE_FILE.read_text(encoding="utf-8"))
+    # Snazzy Maps exports numeric stylers as strings. The Map Tiles API expects
+    # JSON numbers for these values.
+    for rule in style:
+        for styler in rule.get("stylers", []):
+            for name in ("gamma", "lightness", "saturation", "weight"):
+                value = styler.get(name)
+                if isinstance(value, str):
+                    try:
+                        styler[name] = float(value)
+                    except ValueError:
+                        pass
+    return style
+
+
+def _google_tiles_session() -> Tuple[str, str]:
+    """Return (session token, API key), refreshing the token when necessary."""
+    from core import settings
+
+    api_key = settings.google_maps_api_key()
+    if not api_key:
+        raise RuntimeError("Google Map Tiles API key is missing. Add it in Settings.")
+    now = time.time()
+    with _GOOGLE_SESSION_LOCK:
+        if (_GOOGLE_SESSION.get("api_key") == api_key and
+                float(_GOOGLE_SESSION.get("expiry", 0)) > now + 60):
+            return str(_GOOGLE_SESSION["session"]), api_key
+        response = requests.post(
+            "https://tile.googleapis.com/v1/createSession",
+            params={"key": api_key},
+            headers={**HTTP_HEADERS, "Content-Type": "application/json"},
+            json={
+                "mapType": "roadmap",
+                "language": "en-US",
+                "region": "DE",
+                "imageFormat": "png",
+                "styles": _google_simple_style(),
+            },
+            timeout=30,
+        )
+        if response.status_code != 200:
+            try:
+                message = response.json().get("error", {}).get("message")
+            except (ValueError, AttributeError):
+                message = None
+            raise RuntimeError(
+                f"Google Map Tiles session failed ({response.status_code})"
+                + (f": {message}" if message else "")
+            )
+        payload = response.json()
+        session = str(payload.get("session") or "")
+        if not session:
+            raise RuntimeError("Google Map Tiles returned no session token")
+        _GOOGLE_SESSION.clear()
+        _GOOGLE_SESSION.update({
+            "session": session,
+            "expiry": float(payload.get("expiry") or now + 3600),
+            "api_key": api_key,
+        })
+        return session, api_key
+
+
+def _google_tile_cache_paths(z: int, x: int, y: int) -> Tuple[Path, Path]:
+    style_version = hashlib.sha256(GOOGLE_SIMPLE_STYLE_FILE.read_bytes()).hexdigest()[:16]
+    tile = TILE_CACHE / "google_simple_map" / style_version / str(z) / str(x) / f"{y}.png"
+    return tile, tile.with_suffix(".json")
+
+
+def _google_tile_lock(z: int, x: int, y: int) -> threading.Lock:
+    key = (z, x, y)
+    with _GOOGLE_TILE_LOCKS_LOCK:
+        return _GOOGLE_TILE_LOCKS.setdefault(key, threading.Lock())
+
+
+def _cache_max_age(cache_control: str) -> int:
+    match = re.search(r"(?:^|,)\s*max-age=(\d+)", cache_control, re.IGNORECASE)
+    return int(match.group(1)) if match else 0
+
+
+def _today() -> str:
+    return time.strftime("%Y-%m-%d")
+
+
+def _initial_google_tile_count(day: str) -> int:
+    """Recover today's successful downloads if tracking was just enabled."""
+    count = 0
+    root = TILE_CACHE / "google_simple_map"
+    if not root.is_dir():
+        return 0
+    for metadata_path in root.rglob("*.json"):
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            stored_day = time.strftime(
+                "%Y-%m-%d", time.localtime(float(metadata.get("stored_at", 0)))
+            )
+            if stored_day == day:
+                count += 1
+        except (OSError, ValueError, TypeError):
+            continue
+    return count
+
+
+def _load_google_tile_usage() -> dict:
+    day = _today()
+    try:
+        usage = json.loads(GOOGLE_TILE_USAGE_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        usage = {}
+    if usage.get("date") != day:
+        usage = {"date": day, "requests": _initial_google_tile_count(day)}
+    return usage
+
+
+def google_tile_usage() -> dict:
+    from core import settings
+
+    with _GOOGLE_USAGE_LOCK:
+        usage = _load_google_tile_usage()
+        GOOGLE_TILE_USAGE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        GOOGLE_TILE_USAGE_FILE.write_text(json.dumps(usage), encoding="utf-8")
+    limit = settings.google_maps_daily_warning()
+    requests_today = int(usage.get("requests", 0))
+    return {
+        "date": usage["date"],
+        "requests": requests_today,
+        "warning_limit": limit,
+        "limit_reached": requests_today >= limit,
+    }
+
+
+def _record_google_tile_request() -> None:
+    with _GOOGLE_USAGE_LOCK:
+        usage = _load_google_tile_usage()
+        usage["requests"] = int(usage.get("requests", 0)) + 1
+        GOOGLE_TILE_USAGE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temporary = GOOGLE_TILE_USAGE_FILE.with_suffix(".json.tmp")
+        temporary.write_text(json.dumps(usage), encoding="utf-8")
+        temporary.replace(GOOGLE_TILE_USAGE_FILE)
+
+
+def google_simple_tile(z: int, x: int, y: int) -> bytes:
+    """Fetch one styled tile using Google's private HTTP cache directives."""
+    if not (0 <= z <= 22 and 0 <= x < 2 ** z and 0 <= y < 2 ** z):
+        raise ValueError("invalid map tile coordinates")
+    tile_path, metadata_path = _google_tile_cache_paths(z, x, y)
+    with _google_tile_lock(z, x, y):
+        metadata = {}
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError, TypeError):
+            metadata = {}
+        stored_at = float(metadata.get("stored_at", 0))
+        max_age = int(metadata.get("max_age", 0))
+        if tile_path.is_file() and max_age > 0 and time.time() < stored_at + max_age:
+            return tile_path.read_bytes()
+
+        session, api_key = _google_tiles_session()
+        request_headers = dict(HTTP_HEADERS)
+        if tile_path.is_file() and metadata.get("etag"):
+            request_headers["If-None-Match"] = str(metadata["etag"])
+        last_error: Optional[Exception] = None
+        for attempt in range(TILE_RETRIES):
+            try:
+                response = requests.get(
+                    f"https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}",
+                    params={"session": session, "key": api_key},
+                    headers=request_headers,
+                    timeout=20,
+                )
+                _record_google_tile_request()
+                cache_control = response.headers.get("Cache-Control", "")
+                response_max_age = _cache_max_age(cache_control)
+                if response.status_code == 304 and tile_path.is_file():
+                    metadata.update({
+                        "stored_at": time.time(),
+                        "max_age": response_max_age or max_age,
+                        "etag": response.headers.get("ETag") or metadata.get("etag"),
+                        "cache_control": cache_control or metadata.get("cache_control", ""),
+                    })
+                    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+                    return tile_path.read_bytes()
+                if response.status_code == 200 and response.content:
+                    tile_path.parent.mkdir(parents=True, exist_ok=True)
+                    temporary = tile_path.with_suffix(".png.tmp")
+                    temporary.write_bytes(response.content)
+                    temporary.replace(tile_path)
+                    metadata = {
+                        "stored_at": time.time(),
+                        "max_age": response_max_age,
+                        "etag": response.headers.get("ETag"),
+                        "cache_control": cache_control,
+                    }
+                    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+                    return response.content
+                last_error = RuntimeError(f"Google tile HTTP {response.status_code}")
+            except Exception as exc:  # noqa: BLE001
+                last_error = exc
+            time.sleep(0.6 * (attempt + 1))
+        raise RuntimeError(
+            f"Google map tile failed after {TILE_RETRIES} tries: {last_error}"
+        )
+
 def _tile_url(source: dict, z: int, x: int, y: int) -> str:
     sub = source["subdomains"][(x + y) % len(source["subdomains"])]
     return source["url"].format(i=sub, z=z, x=x, y=y)
 
 
 def _fetch_tile(source: dict, z: int, x: int, y: int, cache_key: str) -> bytes:
+    if source.get("provider") == "google_map_tiles":
+        return google_simple_tile(z, x, y)
     cache_path = TILE_CACHE / cache_key / str(z) / str(x) / f"{y}.img"
     if cache_path.exists():
         return cache_path.read_bytes()

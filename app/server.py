@@ -12,6 +12,7 @@ Endpoints:
   GET  /api/health                -> ok
   GET  /api/countries             -> country index (downloads NE file on first call)
   GET  /api/country/<ISO3>        -> GeoJSON geometry for preview outline
+  GET  /api/map-tiles/google-simple/z/x/y -> styled Google roadmap tile
   POST /api/export                -> start export job {json body}
    GET  /api/export/status/<id>    -> job progress/result
    GET  /api/exports                -> available export packages
@@ -163,7 +164,23 @@ class Handler(BaseHTTPRequestHandler):
                     if not backup.exists():
                         backup.write_text(text, encoding="utf-8")
                     comp.write_text(text.replace(old_text, str(target)), encoding="utf-8")
-        app_settings.save({} if use_default else {"exports_path": str(target)})
+        saved = app_settings.load()
+        if use_default:
+            saved.pop("exports_path", None)
+        else:
+            saved["exports_path"] = str(target)
+        google_key = str(config.get("google_maps_api_key") or "").strip()
+        if google_key:
+            saved["google_maps_api_key"] = google_key
+        if "google_maps_daily_warning" in config:
+            try:
+                warning_limit = int(config["google_maps_daily_warning"])
+            except (TypeError, ValueError) as exc:
+                raise ValueError("daily tile warning must be a whole number") from exc
+            if warning_limit < 1:
+                raise ValueError("daily tile warning must be at least 1")
+            saved["google_maps_daily_warning"] = warning_limit
+        app_settings.save(saved)
         LOGGER.info("Export folder set to %s (moved %d packages)", target, moved)
         self._json({"ok": True, "exports_path": str(target), "moved": moved,
                     "using_default": use_default})
@@ -273,10 +290,21 @@ class Handler(BaseHTTPRequestHandler):
                         self._json({"error": "unknown job"}, 404)
                         return
                     self._json({"status": job["status"], "result": job["result"]})
+            elif (m := re.fullmatch(
+                    r"/api/map-tiles/google-simple/(\d{1,2})/(\d+)/(\d+)", path)):
+                tile = exporter.google_simple_tile(*(int(value) for value in m.groups()))
+                self._send(200, tile, "image/png")
+            elif path == "/api/map-tiles/usage":
+                self._json(exporter.google_tile_usage())
             elif path == "/api/settings":
                 self._json({"exports_path": str(app_settings.exports_dir()),
                             "default_exports_path": str(app_settings.DEFAULT_EXPORTS_DIR),
-                            "using_default": not app_settings.has_exports_override()})
+                            "using_default": not app_settings.has_exports_override(),
+                            "google_maps_api_key_configured":
+                                app_settings.has_google_maps_api_key(),
+                            "google_maps_daily_warning":
+                                app_settings.google_maps_daily_warning(),
+                            "google_tile_usage": exporter.google_tile_usage()})
             elif path == "/api/exports":
                 packages = []
                 for candidate in sorted(app_settings.exports_dir().iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):

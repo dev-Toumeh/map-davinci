@@ -18,7 +18,7 @@
   #settingsbtn:hover { border-color:var(--acc); color:var(--acc); }
   .sec { padding:0 16px 12px; border-bottom:1px solid var(--line); }
   .sec label { display:block; color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.6px; margin:10px 0 4px; }
-  input[type=text], input[type=number], select {
+  input[type=text], input[type=password], input[type=number], select {
     width:100%; background:#12141a; color:var(--txt); border:1px solid var(--line);
     border-radius:6px; padding:7px 9px; font-size:13px; outline:none;
   }
@@ -97,6 +97,7 @@
   .modal-close:hover { color:var(--txt); background:#272c35; border-color:var(--line); }
   .modal-body { padding:14px; }
   .settings-field > label { display:block; margin-bottom:5px; color:var(--dim); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }
+  .settings-field + .settings-field { margin-top:14px; }
   .settings-path-row { display:flex; gap:8px; }
   .settings-path-row input { flex:1; min-width:0; }
   .ui-button { padding:7px 10px; border:1px solid var(--line); border-radius:6px; background:#20252e; color:var(--txt); font-size:12px; cursor:pointer; white-space:nowrap; }
@@ -151,6 +152,7 @@
           <select id="source">
             <option value="google_satellite">Google Satellite</option>
             <option value="esri_world_imagery">Esri World Imagery</option>
+            <option id="simplemapoption" value="google_simple_map" disabled>Ivory Teal Map — configure API key</option>
           </select>
         </div>
         <div>
@@ -158,6 +160,7 @@
           <input type="number" id="widefactor" value="2" min="1.2" max="4" step="0.5">
         </div>
       </div>
+      <div id="tileusage" style="display:none;color:var(--dim);font-size:11px;margin-top:6px"></div>
       <div>
         <label>Export name</label>
         <input type="text" id="shotname" placeholder="Generated from selected country">
@@ -198,6 +201,9 @@ const layers = {
   esri_world_imagery: L.tileLayer(
     "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     { maxZoom: 19, attribution: "Esri, Maxar" }),
+  google_simple_map: L.tileLayer(
+    "/api/map-tiles/google-simple/{z}/{x}/{y}",
+    { maxZoom: 22, attribution: "Map data © Google" }),
 };
 const map = L.map("map", {
   zoomControl: true,
@@ -243,11 +249,19 @@ colorInput.addEventListener("input", () => {
 });
 
 async function boot() {
-  const r = await fetch("/api/countries");
-  const data = await r.json();
+  const [countryResponse, settingsResponse] = await Promise.all([
+    fetch("/api/countries"), fetch("/api/settings"),
+  ]);
+  const data = await countryResponse.json();
   if (data.error) { clist.textContent = data.error; return; }
   allCountries = data.countries;
+  const currentSettings = await settingsResponse.json();
+  const simpleOption = document.getElementById("simplemapoption");
+  simpleOption.disabled = !currentSettings.google_maps_api_key_configured;
+  simpleOption.textContent = currentSettings.google_maps_api_key_configured
+    ? "Ivory Teal Map" : "Ivory Teal Map — configure API key";
   renderList();
+  updateGoogleTileUsage();
 }
 
 function renderList() {
@@ -455,7 +469,32 @@ document.getElementById("res").addEventListener("change", updateFrame);
 document.getElementById("source").addEventListener("change", (e) => {
   for (const k in layers) map.removeLayer(layers[k]);
   layers[e.target.value].addTo(map);
+  updateGoogleTileUsage();
 });
+
+async function updateGoogleTileUsage() {
+  const note = document.getElementById("tileusage");
+  if (document.getElementById("source").value !== "google_simple_map") {
+    note.style.display = "none";
+    return;
+  }
+  note.style.display = "block";
+  try {
+    const response = await fetch("/api/map-tiles/usage");
+    const usage = await response.json();
+    if (!response.ok || usage.error) throw new Error(usage.error || "Usage unavailable");
+    note.textContent = `Google tiles today: ${usage.requests.toLocaleString()} / ${usage.warning_limit.toLocaleString()}`;
+    note.style.color = usage.limit_reached ? "var(--err)" : "var(--dim)";
+    const alertKey = "map-video-editor:google-tile-alert:" + usage.date;
+    if (usage.limit_reached && !localStorage.getItem(alertKey)) {
+      localStorage.setItem(alertKey, "shown");
+      window.alert(`Google Map Tiles warning: ${usage.requests.toLocaleString()} requests today. Your warning limit is ${usage.warning_limit.toLocaleString()}.`);
+    }
+  } catch (error) {
+    note.textContent = "Google tile usage unavailable: " + error.message;
+  }
+}
+setInterval(updateGoogleTileUsage, 15000);
 
 // ---- export ----
 document.getElementById("exportbtn").addEventListener("click", async () => {
@@ -539,6 +578,16 @@ boot(); updateFrame();
         </div>
         <div class="setnote" id="exportsdirnote"></div>
       </div>
+      <div class="settings-field">
+        <label for="googlemapskey">Google Map Tiles API key</label>
+        <input type="password" id="googlemapskey" autocomplete="off" placeholder="Paste the API key">
+        <div class="setnote" id="googlemapskeynote">Stored locally and used only by the Python server.</div>
+      </div>
+      <div class="settings-field">
+        <label for="googledailylimit">Daily tile warning</label>
+        <input type="number" id="googledailylimit" min="1" step="1" value="3000">
+        <div class="setnote" id="googledailylimitnote">The app alerts once per day when this number of Google tile requests is reached.</div>
+      </div>
       <div id="settingsstatus" class="setnote" aria-live="polite"></div>
       <div class="modal-actions">
         <button id="settingssave" class="ui-button primary" type="button">Save settings</button>
@@ -562,6 +611,14 @@ async function openSettings() {
     settingsBuiltInDefault = settings.default_exports_path || "";
     settingsElement("exportsdir").value = settings.exports_path || "";
     settingsElement("exportsdirnote").textContent = "Default: " + settingsBuiltInDefault;
+    settingsElement("googlemapskey").value = "";
+    settingsElement("googlemapskey").placeholder = settings.google_maps_api_key_configured
+      ? "Saved — enter a new key to replace it" : "Paste the API key";
+    settingsElement("googledailylimit").value = settings.google_maps_daily_warning || 3000;
+    const usage = settings.google_tile_usage;
+    settingsElement("googledailylimitnote").textContent = usage
+      ? `Today: ${usage.requests.toLocaleString()} requests. The app alerts once per day at the selected limit.`
+      : "The app alerts once per day when this number of Google tile requests is reached.";
   } catch (error) {
     settingsElement("exportsdirnote").textContent = "Failed to load settings: " + error.message;
   }
@@ -578,6 +635,8 @@ settingsElement("settingssave").addEventListener("click", async () => {
       body: JSON.stringify({
         path: settingsElement("exportsdir").value.trim(),
         use_default: settingsElement("exportsdir").value.trim() === settingsBuiltInDefault,
+        google_maps_api_key: settingsElement("googlemapskey").value.trim(),
+        google_maps_daily_warning: Number(settingsElement("googledailylimit").value) || 3000,
       }),
     });
     const result = await response.json();
