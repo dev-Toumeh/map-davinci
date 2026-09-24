@@ -1,0 +1,970 @@
+hey what's going on guys in this video
+
+
+we're going to discuss specifically how
+
+
+to animate lines in daventries off so
+
+
+the first thing we're going to do is to
+
+
+take our Fusion composition clip here
+
+
+straight to the fusion page and let's
+
+
+bring a background note and change the
+
+
+color of the background note to a color
+
+
+that you like the next thing we're going
+
+
+to do is to bring a polygon masking node
+
+
+which is going to be used to primarily
+
+
+Drive Line creation so now let's go
+
+
+ahead and put down two dots on the
+
+
+screen but before we put down the second
+
+
+one a good practice here is to hold down
+
+
+the shift key this is going to ensure
+
+
+the line is straight so now all we need
+
+
+to do is to bring up the Border width
+
+
+just a little bit and as you can see we
+
+
+have a perfectly straight line so to
+
+
+animate the line there are a few things
+
+
+we can do so the first is to play with
+
+
+the length setting another one we can
+
+
+play with is the position setting but
+
+
+the thing to note about position
+
+
+shedding is that you have the ability to
+
+
+take it Beyond zero so now when we take
+
+
+it to
+
+
+-1 you can see the line is going to go
+
+
+all away from the left to the right
+
+
+another setting we can play with is
+
+
+shape animation which automatically
+
+
+keyframes for us so now the first thing
+
+
+we're going to do here is to change the
+
+
+line to modify only and then we're going
+
+
+to shorten this line while holding down
+
+
+the shift key then come to another part
+
+
+of the video then bring it out so this
+
+
+as you can see will automatically
+
+
+keyframe for us and if we replay this
+
+
+right now you will see that we have a a
+
+
+pretty basic line animation created we
+
+
+can also come to spline editor and
+
+
+adjust the interpolation between the two
+
+
+keyframes this will make the animation
+
+
+feel a little bit more refined another
+
+
+thing we can play with is line points so
+
+
+once again let's put down uh you know
+
+
+two dots on the screen then let's change
+
+
+it to modify only then let's select
+
+
+these two points right click and then in
+
+
+the menu let's go to uh polyline and
+
+
+then let's go to publish and then select
+
+
+uh publish points so now as you can see
+
+
+uh the location data for each point is
+
+
+now available to us but to know which
+
+
+point is which what we're going to do is
+
+
+to go back to that same menu and then
+
+
+instead let's activate uh publish points
+
+
+so now as you can see we can tell which
+
+
+is point zero and which is 0.1 and you
+
+
+can change uh the points themselves by
+
+
+changing the data now let's go ahead and
+
+
+copy the y-axis data of 0.01 and then
+
+
+paste it into y-axis of point zero this
+
+
+will ensure both points are on the same
+
+
+line and then let's do the same thing
+
+
+for Point access so now these points are
+
+
+sitting right on top of each other then
+
+
+let's change the border with just by
+
+
+bringing up just a little bit just a
+
+
+touch and then let's keyframe point zero
+
+
+at this part of this video now let's go
+
+
+to another part of the video and that's
+
+
+keyframe Again by bringing out this line
+
+
+and which is essentially changing the
+
+
+x-axis of point zero so now the beauty
+
+
+is that we have this location data
+
+
+available to us so let's go to shape and
+
+
+now we're going to bring our end gone
+
+
+and end render node we're going to
+
+
+create basically a triangle here so
+
+
+let's change sides to three now let's
+
+
+connect this render node to background
+
+
+as a foreground so we're going to do
+
+
+first of all is change the color of this
+
+
+triangle here to a the same color as the
+
+
+line now let's go to the merge node
+
+
+let's bring down the size setting so
+
+
+that the triangle itself is
+
+
+proportionate to the line itself and now
+
+
+let's go to the center setting in the
+
+
+merge node right click and then go to
+
+
+connect to and then let's connect to the
+
+
+path one Precision data so this will
+
+
+ensure that the position of the arrow is
+
+
+always always locked to the same
+
+
+position as a point zero on the line now
+
+
+just FYI if you go to uh the polygon
+
+
+masking note go to the modifiers tab
+
+
+this is where you can find out what's
+
+
+the path uh for uh point zero on the
+
+
+line all right guys so uh let's go back
+
+
+to merge node change angle to 180 this
+
+
+will make sure that the angle the arrow
+
+
+is pointing in the right direction now
+
+
+let's uh go ahead and bring a spline
+
+
+editor and we're going to change the
+
+
+interpolation for two keyframes 4.0 this
+
+
+is going to impact the arrow as well
+
+
+since they are all locked all right now
+
+
+let's go ahead and create another arrow
+
+
+another triangle so let's do that and
+
+
+then we're gonna go to the size setting
+
+
+in this new merch note bring down the
+
+
+sides so that the triangle is
+
+
+proportionate to the line then let's go
+
+
+ahead and the keyframe point one instead
+
+
+this time so let's do that and then once
+
+
+uh we have keyframe point one we're
+
+
+gonna do is to bring this line out to
+
+
+the other side of the screen so once
+
+
+that all that is done you can go back to
+
+
+the modifiers Tab and see that now it is
+
+
+past two 4.1 uh so uh in the emerge node
+
+
+if you go back and then go to the center
+
+
+setting under connect two we're going to
+
+
+connect to path to Precision data at
+
+
+this time so this will ensure the other
+
+
+arrow is locked to that same position as
+
+
+the 0.1 and if you change the
+
+
+interpolation again this is going to
+
+
+impact both the point as well as the
+
+
+arrow as well all right now let's switch
+
+
+gears a little and look at how to create
+
+
+a non-linear line animation so let's put
+
+
+down four points on the screen and we're
+
+
+going to select these points right click
+
+
+in the menu let's go to uh polyline and
+
+
+then go to create and then select a
+
+
+rectangle in the pop-up menu we're going
+
+
+to just select OK for now so this is
+
+
+going to give us a square so what we can
+
+
+do is to select the left two points and
+
+
+then just hold down the shift key drag
+
+
+it out this will give us a rectangle all
+
+
+right guys so now let's uncheck solid
+
+
+bring up the border with adjust the
+
+
+touch and what we can do is to play with
+
+
+the length as well as the position
+
+
+setting here so as you can see let's go
+
+
+ahead and first of all play with the
+
+
+length setting so let's uh keyframe a
+
+
+length setting here uh and then let's go
+
+
+to another part of the video Let's
+
+
+keyframe again let's go back to the
+
+
+previous Point bring down the length
+
+
+setting to zero so now as you can see we
+
+
+have a pretty basic non-linear line
+
+
+animation and then we can also play with
+
+
+the position setting as well uh you know
+
+
+to go along with the length setting but
+
+
+what if we want to add another element
+
+
+well let's once again put down four
+
+
+points on the screen and then let's
+
+
+select all these points and then let's
+
+
+right click in the menu uh let's once
+
+
+again go to polyline go to create and
+
+
+then let's select ellipse this time and
+
+
+that's just select OK and uncheck solid
+
+
+and then bring up water with just a
+
+
+little bit so what we're going to do
+
+
+right now is to play with the length
+
+
+setting uh what we want to do here
+
+
+basically is just to show one quarter of
+
+
+the line so let's do that let's keyframe
+
+
+and put down 0.25 and so this is going
+
+
+to be the finished line so let's
+
+
+keyframe that and then let's go to
+
+
+another part of this video Let's
+
+
+keyframe again let's go back to the
+
+
+previous point and then bring this down
+
+
+to zero all right so now we have a
+
+
+simple nonlinear line animation and then
+
+
+what we're going to do is to basically
+
+
+publish this line path so to do that
+
+
+let's right click shape animation here
+
+
+and then in the menu we're going to
+
+
+remove actually this line first and then
+
+
+let's right click once again and then
+
+
+let's publish this line path information
+
+
+and then let's go to modifiers tab
+
+
+you'll see that it's there available for
+
+
+us so let's go to shape and bring out
+
+
+and gun and render create a triangle
+
+
+here make sure it's three sides and then
+
+
+connect to the background as a
+
+
+foreground and change the color of the
+
+
+triangle of the arrow to the same color
+
+
+as the line and now let's go to the
+
+
+merge node a bring down the size of this
+
+
+Arrow so that it's fitting for this
+
+
+animation and now let's go to the center
+
+
+setting let's right click in the menu
+
+
+select a path this will initiate the
+
+
+path information for this Arrow under
+
+
+the modifiers Tab and now let's uh go to
+
+
+shape animation right click I want to
+
+
+connect to let's connect to the polygon
+
+
+path value this will ensure the arrow is
+
+
+sitting on the same path as the line and
+
+
+now let's go to path one a displacement
+
+
+setting now this is initially
+
+
+automatically keyframe for us but we can
+
+
+on keyframe it but essentially you will
+
+
+see that a changing displacement value
+
+
+is going to animate the arrow for us so
+
+
+with that said let's go to the beginning
+
+
+of the video here we're going to
+
+
+keyframe placement ourselves and then
+
+
+leave it at zero let's go to the end of
+
+
+the line animation and let's go and
+
+
+let's keyframe displacement Again by
+
+
+bringing up to the point where it's
+
+
+sitting at the end of the line so if you
+
+
+were to replace this right now you guys
+
+
+will see that uh this arrow is moving in
+
+
+the same speed as the line now as for
+
+
+the direction of the arrow here we're
+
+
+gonna go to the angle setting let's go
+
+
+to connect two and then let's connect to
+
+
+the path one header uh you know setting
+
+
+here this will ensure that the angle is
+
+
+pointing in the same direction as the
+
+
+line animation all right perfect so uh
+
+
+the next thing we're going to do here is
+
+
+to change the interpolation for the line
+
+
+but the key thing here is to remember
+
+
+when you animate this you need to make
+
+
+sure that you understand what's the
+
+
+value for easy and ease out because we
+
+
+need to make sure that the displacement
+
+
+setting uh when you change the
+
+
+interpolation for the 2 two keyframes
+
+
+it's going to be the same as the value
+
+
+for the others which is going to be 80
+
+
+in this case for using and ease out so
+
+
+as you see now when you do that this is
+
+
+going to ensure the arrow is moving in
+
+
+the same speed as the line so another
+
+
+thing we can do is to bring a text node
+
+
+now let's go to the layout tab and
+
+
+change the type to a path so this will
+
+
+allow us to draw a path on the screen so
+
+
+what we're going to do is to draw a very
+
+
+simple path on the screen but holding
+
+
+down the shift key so this will ensure
+
+
+that the lines are perfectly straight
+
+
+now let's go back to the text box we're
+
+
+going to type in a bunch of dashes and
+
+
+then so this will allow us to basically
+
+
+create a dashed line we can also go to
+
+
+the transform tab there then go change
+
+
+the spacing between each Dash we can
+
+
+also go to the shading Tab and then
+
+
+let's go to precision and let's go to
+
+
+offset this will change how the uh you
+
+
+know dashes are said where the dash is
+
+
+sitting compared to the line path itself
+
+
+then most importantly if we go back to
+
+
+the text tab the ride on setting is
+
+
+going to allow us to animate this line
+
+
+so with that said what we're going to do
+
+
+is to keyframe uh right on at this point
+
+
+of the video let's bring end all the way
+
+
+to a start and then let's go to another
+
+
+part of this video let's bring the Ant
+
+
+back up so now guys as you can see we
+
+
+have created a a pretty basic dash line
+
+
+animation now to add another element to
+
+
+this what we're going to do is to go
+
+
+back to the layout tab and then we're
+
+
+going to go to shape animation right
+
+
+click let's once again remove this path
+
+
+first and then let's right click again
+
+
+and then let's publish this path setting
+
+
+uh so now on the modifiers tab you have
+
+
+this information available and then
+
+
+let's go ahead and bring once again and
+
+
+gone and render create an arrow that's
+
+
+connected to the text tab as a
+
+
+foreground let's once again change the
+
+
+size so that it's fitting for this
+
+
+animation so two things we're gonna do
+
+
+one is let's first of all go through the
+
+
+settings tab right click and then let's
+
+
+go to connect to you will see that
+
+
+there's nothing there so we have to go
+
+
+to path publish the path first and then
+
+
+go to modifiers tab go to a shape
+
+
+animation right click and connect to uh
+
+
+this text path connect to the value so
+
+
+now this arrow is sitting on that same
+
+
+path and then let's go to path one let's
+
+
+once again uh use displacement to help
+
+
+us set the animation for this Arrow so
+
+
+what we're going to do is to just to
+
+
+bring this back to the point where this
+
+
+is at the end of the animation so it's
+
+
+going to be one in this case and now you
+
+
+will see that this arrow is moving in
+
+
+the same speed as the dashed line now
+
+
+let's go back to the angle setting here
+
+
+let's right click and then we're going
+
+
+to go to connect to and now let's make
+
+
+sure that we connect to the path one
+
+
+heading so this will ensure that the
+
+
+arrow is also pointing in that same
+
+
+direction alright guys so this is
+
+
+basically it a quick look at different
+
+
+ways to create line animation in DaVinci
+
+
+Resolve I hope this helps and as always
+
+
+I will see you next time
+
+
+[Music]

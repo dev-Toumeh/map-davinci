@@ -1,0 +1,136 @@
+{
+	Tools = ordered() {
+		MacroTool1 = GroupOperator {
+			CtrlWZoom = false,
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "DropShadow1",
+					Source = "Output",
+				},
+				Output1 = InstanceOutput {
+					SourceOp = "Path2",
+					Source = "Heading",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				DropShadow1 = ofx.com.blackmagicdesign.resolvefx.DropShadow {
+					CtrlWShown = false,
+					Inputs = {
+						refreshTrigger = Input {
+							Value = Number {
+								Value = 1
+							},
+						},
+						Source = Input {
+							SourceOp = "Text2_1",
+							Source = "Output",
+						},
+						shadowStrength = Input { Value = 1, },
+						shadowAngle = Input { Value = 80, },
+						ShadowDistance = Input { Value = 0.0315, },
+						shadowBlur = Input { Value = 0.550000011920929, },
+						shadowColorRed = Input { Value = 0, },
+						shadowColorGreen = Input { Value = 0, },
+						shadowColorBlue = Input { Value = 0, },
+						isLegacyComp = Input { Value = 0, },
+						isLegacyBlur = Input { Value = 1, },
+						blendGroup = Input { Value = 0, },
+						blendIn = Input { Value = 1, },
+						blend = Input { Value = 0, },
+						ignoreContentShape = Input { Value = 0, },
+						legacyIsProcessRGBOnly = Input { Value = 0, },
+						IsNoTemporalFramesReqd = Input { Value = 0, },
+						srcProcessingAlphaMode = Input { Value = 2, },
+						dstProcessingAlphaMode = Input { Value = 2, },
+						resolvefxVersion = Input { Value = "2.1", }
+					},
+					ViewInfo = OperatorInfo { Pos = { 612.254, -124.358 } },
+				},
+				Text2_1 = TextPlus {
+					CtrlWShown = false,
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "Rectangle1_1",
+							Source = "Mask",
+						},
+						Width = Input { Value = 1920, },
+						Height = Input { Value = 1080, },
+						UseFrameFormatSettings = Input { Value = 1, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						Wrap = Input { Value = 1, },
+						Center = Input { Value = { 0.783440195033886, 0.956382901666307 }, },
+						LayoutRotation = Input { Value = 1, },
+						LineSpacing = Input { Value = 1.26, },
+						CharacterOffset = Input {
+							SourceOp = "Path2",
+							Source = "Position",
+						},
+						TransformRotation = Input { Value = 1, },
+						Softness1 = Input { Value = 1, },
+						StyledText = Input { Value = "50 %\n10 مليارات", },
+						Font = Input { Value = "Tahoma", },
+						Style = Input { Value = "Bold", },
+						Size = Input { Value = 0.0611, },
+						VerticalJustificationNew = Input { Value = 3, },
+						HorizontalJustificationNew = Input { Value = 3, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 748.059, -125.302 } },
+					Version = 1
+				},
+				Path2 = PolyPath {
+					DrawMode = "InsertAndModify",
+					CtrlWZoom = false,
+					Inputs = {
+						Displacement = Input {
+							SourceOp = "Path2Displacement",
+							Source = "Value",
+						},
+						PolyLine = Input {
+							Value = Polyline {
+								Points = {
+									{ Linear = true, LockY = true, X = -0.5, Y = -0.607, RX = 0, RY = 0.028 },
+									{ Linear = true, LockY = true, X = -0.5, Y = -0.523, LX = 0, LY = -0.028, RX = 0, RY = 0 },
+									{ Linear = true, LockY = true, X = -0.5, Y = -0.523, LX = 0, LY = 0, RX = 0, RY = 0.02 },
+									{ Linear = true, LockY = true, X = -0.5, Y = -0.463, LX = 0, LY = -0.02, RX = 0, RY = 0 },
+									{ Linear = true, LockY = true, X = -0.5, Y = -0.463, LX = 0, LY = 0, RX = 0, RY = 0.0186666666666667 },
+									{ Linear = true, LockY = true, X = -0.5, Y = -0.407, LX = 0, LY = -0.0186666666666667 }
+								}
+							},
+						}
+					},
+				},
+				Path2Displacement = BezierSpline {
+					SplineColor = { Red = 255, Green = 0, Blue = 255 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[410] = { 0, RH = { 416, 0 }, Flags = { LockedY = true } },
+						[428] = { 0.42, LH = { 422.000600099564, 0.42 }, RH = { 438, 0.42 }, Flags = { LockedY = true } },
+						[458] = { 0.42, LH = { 448, 0.42 }, RH = { 462.332899928093, 0.42 }, Flags = { Linear = true, LockedY = true } },
+						[471] = { 0.72, LH = { 466.666666666667, 0.72 }, RH = { 479.666666666667, 0.72 }, Flags = { LockedY = true } },
+						[497] = { 0.72, LH = { 488.333333333333, 0.72 }, RH = { 502.332799911499, 0.72 }, Flags = { Linear = true, LockedY = true } },
+						[513] = { 1, LH = { 507.666666666667, 1 }, Flags = { LockedY = true } }
+					}
+				},
+				Rectangle1_1 = RectangleMask {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					Inputs = {
+						Filter = Input { Value = FuID { "Fast Gaussian" }, },
+						BorderWidth = Input { Value = 0.048, },
+						MaskWidth = Input { Value = 1920, },
+						MaskHeight = Input { Value = 1080, },
+						PixelAspect = Input { Value = { 1, 1 }, },
+						UseFrameFormatSettings = Input { Value = 1, },
+						ClippingMode = Input { Value = FuID { "None" }, },
+						Center = Input { Value = { 0.817673136860043, 1.32809840515388 }, },
+						Width = Input { Value = 1.29609278186784, },
+						Height = Input { Value = 0.783029680188888, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 872.705, -126.011 } },
+				}
+			},
+		}
+	},
+	ActiveTool = "MacroTool1"
+}
