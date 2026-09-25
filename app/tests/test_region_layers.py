@@ -56,29 +56,38 @@ class RegionLayerTests(unittest.TestCase):
             (package / "regions/geometry_texas-annexation-1845.geojson").write_text(
                 json.dumps({"geometry": GEOMETRY}))
             text = generate(package, self.metadata(), animation).read_text()
-        self.assertIn("USA_Wide_Regions = MultiMerge", text)
-        self.assertIn("USA_Detail_Regions = MultiMerge", text)
-        self.assertIn("USA_Wide_Gate = Merge", text)
-        self.assertIn("USA_Detail_Gate = Merge", text)
         self.assertIn("USA_Visibility = BezierSpline", text)
         self.assertIn("USA_Texas_Annexation_1845_Visibility", text)
-        self.assertIn('LayerName1 = Input { Value = "USA wide region group"', text)
-        self.assertIn('LayerName1 = Input { Value = "USA detail region group"', text)
-        self.assertIn("Country_Final_Wide_Layers = MultiMerge", text)
-        self.assertIn("Country_Final_Detail_Layers = MultiMerge", text)
-        self.assertIn("Country_Final_Detail_Placed = Transform", text)
-        self.assertIn("Country_Final_Layers = MultiMerge", text)
+        self.assertIn("USA_Entire_Combined_Layers = MultiMerge", text)
+        self.assertIn("USA_Texas_Annexation_1845_Combined_Layers = MultiMerge", text)
+        self.assertIn("Country_Deployment_Layers = MultiMerge", text)
         self.assertIn("Map_Country_Layers = MultiMerge", text)
         self.assertIn("Country_Edit_Switch = Switch", text)
         self.assertIn("Country_Mode_Switch = Switch", text)
         self.assertIn('Name0 = Input { Value = "USA - Entire country"', text)
         self.assertIn('Name1 = Input { Value = "USA - Texas Annexation"', text)
-        self.assertIn('Input0 = Input { SourceOp = "Edit_USA_Entire_Combined_Layers"', text)
-        self.assertIn('Input1 = Input { SourceOp = "Edit_USA_Texas_Annexation_1845_Combined_Layers"', text)
+        self.assertIn('Input0 = Input { SourceOp = "USA_Entire_Combined_Layers"', text)
+        self.assertIn('Input1 = Input { SourceOp = "USA_Texas_Annexation_1845_Combined_Layers"', text)
+        deployment = text.split("Country_Deployment_Layers = MultiMerge", 1)[1].split(
+            "Country_Edit_Switch = Switch", 1)[0]
+        self.assertIn(
+            '["Layer1.Foreground"] = Input { SourceOp = "USA_Entire_Combined_Layers"',
+            deployment)
+        self.assertIn(
+            '["Layer2.Foreground"] = Input { SourceOp = "USA_Texas_Annexation_1845_Combined_Layers"',
+            deployment)
         self.assertIn('Name0 = Input { Value = "EDIT MODE - selected country or territory"', text)
-        self.assertIn('Name1 = Input { Value = "FINAL RENDER - all countries and territories"', text)
+        self.assertIn('Name1 = Input { Value = "DEPLOYMENT - all countries and territories"', text)
+        self.assertIn(
+            'Input1 = Input { SourceOp = "Country_Deployment_Layers", Source = "Output"',
+            text)
         self.assertIn('Input = Input { SourceOp = "Map_Country_Layers"', text)
         self.assertIn('Background = Input { SourceOp = "Map_Raster_Layers"', text)
+        self.assertNotIn("USA_Wide_Regions", text)
+        self.assertNotIn("USA_Detail_Regions", text)
+        self.assertNotIn("Country_Final_", text)
+        self.assertNotIn("Edit_USA_", text)
+        self.assertEqual(text.count('SourceOp = "USA_Entire_Combined_Layers"'), 2)
         self.assertNotIn("Vector_AnimationDisplacement", text)
         self.assertNotIn("Vector_AnimationPath", text)
         border = text.split(
@@ -126,8 +135,12 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("NumberOfInputs = Input { Value = 2", edit)
         self.assertIn('Name0 = Input { Value = "USA - Entire country"', edit)
         self.assertIn('Name1 = Input { Value = "CAN - Entire country"', edit)
-        self.assertIn('Input0 = Input { SourceOp = "Edit_USA_Entire_Combined_Layers"', edit)
-        self.assertIn('Input1 = Input { SourceOp = "Edit_CAN_Entire_Combined_Layers"', edit)
+        self.assertIn('Input0 = Input { SourceOp = "USA_Entire_Combined_Layers"', edit)
+        self.assertIn('Input1 = Input { SourceOp = "CAN_Entire_Combined_Layers"', edit)
+        deployment = text.split("Country_Deployment_Layers = MultiMerge", 1)[1].split(
+            "Country_Edit_Switch = Switch", 1)[0]
+        self.assertIn('SourceOp = "USA_Entire_Combined_Layers"', deployment)
+        self.assertIn('SourceOp = "CAN_Entire_Combined_Layers"', deployment)
         self.assertEqual(text.count("Country_Mode_Switch = Switch"), 1)
 
 

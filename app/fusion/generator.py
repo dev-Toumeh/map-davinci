@@ -477,8 +477,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
     tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_detail.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 130 }} }}, }},
 \t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
     vector_layers = []
-    country_final_wide_layers = []
-    country_final_detail_layers = []
+    country_deployment_layers = []
     country_edit_inputs: list[tuple[str, str]] = []
     countries = {country["iso3"]: country for country in metadata.get("countries", [])}
     groups = animation.get("region_groups")
@@ -501,14 +500,12 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
                        "maxx": center_x + half_width, "maxy": center_y + half_height}
     static_tolerance = GEOMETRY_TOLERANCE_PX / max(width, height)
     row_cursor = 360
-    for group_number, group in enumerate(groups, 1):
+    for group in groups:
         country = countries[group["iso3"]]
         iso = _name(country["iso3"])
         group_base = iso
         red, green, blue = _rgb(country.get("color", "#1689ff"))
         border_red, border_green, border_blue = _rgb(country.get("border_color", "#ffffff"))
-        wide_child_layers = []
-        detail_child_layers = []
         parent_node, parent_input = _visibility_spline(
             group_base + "_Visibility", group.get("start_frame"), group.get("end_frame"),
             duration, int(out["fps"]))
@@ -554,59 +551,36 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{prefix}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ -910, {row + y_offset} }} }},
 \t\t}},''')
-            fill_layer, border_layer = child_number * 2 - 1, child_number * 2
             safe_name = _territory_label(child).replace('"', "'")
-            for resolution, layers in (("Wide", wide_child_layers),
-                                       ("Detail", detail_child_layers)):
-                prefix = f"{child_base}_{resolution}"
-                layers.append(f'''\t\t\t\t["Layer{fill_layer}.Foreground"] = Input {{ SourceOp = "{prefix}_Fill", Source = "Output", }},
-\t\t\t\tLayerName{fill_layer} = Input {{ Value = "{safe_name} {resolution.lower()} fill", }},
-\t\t\t\t["Layer{border_layer}.Foreground"] = Input {{ SourceOp = "{prefix}_Border", Source = "Output", }},
-\t\t\t\tLayerName{border_layer} = Input {{ Value = "{safe_name} {resolution.lower()} border", }},''')
-            edit_base = f"Edit_{child_base}"
-            tools.append(f'''\t\t{edit_base}_Wide_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row} }} }}, }},
-\t\t{edit_base}_Wide_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{edit_base}_Wide_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ -440, {row} }} }}, }},
-\t\t{edit_base}_Detail_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Detail_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row + 120} }} }}, }},
-\t\t{edit_base}_Detail_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Detail_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{edit_base}_Detail_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ -440, {row + 120} }} }}, }},
-\t\t{edit_base}_Detail_Placed = Transform {{ NameSet = true, Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "{edit_base}_Detail_Gate", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -210, {row + 120} }} }}, }},
-\t\t{edit_base}_Combined_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{edit_base}_Wide_Gate", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{edit_base}_Detail_Placed", Source = "Output", }}, LayerName1 = Input {{ Value = "{safe_name} detail", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 20, {row + 60} }} }}, }},''')
-            country_edit_inputs.append((f"{group['iso3']} - {safe_name}", edit_base + "_Combined_Layers"))
-        # Keep the group output in its own columns.  Wide and detail occupy
-        # separate rows so the Flow remains readable even with many regions.
-        for resolution, layers, y_offset in (("Wide", wide_child_layers, 0),
-                                              ("Detail", detail_child_layers, 120)):
-            tools.append(f'''\t\t{group_base}_{resolution}_Regions = MultiMerge {{
-\t\t\tNameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_{resolution}_Canvas", Source = "Output", }},
-{chr(10).join(layers)}
-\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 300, {row_cursor + y_offset} }} }},
-\t\t}},
-\t\t{group_base}_{resolution}_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_{resolution}_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{group_base}_{resolution}_Regions", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ 530, {row_cursor + y_offset} }} }}, }},''')
-        country_final_wide_layers.append(f'''\t\t\t\t["Layer{group_number}.Foreground"] = Input {{ SourceOp = "{group_base}_Wide_Gate", Source = "Output", }},
-\t\t\t\tLayerName{group_number} = Input {{ Value = "{group['iso3']} wide region group", }},''')
-        country_final_detail_layers.append(f'''\t\t\t\t["Layer{group_number}.Foreground"] = Input {{ SourceOp = "{group_base}_Detail_Gate", Source = "Output", }},
-\t\t\t\tLayerName{group_number} = Input {{ Value = "{group['iso3']} detail region group", }},''')
+            tools.append(f'''\t\t{child_base}_Wide_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row} }} }}, }},
+\t\t{child_base}_Wide_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{child_base}_Wide_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ -440, {row} }} }}, }},
+\t\t{child_base}_Detail_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Detail_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row + 120} }} }}, }},
+\t\t{child_base}_Detail_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Detail_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{child_base}_Detail_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ -440, {row + 120} }} }}, }},
+\t\t{child_base}_Detail_Placed = Transform {{ NameSet = true, Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "{child_base}_Detail_Gate", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -210, {row + 120} }} }}, }},
+\t\t{child_base}_Combined_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{child_base}_Wide_Gate", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Placed", Source = "Output", }}, LayerName1 = Input {{ Value = "{safe_name} detail", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 20, {row + 60} }} }}, }},''')
+            shared_output = child_base + "_Combined_Layers"
+            country_edit_inputs.append((f"{group['iso3']} - {safe_name}", shared_output))
+            deployment_layer = len(country_deployment_layers) + 1
+            country_deployment_layers.append(
+                f'''\t\t\t\t["Layer{deployment_layer}.Foreground"] = Input {{ SourceOp = "{shared_output}", Source = "Output", }},
+\t\t\t\tLayerName{deployment_layer} = Input {{ Value = "{group['iso3']} - {safe_name}", }},''')
         row_cursor += max(360, len(group.get("children", [])) * 240 + 180)
     if country_edit_inputs:
         first_group_base = _name(groups[0]["iso3"])
-        tools.append(f'''\t\tCountry_Final_Wide_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{first_group_base}_Wide_Canvas", Source = "Output", }},
-{chr(10).join(country_final_wide_layers)}
-\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 780, 360 }} }}, }},
-\t\tCountry_Final_Detail_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{first_group_base}_Detail_Canvas", Source = "Output", }},
-{chr(10).join(country_final_detail_layers)}
-\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 780, 480 }} }}, }},
-\t\tCountry_Final_Detail_Placed = Transform {{ NameSet = true, Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Country_Final_Detail_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1010, 480 }} }}, }},
-\t\tCountry_Final_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Final_Wide_Layers", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "Country_Final_Detail_Placed", Source = "Output", }}, LayerName1 = Input {{ Value = "Detail territory polygons", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1240, 420 }} }}, }},''')
-        tools.append(_switch_tool("Country_Edit_Switch", country_edit_inputs, (1470, 540)))
+        tools.append(f'''\t\tCountry_Deployment_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{first_group_base}_Wide_Canvas", Source = "Output", }},
+{chr(10).join(country_deployment_layers)}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 1240, 360 }} }}, }},''')
+        tools.append(_switch_tool("Country_Edit_Switch", country_edit_inputs, (1240, 540)))
         tools.append(_switch_tool("Country_Mode_Switch", [
             ("EDIT MODE - selected country or territory", "Country_Edit_Switch"),
-            ("FINAL RENDER - all countries and territories", "Country_Final_Layers"),
-        ], (1700, 480)))
+            ("DEPLOYMENT - all countries and territories", "Country_Deployment_Layers"),
+        ], (1470, 450)))
         tools.append('''\t\tMap_Country_Layers = MultiMerge {
 \t\t\tNameSet = true,
 \t\t\tInputs = { Background = Input { SourceOp = "Map_Raster_Layers", Source = "Output", },
 \t\t\t\t["Layer1.Foreground"] = Input { SourceOp = "Country_Mode_Switch", Source = "Output", },
 \t\t\t\tLayerName1 = Input { Value = "Country performance mode", },
-\t\t\t}, ViewInfo = OperatorInfo { Pos = { 1930, 420 } },
+\t\t\t}, ViewInfo = OperatorInfo { Pos = { 1700, 450 } },
 \t\t},''')
         map_animation_source = "Map_Country_Layers"
         layer_number = 1
