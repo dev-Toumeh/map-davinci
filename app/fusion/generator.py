@@ -35,6 +35,27 @@ def _name(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_]", "_", value)
 
 
+def _territory_base(iso3: str, child: dict) -> str:
+    """Return a short, readable Fusion prefix without repeated country words."""
+    iso = _name(iso3.upper())
+    if child.get("category") == "country":
+        return f"{iso}_Entire"
+    if child.get("id") == "us-original-1783":
+        return f"{iso}_Territory_1783"
+    label = re.sub(r"_+", "_", _name(str(child.get("name") or child["id"]))).strip("_")
+    label = re.sub(r"^(?:USA|US|U_S|United_States)_", "", label, flags=re.IGNORECASE)
+    year = re.search(r"(?:^|[-_])(\d{4})(?:$|[-_])", str(child.get("id", "")))
+    if year and year.group(1) not in label:
+        label += "_" + year.group(1)
+    return f"{iso}_{label}"
+
+
+def _territory_label(child: dict) -> str:
+    if child.get("id") == "us-original-1783":
+        return "Territory recognized in 1783"
+    return str(child.get("name") or child.get("id") or "Territory")
+
+
 def _lua_path(path: Path) -> str:
     return str(path.resolve()).replace("\\", "\\\\").replace('"', '\\"')
 
@@ -170,7 +191,8 @@ def _country_mask(name: str, geometry: dict, wide_bbox: dict, width: int, height
                   *, outline: bool = False, pos: tuple[int, int] = (0, 0),
                   x_scale: float = 1.0, y_scale: float = 1.0,
                   prepared_rings: list[tuple[int, list[tuple[float, float]]]] | None = None,
-                  instance_source: str | None = None) -> str:
+                  instance_source: str | None = None,
+                  border_width: float = 0.0005) -> str:
     rings = prepared_rings or _prepared_rings(
         geometry, wide_bbox, x_scale, y_scale)
     if not rings:
@@ -179,11 +201,11 @@ def _country_mask(name: str, geometry: dict, wide_bbox: dict, width: int, height
     for index, (level, points) in enumerate(rings, 1):
         order.append(str(index))
         outline_inputs = (f'\n\t\t\t\t["PolyMask{index}.Solid"] = Input {{ Value = 0, }},'
-                          f'\n\t\t\t\t["PolyMask{index}.BorderWidth"] = Input {{ SourceOp = "Map_CountryBorderWidth", Source = "Value", }},') if outline else ""
+                          f'\n\t\t\t\t["PolyMask{index}.BorderWidth"] = Input {{ Value = {border_width:.12g}, }},') if outline else ""
         geometry_inputs = "" if instance_source else f'''\t\t\t\t["PolyMask{index}.Level"] = Input {{ Value = {level}, }},
 \t\t\t\t["PolyMask{index}.Filter"] = Input {{ Value = FuID {{ "Fast Gaussian" }}, }},
-\t\t\t\t["PolyMask{index}.Center"] = Input {{ SourceOp = "Vector_AnimationPath", Source = "Position", }},
-\t\t\t\t["PolyMask{index}.Size"] = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }},
+\t\t\t\t["PolyMask{index}.Center"] = Input {{ Value = {{ 0.5, 0.5 }}, }},
+\t\t\t\t["PolyMask{index}.Size"] = Input {{ Value = 1, }},
 \t\t\t\t["PolyMask{index}.Polyline"] = Input {{ Value = Polyline {{ Closed = true, Points = {{ {_polyline(points)} }} }}, }},
 \t\t\t\t["PolyMask{index}.Polyline2"] = Input {{ Value = Polyline {{ }}, Disabled = true, }},'''
         inputs.append(geometry_inputs + outline_inputs)
@@ -249,8 +271,8 @@ def _switch_tool(name: str, inputs: list[tuple[str, str]], pos: tuple[int, int])
     for index, (label, source) in enumerate(inputs, 1):
         safe_label = str(label).replace('"', "'")
         lines.extend([
-            f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},',
-            f'\t\t\t\tName{index} = Input {{ Value = "{safe_label}", }},',
+            f'\t\t\t\tInput{index - 1} = Input {{ SourceOp = "{source}", Source = "Output", }},',
+            f'\t\t\t\tName{index - 1} = Input {{ Value = "{safe_label}", }},',
         ])
     lines.extend([
         "\t\t\t},",
@@ -430,25 +452,33 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
     output_width, output_height = out["width"], out["height"]
     vector_width, vector_height = max(width, output_width), max(height, output_height)
     vector_x_scale, vector_y_scale = width / vector_width, height / vector_height
-    maximum_camera_size = max(sample["zoom"] for sample in samples)
-    geometry_tolerance = (GEOMETRY_TOLERANCE_PX /
-                          (max(vector_width, vector_height) * maximum_camera_size))
-    vector_lengths = [0.0]
-    for previous, current in zip(samples, samples[1:]):
-        dx = (current["fusion_path"]["x"] - previous["fusion_path"]["x"]) * vector_x_scale
-        dy = (current["fusion_path"]["y"] - previous["fusion_path"]["y"]) * vector_y_scale
-        vector_lengths.append(vector_lengths[-1] + math.hypot(dx, dy))
-    vector_total = vector_lengths[-1]
-    vector_displacement_keys = "\n".join(
-        f'\t\t\t\t[{sample["frame"]}] = {{ {length / vector_total if vector_total else 0:.12g}, Flags = {{ Linear = true }} }},'
-        for sample, length in zip(samples, vector_lengths))
+    vector_controller = ""
+    if animation.get("connections"):
+        vector_lengths = [0.0]
+        for previous, current in zip(samples, samples[1:]):
+            dx = ((current["fusion_path"]["x"] - previous["fusion_path"]["x"])
+                  * vector_x_scale)
+            dy = ((current["fusion_path"]["y"] - previous["fusion_path"]["y"])
+                  * vector_y_scale)
+            vector_lengths.append(vector_lengths[-1] + math.hypot(dx, dy))
+        vector_total = vector_lengths[-1]
+        vector_displacement_keys = "\n".join(
+            f'\t\t\t\t[{sample["frame"]}] = {{ {length / vector_total if vector_total else 0:.12g}, Flags = {{ Linear = true }} }},'
+            for sample, length in zip(samples, vector_lengths))
+        vector_controller = f'''\t\tVector_AnimationDisplacement = BezierSpline {{ KeyFrames = {{
+{vector_displacement_keys}
+\t\t\t}} }},
+\t\tVector_AnimationPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "Vector_AnimationDisplacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
+{_path_points(samples, vector_x_scale, vector_y_scale)}
+\t\t\t\t\t\t}} }}, }} }}, }},'''
     tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_wide.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
     # Detail remains a raster layer, geographically placed over the wide map.
     factor = float(native["wide_factor"])
     tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_detail.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 130 }} }}, }},
 \t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
     vector_layers = []
-    country_final_layers = []
+    country_final_wide_layers = []
+    country_final_detail_layers = []
     country_edit_inputs: list[tuple[str, str]] = []
     countries = {country["iso3"]: country for country in metadata.get("countries", [])}
     groups = animation.get("region_groups")
@@ -458,93 +488,130 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
                                   "name": "Entire country", "category": "country",
                                   "start_frame": None, "end_frame": None}]}
                   for country in metadata.get("countries", [])]
-    row_cursor = 300
+    wide_bbox = metadata.get("wide", {}).get("bbox_mercator")
+    if not wide_bbox:
+        wide_bbox = {"minx": 0, "miny": 0, "maxx": 1, "maxy": 1}
+    detail_bbox = metadata.get("detail", {}).get("bbox_mercator")
+    if not detail_bbox:
+        center_x = (wide_bbox["minx"] + wide_bbox["maxx"]) / 2
+        center_y = (wide_bbox["miny"] + wide_bbox["maxy"]) / 2
+        half_width = (wide_bbox["maxx"] - wide_bbox["minx"]) / (2 * factor)
+        half_height = (wide_bbox["maxy"] - wide_bbox["miny"]) / (2 * factor)
+        detail_bbox = {"minx": center_x - half_width, "miny": center_y - half_height,
+                       "maxx": center_x + half_width, "maxy": center_y + half_height}
+    static_tolerance = GEOMETRY_TOLERANCE_PX / max(width, height)
+    row_cursor = 360
     for group_number, group in enumerate(groups, 1):
         country = countries[group["iso3"]]
         iso = _name(country["iso3"])
-        group_base = f"Country_{iso}"
+        group_base = iso
         red, green, blue = _rgb(country.get("color", "#1689ff"))
         border_red, border_green, border_blue = _rgb(country.get("border_color", "#ffffff"))
-        child_layers = []
+        wide_child_layers = []
+        detail_child_layers = []
         parent_node, parent_input = _visibility_spline(
             group_base + "_Visibility", group.get("start_frame"), group.get("end_frame"),
             duration, int(out["fps"]))
         if parent_node:
             tools.append(parent_node)
-        tools.append(f'''\t\t{group_base}_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {vector_width}, }}, Height = Input {{ Value = {vector_height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -40, {row_cursor} }} }}, }},''')
+        tools.append(f'''\t\t{group_base}_Wide_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -1830, {row_cursor} }} }}, }},
+\t\t{group_base}_Detail_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -1830, {row_cursor + 120} }} }}, }},''')
         for child_number, child in enumerate(group.get("children", []), 1):
-            child_base = f"{group_base}_Region_{_name(child['id'])}"
+            child_base = _territory_base(group["iso3"], child)
             geometry = _child_geometry(package, country, child)
-            row = row_cursor + (child_number - 1) * 150
-            prepared_rings = _prepared_rings(
-                geometry, metadata["wide"]["bbox_mercator"],
-                vector_x_scale, vector_y_scale, geometry_tolerance,
-                RING_LIMITS.get(child["id"], DEFAULT_RING_LIMIT))
-            tools.append(_country_mask(child_base + "_Fill", geometry, metadata["wide"]["bbox_mercator"], vector_width, vector_height,
-                                       pos=(-700, row), x_scale=vector_x_scale, y_scale=vector_y_scale,
-                                       prepared_rings=prepared_rings))
-            tools.append(_country_mask(child_base + "_Border", geometry, metadata["wide"]["bbox_mercator"], vector_width, vector_height,
-                                       outline=True, pos=(-700, row + 65), x_scale=vector_x_scale, y_scale=vector_y_scale,
-                                       prepared_rings=prepared_rings,
-                                       instance_source=child_base + "_Fill_Mask"))
+            row = row_cursor + (child_number - 1) * 240
+            ring_limit = RING_LIMITS.get(child["id"], DEFAULT_RING_LIMIT)
+            wide_rings = _prepared_rings(
+                geometry, wide_bbox, 1.0, 1.0, static_tolerance, ring_limit)
+            detail_rings = _prepared_rings(
+                geometry, detail_bbox, 1.0, 1.0, static_tolerance, ring_limit)
+            for resolution, bbox, rings, border_width, y_offset in (
+                    ("Wide", wide_bbox, wide_rings, 0.0005, 0),
+                    ("Detail", detail_bbox, detail_rings, 0.0005 * factor, 120)):
+                prefix = f"{child_base}_{resolution}"
+                tools.append(_country_mask(
+                    prefix + "_Fill", geometry, bbox, width, height,
+                    pos=(-1600, row + y_offset), prepared_rings=rings))
+                tools.append(_country_mask(
+                    prefix + "_Border", geometry, bbox, width, height,
+                    outline=True, pos=(-1370, row + y_offset),
+                    prepared_rings=rings, instance_source=prefix + "_Fill_Mask",
+                    border_width=border_width))
             visibility_node, visibility_input = _visibility_spline(
                 child_base + "_Visibility", child.get("start_frame"), child.get("end_frame"),
                 duration, int(out["fps"]))
             if visibility_node:
                 tools.append(visibility_node)
-            tools.append(f'''\t\t{child_base}_Fill = Background {{
+            for resolution, y_offset in (("Wide", 0), ("Detail", 120)):
+                prefix = f"{child_base}_{resolution}"
+                tools.append(f'''\t\t{prefix}_Fill = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{child_base}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {vector_width}, }}, Height = Input {{ Value = {vector_height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -400, {row} }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{prefix}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -1140, {row + y_offset} }} }},
 \t\t}},
-\t\t{child_base}_Border = Background {{
+\t\t{prefix}_Border = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{child_base}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {vector_width}, }}, Height = Input {{ Value = {vector_height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -400, {row + 65} }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{prefix}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -910, {row + y_offset} }} }},
 \t\t}},''')
             fill_layer, border_layer = child_number * 2 - 1, child_number * 2
-            safe_name = str(child["name"]).replace('"', "'")
-            child_layers.append(f'''\t\t\t\t["Layer{fill_layer}.Foreground"] = Input {{ SourceOp = "{child_base}_Fill", Source = "Output", }},
-\t\t\t\tLayerName{fill_layer} = Input {{ Value = "{safe_name} fill", }},
-\t\t\t\t["Layer{border_layer}.Foreground"] = Input {{ SourceOp = "{child_base}_Border", Source = "Output", }},
-\t\t\t\tLayerName{border_layer} = Input {{ Value = "{safe_name} border", }},''')
-            edit_base = f"EDIT_{iso}_{_name(child['id'])}"
-            tools.append(f'''\t\t{edit_base}_Composite = MultiMerge {{
-\t\t\tNameSet = true,
-\t\t\tInputs = {{ Background = Input {{ SourceOp = "{group_base}_Canvas", Source = "Output", }},
-\t\t\t\t["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Fill", Source = "Output", }},
-\t\t\t\tLayerName1 = Input {{ Value = "{safe_name} fill", }},
-\t\t\t\t["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Border", Source = "Output", }},
-\t\t\t\tLayerName2 = Input {{ Value = "{safe_name} border", }},
-\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ -40, {row + 65} }} }},
+            safe_name = _territory_label(child).replace('"', "'")
+            for resolution, layers in (("Wide", wide_child_layers),
+                                       ("Detail", detail_child_layers)):
+                prefix = f"{child_base}_{resolution}"
+                layers.append(f'''\t\t\t\t["Layer{fill_layer}.Foreground"] = Input {{ SourceOp = "{prefix}_Fill", Source = "Output", }},
+\t\t\t\tLayerName{fill_layer} = Input {{ Value = "{safe_name} {resolution.lower()} fill", }},
+\t\t\t\t["Layer{border_layer}.Foreground"] = Input {{ SourceOp = "{prefix}_Border", Source = "Output", }},
+\t\t\t\tLayerName{border_layer} = Input {{ Value = "{safe_name} {resolution.lower()} border", }},''')
+            edit_base = f"Edit_{child_base}"
+            tools.append(f'''\t\t{edit_base}_Wide_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row} }} }}, }},
+\t\t{edit_base}_Wide_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{edit_base}_Wide_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ -440, {row} }} }}, }},
+\t\t{edit_base}_Detail_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Detail_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Detail_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row + 120} }} }}, }},
+\t\t{edit_base}_Detail_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Detail_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{edit_base}_Detail_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ -440, {row + 120} }} }}, }},
+\t\t{edit_base}_Detail_Placed = Transform {{ NameSet = true, Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "{edit_base}_Detail_Gate", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -210, {row + 120} }} }}, }},
+\t\t{edit_base}_Combined_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{edit_base}_Wide_Gate", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{edit_base}_Detail_Placed", Source = "Output", }}, LayerName1 = Input {{ Value = "{safe_name} detail", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 20, {row + 60} }} }}, }},''')
+            country_edit_inputs.append((f"{group['iso3']} - {safe_name}", edit_base + "_Combined_Layers"))
+        # Keep the group output in its own columns.  Wide and detail occupy
+        # separate rows so the Flow remains readable even with many regions.
+        for resolution, layers, y_offset in (("Wide", wide_child_layers, 0),
+                                              ("Detail", detail_child_layers, 120)):
+            tools.append(f'''\t\t{group_base}_{resolution}_Regions = MultiMerge {{
+\t\t\tNameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_{resolution}_Canvas", Source = "Output", }},
+{chr(10).join(layers)}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 300, {row_cursor + y_offset} }} }},
 \t\t}},
-\t\t{edit_base}_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{edit_base}_Composite", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ 180, {row + 65} }} }}, }},''')
-            country_edit_inputs.append((f"{group['iso3']} - {safe_name}", edit_base + "_Gate"))
-        tools.append(f'''\t\t{group_base}_Regions = MultiMerge {{
-\t\t\tNameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Canvas", Source = "Output", }},
-{chr(10).join(child_layers)}
-\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ -40, {row_cursor + 70} }} }},
-\t\t}},''')
-        tools.append(f'''\t\t{group_base}_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{group_base}_Regions", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ 180, {row_cursor + 70} }} }}, }},''')
-        country_final_layers.append(f'''\t\t\t\t["Layer{group_number}.Foreground"] = Input {{ SourceOp = "{group_base}_Gate", Source = "Output", }},
-\t\t\t\tLayerName{group_number} = Input {{ Value = "{group['iso3']} region group", }},''')
-        row_cursor += max(220, len(group.get("children", [])) * 150 + 80)
+\t\t{group_base}_{resolution}_Gate = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_{resolution}_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{group_base}_{resolution}_Regions", Source = "Output", }}, Blend = {parent_input} }}, ViewInfo = OperatorInfo {{ Pos = {{ 530, {row_cursor + y_offset} }} }}, }},''')
+        country_final_wide_layers.append(f'''\t\t\t\t["Layer{group_number}.Foreground"] = Input {{ SourceOp = "{group_base}_Wide_Gate", Source = "Output", }},
+\t\t\t\tLayerName{group_number} = Input {{ Value = "{group['iso3']} wide region group", }},''')
+        country_final_detail_layers.append(f'''\t\t\t\t["Layer{group_number}.Foreground"] = Input {{ SourceOp = "{group_base}_Detail_Gate", Source = "Output", }},
+\t\t\t\tLayerName{group_number} = Input {{ Value = "{group['iso3']} detail region group", }},''')
+        row_cursor += max(360, len(group.get("children", [])) * 240 + 180)
     if country_edit_inputs:
-        first_group_base = f"Country_{_name(groups[0]['iso3'])}"
-        tools.append(f'''\t\tCountry_Final_Layers = MultiMerge {{
-\t\t\tNameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{first_group_base}_Canvas", Source = "Output", }},
-{chr(10).join(country_final_layers)}
-\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 400, 300 }} }},
-\t\t}},''')
-        tools.append(_switch_tool("Country_Edit_Switch", country_edit_inputs, (400, 430)))
+        first_group_base = _name(groups[0]["iso3"])
+        tools.append(f'''\t\tCountry_Final_Wide_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{first_group_base}_Wide_Canvas", Source = "Output", }},
+{chr(10).join(country_final_wide_layers)}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 780, 360 }} }}, }},
+\t\tCountry_Final_Detail_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{first_group_base}_Detail_Canvas", Source = "Output", }},
+{chr(10).join(country_final_detail_layers)}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 780, 480 }} }}, }},
+\t\tCountry_Final_Detail_Placed = Transform {{ NameSet = true, Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Country_Final_Detail_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1010, 480 }} }}, }},
+\t\tCountry_Final_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Final_Wide_Layers", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "Country_Final_Detail_Placed", Source = "Output", }}, LayerName1 = Input {{ Value = "Detail territory polygons", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1240, 420 }} }}, }},''')
+        tools.append(_switch_tool("Country_Edit_Switch", country_edit_inputs, (1470, 540)))
         tools.append(_switch_tool("Country_Mode_Switch", [
             ("EDIT MODE - selected country or territory", "Country_Edit_Switch"),
             ("FINAL RENDER - all countries and territories", "Country_Final_Layers"),
-        ], (620, 365)))
-        vector_layers.append('''\t\t\t\t["Layer1.Foreground"] = Input { SourceOp = "Country_Mode_Switch", Source = "Output", },
-\t\t\t\tLayerName1 = Input { Value = "Country performance mode", },''')
-        layer_number = 2
+        ], (1700, 480)))
+        tools.append('''\t\tMap_Country_Layers = MultiMerge {
+\t\t\tNameSet = true,
+\t\t\tInputs = { Background = Input { SourceOp = "Map_Raster_Layers", Source = "Output", },
+\t\t\t\t["Layer1.Foreground"] = Input { SourceOp = "Country_Mode_Switch", Source = "Output", },
+\t\t\t\tLayerName1 = Input { Value = "Country performance mode", },
+\t\t\t}, ViewInfo = OperatorInfo { Pos = { 1930, 420 } },
+\t\t},''')
+        map_animation_source = "Map_Country_Layers"
+        layer_number = 1
     else:
+        map_animation_source = "Map_Raster_Layers"
         layer_number = 1
     incomplete = [connection["name"] for connection in animation.get("connections", [])
                   if not connection.get("start") or not connection.get("end")]
@@ -571,25 +638,17 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\tMap_AnimationSize = BezierSpline {{ KeyFrames = {{
 {_key_lines(keys, samples, 'size')}
 \t\t\t}} }},
-\t\tMap_CountryBorderWidth = BezierSpline {{ KeyFrames = {{
-{_key_lines(keys, samples, 'size', 0.0005 * vector_x_scale)}
-\t\t\t}} }},
 \t\tMap_AnimationPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "Map_AnimationDisplacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
 {_path_points(samples)}
 \t\t\t\t\t\t}} }}, }} }}, }},
-\t\tVector_AnimationDisplacement = BezierSpline {{ KeyFrames = {{
-{vector_displacement_keys}
-\t\t\t}} }},
-\t\tVector_AnimationPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "Vector_AnimationDisplacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
-{_path_points(samples, vector_x_scale, vector_y_scale)}
-\t\t\t\t\t\t}} }}, }} }}, }},
-\t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, ClippingMode = Input {{ Value = FuID {{ "None" }}, }}, Input = Input {{ SourceOp = "Map_Raster_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 0 }} }}, }},
-\t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 600, 130 }} }}, }},
-\t\tFinal_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Output_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "Map_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 820, 0 }} }}, }},
+{vector_controller}
+\t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, ClippingMode = Input {{ Value = FuID {{ "None" }}, }}, Input = Input {{ SourceOp = "{map_animation_source}", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2160, 0 }} }}, }},
+\t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2160, 130 }} }}, }},
+\t\tFinal_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Output_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "Map_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2390, 0 }} }}, }},
 \t\tVector_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Final_Composite", Source = "Output", }},
 {chr(10).join(vector_layers)}
-\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 1040, 0 }} }}, }},
-\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1260, 0 }} }}, }},''')
+\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 2620, 0 }} }}, }},
+\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2850, 0 }} }}, }},''')
     content = f'''Composition {{
 \tCurrentTime = 0, RenderRange = {{ 0, {duration} }}, GlobalRange = {{ 0, {duration} }},
 \tTools = {{

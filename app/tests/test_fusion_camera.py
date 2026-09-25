@@ -101,15 +101,16 @@ class CameraProjectionTests(unittest.TestCase):
         arrow = text.split("Link_example_ArrowShape = BezierSpline", 1)[1]
         self.assertGreater(arrow.count("Value = Polyline"), 30)
 
-    def test_country_polygons_share_camera_controls_before_rasterization(self):
+    def test_country_polygons_are_static_before_map_animation(self):
         geometry = {"type": "Polygon", "coordinates": [[
             [0, 0], [1, 0], [1, 1], [0, 1], [0, 0],
         ]]}
         bbox = {"minx": 0, "miny": 0, "maxx": 1, "maxy": 1}
         text = _country_mask("Country_TST_Fill", geometry, bbox, 3840, 2160, outline=True)
-        self.assertIn('["PolyMask1.Center"] = Input { SourceOp = "Vector_AnimationPath"', text)
-        self.assertIn('["PolyMask1.Size"] = Input { SourceOp = "Map_AnimationSize"', text)
-        self.assertIn('["PolyMask1.BorderWidth"] = Input { SourceOp = "Map_CountryBorderWidth"', text)
+        self.assertIn('["PolyMask1.Center"] = Input { Value = { 0.5, 0.5 }', text)
+        self.assertIn('["PolyMask1.Size"] = Input { Value = 1', text)
+        self.assertIn('["PolyMask1.BorderWidth"] = Input { Value = 0.0005', text)
+        self.assertNotIn("SourceOp", text)
 
     def test_handles_approximate_smooth_zoom_with_authored_keys(self):
         animation = {"output": {"width": 2160, "height": 3840}, "keyframes": [

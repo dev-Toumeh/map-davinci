@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from core.animation_schema import normalize_animation
-from fusion.generator import generate
+from fusion.generator import _territory_base, _territory_label, generate
 
 
 GEOMETRY = {"type": "Polygon", "coordinates": [[
@@ -56,25 +56,49 @@ class RegionLayerTests(unittest.TestCase):
             (package / "regions/geometry_texas-annexation-1845.geojson").write_text(
                 json.dumps({"geometry": GEOMETRY}))
             text = generate(package, self.metadata(), animation).read_text()
-        self.assertIn("Country_USA_Regions = MultiMerge", text)
-        self.assertIn("Country_USA_Gate = Merge", text)
-        self.assertIn("Country_USA_Visibility = BezierSpline", text)
-        self.assertIn("Country_USA_Region_texas_annexation_1845_Visibility", text)
-        self.assertIn('LayerName1 = Input { Value = "USA region group"', text)
+        self.assertIn("USA_Wide_Regions = MultiMerge", text)
+        self.assertIn("USA_Detail_Regions = MultiMerge", text)
+        self.assertIn("USA_Wide_Gate = Merge", text)
+        self.assertIn("USA_Detail_Gate = Merge", text)
+        self.assertIn("USA_Visibility = BezierSpline", text)
+        self.assertIn("USA_Texas_Annexation_1845_Visibility", text)
+        self.assertIn('LayerName1 = Input { Value = "USA wide region group"', text)
+        self.assertIn('LayerName1 = Input { Value = "USA detail region group"', text)
+        self.assertIn("Country_Final_Wide_Layers = MultiMerge", text)
+        self.assertIn("Country_Final_Detail_Layers = MultiMerge", text)
+        self.assertIn("Country_Final_Detail_Placed = Transform", text)
         self.assertIn("Country_Final_Layers = MultiMerge", text)
+        self.assertIn("Map_Country_Layers = MultiMerge", text)
         self.assertIn("Country_Edit_Switch = Switch", text)
         self.assertIn("Country_Mode_Switch = Switch", text)
-        self.assertIn('Name1 = Input { Value = "USA - Entire country"', text)
-        self.assertIn('Name2 = Input { Value = "USA - Texas Annexation"', text)
-        self.assertIn('Name1 = Input { Value = "EDIT MODE - selected country or territory"', text)
-        self.assertIn('Name2 = Input { Value = "FINAL RENDER - all countries and territories"', text)
-        self.assertIn('SourceOp = "Country_Mode_Switch"', text)
+        self.assertIn('Name0 = Input { Value = "USA - Entire country"', text)
+        self.assertIn('Name1 = Input { Value = "USA - Texas Annexation"', text)
+        self.assertIn('Input0 = Input { SourceOp = "Edit_USA_Entire_Combined_Layers"', text)
+        self.assertIn('Input1 = Input { SourceOp = "Edit_USA_Texas_Annexation_1845_Combined_Layers"', text)
+        self.assertIn('Name0 = Input { Value = "EDIT MODE - selected country or territory"', text)
+        self.assertIn('Name1 = Input { Value = "FINAL RENDER - all countries and territories"', text)
+        self.assertIn('Input = Input { SourceOp = "Map_Country_Layers"', text)
+        self.assertIn('Background = Input { SourceOp = "Map_Raster_Layers"', text)
+        self.assertNotIn("Vector_AnimationDisplacement", text)
+        self.assertNotIn("Vector_AnimationPath", text)
         border = text.split(
-            "Country_USA_Region_country_usa_Border_Mask = MultiPoly", 1)[1].split(
-                "Country_USA_Region_country_usa_Fill = Background", 1)[0]
+            "USA_Entire_Wide_Border_Mask = MultiPoly", 1)[1].split(
+                "USA_Entire_Detail_Fill_Mask", 1)[0]
         self.assertIn(
-            'SourceOp = "Country_USA_Region_country_usa_Fill_Mask"', border)
+            'SourceOp = "USA_Entire_Wide_Fill_Mask"', border)
         self.assertNotIn(".Polyline\"]", border)
+
+    def test_territory_names_are_short_and_explain_original_territory(self):
+        entire = {"id": "country-usa", "name": "Entire country", "category": "country"}
+        original = {"id": "us-original-1783", "name": "Original US Territory",
+                    "category": "historical"}
+        louisiana = {"id": "louisiana-purchase-1803", "name": "Louisiana Purchase",
+                     "category": "historical"}
+        self.assertEqual(_territory_base("USA", entire), "USA_Entire")
+        self.assertEqual(_territory_base("USA", original), "USA_Territory_1783")
+        self.assertEqual(_territory_label(original), "Territory recognized in 1783")
+        self.assertEqual(_territory_base("USA", louisiana),
+                         "USA_Louisiana_Purchase_1803")
 
     def test_invalid_child_interval_is_rejected(self):
         animation = self.base_animation()
@@ -100,8 +124,10 @@ class RegionLayerTests(unittest.TestCase):
         edit = text.split("Country_Edit_Switch = Switch", 1)[1].split(
             "Country_Mode_Switch = Switch", 1)[0]
         self.assertIn("NumberOfInputs = Input { Value = 2", edit)
-        self.assertIn('Name1 = Input { Value = "USA - Entire country"', edit)
-        self.assertIn('Name2 = Input { Value = "CAN - Entire country"', edit)
+        self.assertIn('Name0 = Input { Value = "USA - Entire country"', edit)
+        self.assertIn('Name1 = Input { Value = "CAN - Entire country"', edit)
+        self.assertIn('Input0 = Input { SourceOp = "Edit_USA_Entire_Combined_Layers"', edit)
+        self.assertIn('Input1 = Input { SourceOp = "Edit_CAN_Entire_Combined_Layers"', edit)
         self.assertEqual(text.count("Country_Mode_Switch = Switch"), 1)
 
 
