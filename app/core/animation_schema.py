@@ -4,10 +4,11 @@ from __future__ import annotations
 import math
 from typing import Any
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 EASINGS = {"linear", "smooth"}
 LINE_STYLES = {"solid", "dashed"}
 PATH_TYPES = {"straight", "curved"}
+REGION_CATEGORIES = {"country", "administrative", "historical"}
 
 
 def _number(value: Any, name: str) -> float:
@@ -63,6 +64,84 @@ def _commentary(value: Any) -> dict:
                            "start_frame": max(0, int(_number(clip.get("start_frame", 0), "commentary start frame"))),
                            "trim_in": trim_in, "trim_out": trim_out})
     return {"clips": normalized}
+
+
+def _optional_frame(value: Any, name: str, duration: int) -> int | None:
+    if value in (None, ""):
+        return None
+    frame = int(_number(value, name))
+    if not 0 <= frame < duration:
+        raise ValueError(f"{name} must be inside the shot duration")
+    return frame
+
+
+def _region_groups(value: Any, metadata: dict, duration: int) -> list[dict]:
+    """Normalize timed parent-country groups and their child regions."""
+    countries = {str(item.get("iso3", "")).upper(): item
+                 for item in metadata.get("countries", []) if item.get("iso3")}
+    if value is None:
+        return [{"iso3": iso3, "start_frame": None, "end_frame": None,
+                 "children": [{"id": f"country-{iso3.lower()}", "name": "Entire country",
+                                "category": "country", "start_frame": None,
+                                "end_frame": None}]}
+                for iso3 in countries]
+    if not isinstance(value, list):
+        raise ValueError("region_groups must be a list")
+    groups, seen_countries = [], set()
+    for group_index, group in enumerate(value):
+        if not isinstance(group, dict):
+            raise ValueError("region group must be an object")
+        iso3 = str(group.get("iso3", "")).upper()
+        if iso3 not in countries:
+            raise ValueError(f"region group country is not in this export: {iso3}")
+        if iso3 in seen_countries:
+            raise ValueError(f"only one region group is allowed for {iso3}")
+        seen_countries.add(iso3)
+        start = _optional_frame(group.get("start_frame"), f"{iso3} parent start frame", duration)
+        end = _optional_frame(group.get("end_frame"), f"{iso3} parent disappear frame", duration)
+        if start is not None and end is not None and start >= end:
+            raise ValueError(f"{iso3} parent start frame must be before disappear frame")
+        children_value = group.get("children") or []
+        if not isinstance(children_value, list):
+            raise ValueError(f"{iso3} region children must be a list")
+        children, ids = [], set()
+        for child_index, child in enumerate(children_value):
+            if not isinstance(child, dict):
+                raise ValueError(f"{iso3} child region must be an object")
+            identifier = str(child.get("id", ""))[:120]
+            if not __import__("re").fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,119}", identifier):
+                raise ValueError(f"{iso3} child region has an invalid id")
+            if identifier in ids:
+                raise ValueError(f"{iso3} child region ids must be unique")
+            ids.add(identifier)
+            category = str(child.get("category", ""))
+            if category not in REGION_CATEGORIES:
+                raise ValueError(f"{iso3} child region has an invalid category")
+            if category == "historical" and iso3 != "USA":
+                raise ValueError("historical acquisition regions are available only for USA")
+            child_start = _optional_frame(
+                child.get("start_frame"), f"{iso3} region {child_index + 1} appear frame", duration)
+            child_end = _optional_frame(
+                child.get("end_frame"), f"{iso3} region {child_index + 1} disappear frame", duration)
+            if child_start is not None and child_end is not None and child_start >= child_end:
+                raise ValueError(f"{iso3} region {child_index + 1} appear frame must precede disappear frame")
+            normalized = {"id": identifier, "name": str(child.get("name") or identifier)[:120],
+                          "category": category, "start_frame": child_start,
+                          "end_frame": child_end}
+            geometry_file = child.get("geometry_file")
+            if geometry_file:
+                geometry_file = str(geometry_file)
+                if not __import__("re").fullmatch(r"regions/geometry_[A-Za-z0-9_.-]+\.geojson", geometry_file):
+                    raise ValueError("sub-territory geometry file must be package-local")
+                normalized["geometry_file"] = geometry_file
+            children.append(normalized)
+        groups.append({"iso3": iso3, "start_frame": start, "end_frame": end,
+                       "children": children})
+    # Metadata order remains authoritative and missing groups are restored with
+    # the backward-compatible entire-country child.
+    by_country = {group["iso3"]: group for group in groups}
+    defaults = _region_groups(None, metadata, duration)
+    return [by_country.get(group["iso3"], group) for group in defaults]
 
 
 def normalize_animation(value: Any, metadata: dict) -> dict:
@@ -184,4 +263,5 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
             "output": {"width": width, "height": height, "fps": fps,
                        "duration_frames": duration},
              "commentary": _commentary(value.get("commentary")),
-             "keyframes": normalized, "connections": normalized_connections}
+             "keyframes": normalized, "connections": normalized_connections,
+             "region_groups": _region_groups(value.get("region_groups"), metadata, duration)}

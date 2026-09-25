@@ -12,6 +12,8 @@ Endpoints:
   GET  /api/health                -> ok
   GET  /api/countries             -> country index (downloads NE file on first call)
   GET  /api/country/<ISO3>        -> GeoJSON geometry for preview outline
+  GET  /api/subterritories/<ISO3>/<category> -> administrative/historical catalog
+  GET  /api/subterritory/<ISO3>/<category>/<id> -> one region geometry
   GET  /api/map-tiles/google-simple/z/x/y -> styled Google roadmap tile
   POST /api/export                -> start export job {json body}
    GET  /api/export/status/<id>    -> job progress/result
@@ -23,6 +25,7 @@ Endpoints:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -34,7 +37,7 @@ import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from core import animation_schema, exporter, settings as app_settings
+from core import animation_schema, exporter, regions, settings as app_settings
 from fusion import generator as fusion_generator
 
 APP_ROOT = Path(__file__).resolve().parent
@@ -241,22 +244,106 @@ class Handler(BaseHTTPRequestHandler):
                                   disappearance_frame=None if pinned_to_end else disappearance)
                 repaired.append(connection)
             config["connections"] = repaired
+        if duration >= 1 and isinstance(config.get("region_groups"), list):
+            repaired_groups = []
+            for source_group in config["region_groups"]:
+                group = dict(source_group)
+                def fit_timing(item: dict) -> dict:
+                    item = dict(item)
+                    for key in ("start_frame", "end_frame"):
+                        if item.get(key) not in (None, ""):
+                            item[key] = max(0, min(int(item[key]), duration - 1))
+                    if (item.get("start_frame") is not None and
+                            item.get("end_frame") is not None and
+                            item["start_frame"] >= item["end_frame"]):
+                        if duration < 2:
+                            item["end_frame"] = None
+                        else:
+                            item["start_frame"] = min(item["start_frame"], duration - 2)
+                            item["end_frame"] = max(item["start_frame"] + 1,
+                                                    item["end_frame"])
+                    return item
+                group = fit_timing(group)
+                group["children"] = [fit_timing(child)
+                                     for child in group.get("children", [])]
+                repaired_groups.append(group)
+            config["region_groups"] = repaired_groups
         animation = animation_schema.normalize_animation(config, self._metadata(package))
         target = package / "animation.json"
-        if not target.is_file():
-            return animation
-        existing = animation_schema.normalize_animation(
-            json.loads(target.read_text(encoding="utf-8")), self._metadata(package))
-        paths = {key["frame"]: key["fusion_path"] for key in existing["keyframes"]
-                 if key.get("fusion_path")}
-        for key in animation["keyframes"]:
-            if "fusion_path" not in key and key["frame"] in paths:
-                key["fusion_path"] = paths[key["frame"]]
-        # A tab opened before commentary existed sends no commentary field; keep
-        # the saved narration reference instead of erasing it.
-        if "commentary" not in config:
-            animation["commentary"] = existing["commentary"]
-        return animation
+        if target.is_file():
+            existing = animation_schema.normalize_animation(
+                json.loads(target.read_text(encoding="utf-8")), self._metadata(package))
+            paths = {key["frame"]: key["fusion_path"] for key in existing["keyframes"]
+                     if key.get("fusion_path")}
+            for key in animation["keyframes"]:
+                if "fusion_path" not in key and key["frame"] in paths:
+                    key["fusion_path"] = paths[key["frame"]]
+            # A tab opened before commentary existed sends no commentary field; keep
+            # the saved narration reference instead of erasing it.
+            if "commentary" not in config:
+                animation["commentary"] = existing["commentary"]
+        return regions.materialize(package, animation)
+
+    def _add_animation_country(self, package: Path, config: dict) -> dict:
+        """Add one vector country to an existing animation package."""
+        iso3 = str(config.get("iso3", "")).upper()
+        if not re.fullmatch(r"[A-Z0-9]{3}", iso3):
+            raise ValueError("select a valid country")
+        catalog = {item["iso3"]: item for item in exporter.load_countries()}
+        if iso3 not in catalog:
+            raise ValueError(f"country not found: {iso3}")
+
+        metadata = self._metadata(package)
+        if any(str(item.get("iso3", "")).upper() == iso3
+               for item in metadata.get("countries", [])):
+            raise ValueError(f"{catalog[iso3]['name']} is already in this animation")
+
+        color, _ = exporter.parse_hex_color(
+            config.get("color") or catalog[iso3].get("default_color")
+            or exporter.country_default_color(iso3))
+        geometry = exporter.get_geometry(iso3)
+        geometry_name = f"geometry_{iso3}.geojson"
+        geometry_payload = {
+            "type": "Feature",
+            "properties": {"iso3": iso3, "color": color},
+            "geometry": geometry,
+        }
+        geometry_bytes = (json.dumps(geometry_payload, indent=2,
+                                     ensure_ascii=False) + "\n").encode("utf-8")
+
+        metadata.setdefault("countries", []).append({
+            "iso3": iso3,
+            "name": catalog[iso3]["name"],
+            "color": color,
+            "border_color": (catalog[iso3].get("default_border_color")
+                             or exporter.country_default_border_color(iso3)),
+            "geometry_file": geometry_name,
+        })
+        metadata.setdefault("files", {})[geometry_name] = {
+            "sha256": hashlib.sha256(geometry_bytes).hexdigest(),
+            "bytes": len(geometry_bytes),
+        }
+
+        animation_path = package / "animation.json"
+        if not animation_path.is_file():
+            raise ValueError("create the animation before adding another country")
+        source_animation = json.loads(animation_path.read_text(encoding="utf-8"))
+        animation = animation_schema.normalize_animation(source_animation, metadata)
+        animation = regions.materialize(package, animation)
+
+        geometry_path = package / geometry_name
+        geometry_temp = geometry_path.with_suffix(".geojson.tmp")
+        metadata_path = package / "metadata.json"
+        metadata_temp = metadata_path.with_suffix(".json.tmp")
+        animation_temp = animation_path.with_suffix(".json.tmp")
+        geometry_temp.write_bytes(geometry_bytes)
+        metadata_temp.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+        animation_temp.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
+        geometry_temp.replace(geometry_path)
+        metadata_temp.replace(metadata_path)
+        animation_temp.replace(animation_path)
+        return {"ok": True, "metadata": metadata, "animation": animation,
+                "country": metadata["countries"][-1], "geometry": geometry}
 
     # ---- routing ---------------------------------------------------------
 
@@ -281,6 +368,20 @@ class Handler(BaseHTTPRequestHandler):
                 try:
                     self._json({"iso3": m.group(1).upper(),
                                 "geometry": exporter.get_geometry(m.group(1))})
+                except KeyError as exc:
+                    self._json({"error": str(exc)}, 404)
+            elif (m := re.fullmatch(
+                    r"/api/subterritories/([A-Za-z0-9]{3})/(administrative|historical)", path)):
+                iso3, category = m.groups()
+                self._json({"country": iso3.upper(), "category": category,
+                            "regions": regions.catalog(iso3, category)})
+            elif (m := re.fullmatch(
+                    r"/api/subterritory/([A-Za-z0-9]{3})/(administrative|historical)/([A-Za-z0-9_.-]+)", path)):
+                iso3, category, identifier = m.groups()
+                try:
+                    self._json({"country": iso3.upper(), "category": category,
+                                "id": identifier,
+                                "geometry": regions.geometry(iso3, category, identifier)})
                 except KeyError as exc:
                     self._json({"error": str(exc)}, 404)
             elif (m := re.fullmatch(r"/api/export/status/([a-f0-9-]+)", path)):
@@ -385,6 +486,10 @@ class Handler(BaseHTTPRequestHandler):
                 if removed and "/" not in removed and "\\" not in removed:
                     (package / removed).unlink(missing_ok=True)
                 self._json({"ok": True, "animation": animation})
+                return
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/country", path)):
+                package = self._package(m.group(1))
+                self._json(self._add_animation_country(package, config))
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
                 package = self._package(m.group(1))
