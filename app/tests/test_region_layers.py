@@ -60,6 +60,16 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("USA_Texas_Annexation_1845_Visibility", text)
         self.assertIn("USA_Entire_Combined_Layers = MultiMerge", text)
         self.assertIn("USA_Texas_Annexation_1845_Combined_Layers = MultiMerge", text)
+        entire_combined = text.split("USA_Entire_Combined_Layers = MultiMerge", 1)[1].split(
+            "USA_Texas_Annexation_1845_Wide_Fill_Mask", 1)[0]
+        self.assertIn('Background = Input { SourceOp = "USA_Wide_Canvas"',
+                      entire_combined)
+        self.assertIn(
+            '["Layer1.Foreground"] = Input { SourceOp = "USA_Entire_Wide_Gate"',
+            entire_combined)
+        self.assertIn(
+            '["Layer2.Foreground"] = Input { SourceOp = "USA_Entire_Detail_Placed"',
+            entire_combined)
         self.assertIn("Country_Deployment_Layers = MultiMerge", text)
         self.assertIn("Map_Country_Layers = MultiMerge", text)
         self.assertIn("Country_Edit_Switch = Switch", text)
