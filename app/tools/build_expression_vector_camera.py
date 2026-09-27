@@ -11,6 +11,7 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
+from core import package_layout  # noqa: E402
 from tools.build_sparse_vector_camera import _replace_vector_controller  # noqa: E402
 
 
@@ -42,8 +43,8 @@ def _curve(keys: list[dict], field: str, color: tuple[int, int, int]) -> str:
 
 
 def build(package: Path, source: Path, target: Path) -> dict:
-    metadata = json.loads((package / "metadata.json").read_text(encoding="utf-8"))
-    animation = json.loads((package / "animation.json").read_text(encoding="utf-8"))
+    metadata = json.loads(package_layout.metadata_path(package).read_text(encoding="utf-8"))
+    animation = json.loads(package_layout.animation_path(package).read_text(encoding="utf-8"))
     keys = sorted(animation["keyframes"], key=lambda key: key["frame"])
     native, output = metadata["output"], animation["output"]
     vector_width = max(native["width"], output["width"])

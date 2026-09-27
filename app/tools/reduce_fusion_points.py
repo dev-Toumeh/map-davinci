@@ -13,6 +13,7 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
+from core import package_layout  # noqa: E402
 from fusion.generator import _camera_samples  # noqa: E402
 
 POLYLINE = re.compile(
@@ -77,8 +78,8 @@ def _format_points(points: list[tuple[float, float]]) -> str:
 
 
 def _geometry_tolerance(package: Path, tolerance_px: float) -> tuple[float, float, int]:
-    metadata = json.loads((package / "metadata.json").read_text(encoding="utf-8"))
-    animation = json.loads((package / "animation.json").read_text(encoding="utf-8"))
+    metadata = json.loads(package_layout.metadata_path(package).read_text(encoding="utf-8"))
+    animation = json.loads(package_layout.animation_path(package).read_text(encoding="utf-8"))
     samples = _camera_samples(animation, metadata["output"])
     maximum_size = max(sample["zoom"] for sample in samples)
     canvas = max(metadata["output"]["width"], metadata["output"]["height"],

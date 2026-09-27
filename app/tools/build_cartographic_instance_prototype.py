@@ -12,6 +12,7 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
+from core import package_layout  # noqa: E402
 from fusion.generator import _camera_samples  # noqa: E402
 from tools.reduce_fusion_points import POINT, _format_points, _reduce_ring  # noqa: E402
 from tools.share_polygon_border import _tool_span  # noqa: E402
@@ -108,8 +109,8 @@ def _border_instance(name: str, source: str, ring_count: int,
 
 
 def _camera_tolerance(package: Path, pixels: float) -> tuple[float, float, int]:
-    metadata = json.loads((package / "metadata.json").read_text(encoding="utf-8"))
-    animation = json.loads((package / "animation.json").read_text(encoding="utf-8"))
+    metadata = json.loads(package_layout.metadata_path(package).read_text(encoding="utf-8"))
+    animation = json.loads(package_layout.animation_path(package).read_text(encoding="utf-8"))
     maximum = max(sample["zoom"] for sample in _camera_samples(animation, metadata["output"]))
     canvas = max(metadata["output"]["width"], metadata["output"]["height"],
                  animation["output"]["width"], animation["output"]["height"])

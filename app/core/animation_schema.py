@@ -4,6 +4,8 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from core import package_layout
+
 SCHEMA_VERSION = 3
 EASINGS = {"linear", "smooth"}
 LINE_STYLES = {"solid", "dashed"}
@@ -257,9 +259,13 @@ def normalize_animation(value: Any, metadata: dict) -> dict:
             "color": color, "thickness": thickness, "arrowhead": bool(connection.get("arrowhead", True)),
             "arrow_size": max(1, min(100, _number(connection.get("arrow_size", 14), f"connection {index + 1} arrow size"))),
             "start_frame": start_frame, "arrival_frame": arrival_frame, "disappearance_frame": disappearance_frame, "easing": easing})
+    metadata_file = (str(package_layout.METADATA_FILE)
+                     if int((metadata.get("package_layout") or {}).get("version", 1))
+                     >= package_layout.VERSION
+                     else str(package_layout.LEGACY_METADATA_FILE))
     return {"schema_version": SCHEMA_VERSION,
             "name": str(value.get("name") or "Map animation")[:120],
-            "assets_metadata": "metadata.json",
+            "assets_metadata": metadata_file,
             "output": {"width": width, "height": height, "fps": fps,
                        "duration_frames": duration},
              "commentary": _commentary(value.get("commentary")),

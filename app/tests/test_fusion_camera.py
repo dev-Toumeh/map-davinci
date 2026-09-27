@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from fusion.generator import (_camera_samples, _country_mask, _path_points, _key_lines,
-                              _camera_timing_keys, generate)
+                              _camera_timing_keys, MAX_CAMERA_TIMING_KEYS, generate)
 
 
 class CameraProjectionTests(unittest.TestCase):
@@ -112,6 +112,48 @@ class CameraProjectionTests(unittest.TestCase):
         self.assertIn('["PolyMask1.BorderWidth"] = Input { Value = 0.0005', text)
         self.assertNotIn("SourceOp", text)
 
+    def test_wide_country_backgrounds_share_detail_colors(self):
+        geometry = {"type": "Polygon", "coordinates": [[
+            [0, 0], [1, 0], [1, 1], [0, 1], [0, 0],
+        ]]}
+        metadata = {
+            "output": {"width": 3840, "height": 2160, "wide_factor": 2},
+            "wide": {"bbox_mercator": {"minx": 0, "miny": 0,
+                                        "maxx": 2, "maxy": 2}},
+            "detail": {"bbox_mercator": {"minx": .5, "miny": .5,
+                                          "maxx": 1.5, "maxy": 1.5}},
+            "countries": [{"iso3": "TST", "color": "#123456",
+                           "border_color": "#abcdef",
+                           "geometry_file": "geometry_TST.geojson"}],
+        }
+        animation = {
+            "output": {"width": 2160, "height": 3840, "fps": 24,
+                       "duration_frames": 48},
+            "keyframes": [{"frame": 0, "center": {"x": .5, "y": .5},
+                           "view_width": .5}],
+            "connections": [],
+            "region_groups": [{"iso3": "TST", "start_frame": None,
+                               "end_frame": None,
+                               "children": [{"id": "country-tst",
+                                             "name": "Entire country",
+                                             "category": "country",
+                                             "start_frame": None,
+                                             "end_frame": None}]}],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            package = Path(tmp)
+            (package / "geometry_TST.geojson").write_text(
+                __import__("json").dumps({"type": "Feature", "geometry": geometry,
+                                          "properties": {}}))
+            text = generate(package, metadata, animation).read_text()
+        self.assertIn('TST_Entire_Detail_Fill = Background {', text)
+        self.assertIn('TST_Entire_Wide_Fill = Background {\n'
+                      '\t\t\tNameSet = true,\n'
+                      '\t\t\tSourceOp = "TST_Entire_Detail_Fill",', text)
+        self.assertIn('TST_Entire_Wide_Border = Background {\n'
+                      '\t\t\tNameSet = true,\n'
+                      '\t\t\tSourceOp = "TST_Entire_Detail_Border",', text)
+
     def test_handles_approximate_smooth_zoom_with_authored_keys(self):
         animation = {"output": {"width": 2160, "height": 3840}, "keyframes": [
             {"frame": 0, "center": {"x": .5, "y": .5}, "view_width": .25},
@@ -128,6 +170,16 @@ class CameraProjectionTests(unittest.TestCase):
                 size = ((1-t)**3*a["zoom"] + 3*(1-t)**2*t*right +
                         3*(1-t)*t*t*left + t**3*b["zoom"])
                 self.assertLessEqual(abs(size-samples[frame]["zoom"])/samples[frame]["zoom"], .0201)
+
+    def test_generated_camera_timing_keys_have_an_editable_limit(self):
+        samples = [{"frame": frame,
+                    "zoom": 1 + (frame % 7) * .4,
+                    "displacement": frame / 199 + (frame % 5) * .002}
+                   for frame in range(200)]
+        keys = _camera_timing_keys(samples, {0, 199})
+        self.assertLessEqual(len(keys), MAX_CAMERA_TIMING_KEYS)
+        self.assertEqual(keys[0]["frame"], 0)
+        self.assertEqual(keys[-1]["frame"], 199)
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from core import package_layout
 from server import Handler
 
 
@@ -61,6 +62,32 @@ class AnimationCountryTests(unittest.TestCase):
             with patch("server.exporter.load_countries", return_value=catalog):
                 with self.assertRaisesRegex(ValueError, "already in this animation"):
                     handler._add_animation_country(package, {"iso3": "PRT"})
+
+    def test_add_country_uses_structured_json_and_data_directories(self):
+        with tempfile.TemporaryDirectory() as folder:
+            package = Path(folder)
+            package_layout.create(package)
+            metadata = {"package_layout": {"version": 2},
+                        "output": {"width": 3840, "height": 2160, "wide_factor": 2},
+                        "countries": [], "files": {}}
+            animation = {"name": "test", "output": {"width": 3840, "height": 2160,
+                         "fps": 24, "duration_frames": 120},
+                         "keyframes": [{"frame": 0, "center": {"x": .5, "y": .5},
+                                        "view_width": 1, "easing": "linear"}],
+                         "connections": []}
+            (package / "json/metadata.json").write_text(json.dumps(metadata))
+            (package / "json/animation.json").write_text(json.dumps(animation))
+            handler = Handler.__new__(Handler)
+            catalog = [{"iso3": "PRT", "name": "Portugal",
+                        "default_color": "#006600", "default_border_color": "#ffffff"}]
+            with patch("server.exporter.load_countries", return_value=catalog), \
+                    patch("server.exporter.get_geometry", return_value=GEOMETRY):
+                handler._add_animation_country(package, {"iso3": "PRT"})
+            saved = json.loads((package / "json/metadata.json").read_text())
+            self.assertEqual(saved["countries"][0]["geometry_file"],
+                             "data/geometry_PRT.geojson")
+            self.assertTrue((package / "data/geometry_PRT.geojson").is_file())
+            self.assertTrue((package / "json/animation.json").is_file())
 
 
 class AnimationCountryUITests(unittest.TestCase):

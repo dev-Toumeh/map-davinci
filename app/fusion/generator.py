@@ -9,6 +9,7 @@ import json
 import math
 import re
 from pathlib import Path
+from core import package_layout
 from .connection_geometry import connection_tools
 
 R = 6378137.0
@@ -29,6 +30,7 @@ RING_LIMITS = {
 }
 DEFAULT_RING_LIMIT = 40
 GEOMETRY_TOLERANCE_PX = 4.0
+MAX_CAMERA_TIMING_KEYS = 59
 
 
 def _name(value: str) -> str:
@@ -321,7 +323,7 @@ def _camera_timing_keys(samples: list[dict], authored_frames: set[int]) -> list[
     retained = {frame - offset for frame in authored_frames}
 
     def split(i: int, j: int) -> None:
-        if j - i < 2:
+        if j - i < 2 or len(retained) >= max(MAX_CAMERA_TIMING_KEYS, len(authored_frames)):
             return
         handles = {part: _fit_camera_handles(samples, samples[i], samples[j], part)
                    for part in ("size", "displacement")}
@@ -471,10 +473,14 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\tVector_AnimationPath = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "Vector_AnimationDisplacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
 {_path_points(samples, vector_x_scale, vector_y_scale)}
 \t\t\t\t\t\t}} }}, }} }}, }},'''
-    tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_wide.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
+    wide_image = package / package_layout.asset_relative(
+        metadata, "satellite_wide", str(package_layout.LEGACY_SATELLITE_WIDE_FILE))
+    detail_image = package / package_layout.asset_relative(
+        metadata, "satellite_detail", str(package_layout.LEGACY_SATELLITE_DETAIL_FILE))
+    tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(wide_image)}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
     # Detail remains a raster layer, geographically placed over the wide map.
     factor = float(native["wide_factor"])
-    tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(package / 'satellite_detail.png')}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 130 }} }}, }},
+    tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(detail_image)}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 130 }} }}, }},
 \t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
     vector_layers = []
     country_deployment_layers = []
@@ -539,17 +545,32 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
                 duration, int(out["fps"]))
             if visibility_node:
                 tools.append(visibility_node)
-            for resolution, y_offset in (("Wide", 0), ("Detail", 120)):
-                prefix = f"{child_base}_{resolution}"
-                tools.append(f'''\t\t{prefix}_Fill = Background {{
+            # Detail is the color/style master. The Wide backgrounds are
+            # instances with only their masks de-instanced, so changing fill
+            # or border color once updates both resolution branches.
+            detail_prefix = f"{child_base}_Detail"
+            wide_prefix = f"{child_base}_Wide"
+            tools.append(f'''\t\t{detail_prefix}_Fill = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{prefix}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -1140, {row + y_offset} }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{detail_prefix}_Fill_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {red:.12g}, }}, TopLeftGreen = Input {{ Value = {green:.12g}, }}, TopLeftBlue = Input {{ Value = {blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -1140, {row + 120} }} }},
 \t\t}},
-\t\t{prefix}_Border = Background {{
+\t\t{detail_prefix}_Border = Background {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{prefix}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -910, {row + y_offset} }} }},
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{detail_prefix}_Border_Mask", Source = "Mask", }}, GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftRed = Input {{ Value = {border_red:.12g}, }}, TopLeftGreen = Input {{ Value = {border_green:.12g}, }}, TopLeftBlue = Input {{ Value = {border_blue:.12g}, }}, TopLeftAlpha = {visibility_input} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -910, {row + 120} }} }},
+\t\t}},
+\t\t{wide_prefix}_Fill = Background {{
+\t\t\tNameSet = true,
+\t\t\tSourceOp = "{detail_prefix}_Fill",
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{wide_prefix}_Fill_Mask", Source = "Mask", }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -1140, {row} }} }},
+\t\t}},
+\t\t{wide_prefix}_Border = Background {{
+\t\t\tNameSet = true,
+\t\t\tSourceOp = "{detail_prefix}_Border",
+\t\t\tInputs = {{ EffectMask = Input {{ SourceOp = "{wide_prefix}_Border_Mask", Source = "Mask", }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ -910, {row} }} }},
 \t\t}},''')
             safe_name = _territory_label(child).replace('"', "'")
             tools.append(f'''\t\t{child_base}_Wide_Composite = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{group_base}_Wide_Canvas", Source = "Output", }}, ["Layer1.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Fill", Source = "Output", }}, ["Layer2.Foreground"] = Input {{ SourceOp = "{child_base}_Wide_Border", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -670, {row} }} }}, }},
@@ -630,7 +651,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t}}
 }}
 '''
-    fusion_dir = package / "fusion"
+    fusion_dir = package / package_layout.FUSION_DIR
     fusion_dir.mkdir(exist_ok=True)
     versions = [int(m.group(1)) for path in fusion_dir.glob("scene_v*.comp")
                 if (m := re.fullmatch(r"scene_v(\d+)\.comp", path.name))]

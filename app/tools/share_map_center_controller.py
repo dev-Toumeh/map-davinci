@@ -12,6 +12,7 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
+from core import package_layout  # noqa: E402
 from tools.share_polygon_border import _tool_span  # noqa: E402
 
 CENTER_LINK = re.compile(
@@ -21,8 +22,8 @@ CENTER_LINK = re.compile(
 
 
 def build(package: Path, source: Path, target: Path) -> dict:
-    metadata = json.loads((package / "metadata.json").read_text(encoding="utf-8"))
-    animation = json.loads((package / "animation.json").read_text(encoding="utf-8"))
+    metadata = json.loads(package_layout.metadata_path(package).read_text(encoding="utf-8"))
+    animation = json.loads(package_layout.animation_path(package).read_text(encoding="utf-8"))
     native, output = metadata["output"], animation["output"]
     vector_width = max(native["width"], output["width"])
     vector_height = max(native["height"], output["height"])

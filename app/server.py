@@ -37,7 +37,7 @@ import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from core import animation_schema, exporter, regions, settings as app_settings
+from core import animation_schema, exporter, package_layout, regions, settings as app_settings
 from fusion import generator as fusion_generator
 
 APP_ROOT = Path(__file__).resolve().parent
@@ -207,15 +207,17 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError("invalid export package name")
         exports_dir = app_settings.exports_dir()
         package = (exports_dir / name).resolve()
-        if package.parent != exports_dir.resolve() or not (package / "metadata.json").is_file():
+        if (package.parent != exports_dir.resolve()
+                or not package_layout.metadata_path(package).is_file()):
             raise FileNotFoundError("export package not found")
         return package
 
     def _metadata(self, package: Path) -> dict:
-        return json.loads((package / "metadata.json").read_text(encoding="utf-8"))
+        metadata = json.loads(package_layout.metadata_path(package).read_text(encoding="utf-8"))
+        return package_layout.describe(package, metadata)
 
     def _animation_response(self, package: Path) -> dict:
-        path = package / "animation.json"
+        path = package_layout.animation_path(package)
         return {"export": package.name, "metadata": self._metadata(package),
                 "animation": json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None}
 
@@ -269,7 +271,7 @@ class Handler(BaseHTTPRequestHandler):
                 repaired_groups.append(group)
             config["region_groups"] = repaired_groups
         animation = animation_schema.normalize_animation(config, self._metadata(package))
-        target = package / "animation.json"
+        target = package_layout.animation_path(package)
         if target.is_file():
             existing = animation_schema.normalize_animation(
                 json.loads(target.read_text(encoding="utf-8")), self._metadata(package))
@@ -302,7 +304,7 @@ class Handler(BaseHTTPRequestHandler):
             config.get("color") or catalog[iso3].get("default_color")
             or exporter.country_default_color(iso3))
         geometry = exporter.get_geometry(iso3)
-        geometry_name = f"geometry_{iso3}.geojson"
+        geometry_relative = package_layout.data_relative(package, f"geometry_{iso3}.geojson")
         geometry_payload = {
             "type": "Feature",
             "properties": {"iso3": iso3, "color": color},
@@ -317,23 +319,24 @@ class Handler(BaseHTTPRequestHandler):
             "color": color,
             "border_color": (catalog[iso3].get("default_border_color")
                              or exporter.country_default_border_color(iso3)),
-            "geometry_file": geometry_name,
+            "geometry_file": str(geometry_relative),
         })
-        metadata.setdefault("files", {})[geometry_name] = {
+        metadata.setdefault("files", {})[str(geometry_relative)] = {
             "sha256": hashlib.sha256(geometry_bytes).hexdigest(),
             "bytes": len(geometry_bytes),
         }
 
-        animation_path = package / "animation.json"
+        animation_path = package_layout.animation_path(package)
         if not animation_path.is_file():
             raise ValueError("create the animation before adding another country")
         source_animation = json.loads(animation_path.read_text(encoding="utf-8"))
         animation = animation_schema.normalize_animation(source_animation, metadata)
         animation = regions.materialize(package, animation)
 
-        geometry_path = package / geometry_name
+        geometry_path = package / geometry_relative
+        geometry_path.parent.mkdir(parents=True, exist_ok=True)
         geometry_temp = geometry_path.with_suffix(".geojson.tmp")
-        metadata_path = package / "metadata.json"
+        metadata_path = package_layout.metadata_path(package)
         metadata_temp = metadata_path.with_suffix(".json.tmp")
         animation_temp = animation_path.with_suffix(".json.tmp")
         geometry_temp.write_bytes(geometry_bytes)
@@ -409,13 +412,14 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/api/exports":
                 packages = []
                 for candidate in sorted(app_settings.exports_dir().iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
-                    if not candidate.is_dir() or not (candidate / "metadata.json").is_file():
+                    if (not candidate.is_dir()
+                            or not package_layout.metadata_path(candidate).is_file()):
                         continue
                     metadata = self._metadata(candidate)
                     packages.append({"name": candidate.name, "generated_at": metadata.get("generated_at"),
                                      "output": metadata.get("output"),
                                      "countries": [c.get("iso3") for c in metadata.get("countries", [])],
-                                     "has_animation": (candidate / "animation.json").is_file()})
+                                     "has_animation": package_layout.animation_path(candidate).is_file()})
                 self._json({"exports": packages})
             elif (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
                 self._json(self._animation_response(self._package(m.group(1))))
@@ -467,14 +471,17 @@ class Handler(BaseHTTPRequestHandler):
                 if suffix not in MIME or not MIME[suffix].startswith("audio/"):
                     suffix = ".mp3"
                 safe_name = f"{Path(clean_name).stem[:80 - len(suffix)]}{suffix}"
-                (package / safe_name).write_bytes(audio)
+                audio_relative = package_layout.sounds_relative(package, safe_name)
+                audio_path = package / audio_relative
+                audio_path.parent.mkdir(parents=True, exist_ok=True)
+                audio_path.write_bytes(audio)
                 # The editor adds this file as a clip, then saves the complete
                 # clip list. Do not overwrite existing sections here.
-                self._json({"ok": True, "file": safe_name})
+                self._json({"ok": True, "file": str(audio_relative)})
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/audio/remove", path)):
                 package = self._package(m.group(1))
-                animation_path = package / "animation.json"
+                animation_path = package_layout.animation_path(package)
                 animation = animation_schema.normalize_animation(
                     json.loads(animation_path.read_text(encoding="utf-8")) if animation_path.is_file() else {},
                     self._metadata(package))
@@ -494,7 +501,7 @@ class Handler(BaseHTTPRequestHandler):
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
                 package = self._package(m.group(1))
                 animation = self._normalize_animation(package, config)
-                target = package / "animation.json"
+                target = package_layout.animation_path(package)
                 temporary = target.with_suffix(".json.tmp")
                 temporary.write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 temporary.replace(target)
@@ -504,7 +511,8 @@ class Handler(BaseHTTPRequestHandler):
                 package = self._package(m.group(1))
                 metadata = self._metadata(package)
                 animation = self._normalize_animation(package, config)
-                (package / "animation.json").write_text(json.dumps(animation, indent=2) + "\n", encoding="utf-8")
+                package_layout.animation_path(package).write_text(
+                    json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 target = fusion_generator.generate(package, metadata, animation)
                 relative = target.relative_to(app_settings.exports_dir())
                 self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative)})

@@ -32,21 +32,21 @@ Then open **http://127.0.0.1:8787** in a browser.
 5. Click **Export assets**.
 6. In the completed-export panel, choose **Animate this export**. In the 2D editor,
    pan/zoom the real exported backgrounds, add timeline keyframes, select linear or
-   smooth movement, save `animation.json`, then generate `fusion/scene.comp`.
+   smooth movement, save `json/animation.json`, then generate a Fusion composition.
 
 ## Output package (`exports/<name>/`)
 
-| File | Content |
+| Path | Content |
 |---|---|
-| `satellite_detail.png` | Background at the framed extent |
-| `satellite_wide.png` | Same center, `wide_factor` × the extent, same pixel size |
-| `mask_<ISO>.png` | One per country — selected highlight color on transparent, exact same grid as the detail image |
-| `mask_<ISO>.svg` | Vector version of the same colored mask — viewBox matches the PNG pixels 1:1, holes and islands preserved |
-| `geometry_<ISO>.geojson` | Original vector geometry saved with the package for editable native Fusion polygon masks |
-| `alignment_check.jpg` | Detail background with masks overlaid 50% red — quick visual QA |
-| `metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, SHA-256 hashes, attribution |
-| `animation.json` | Saved 2D view keyframes, timing, FPS, and easing (created in the Animation Editor) |
+| `images/` | Satellite backgrounds, PNG/SVG masks, and the alignment-check image |
+| `json/metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, hashes, and attribution |
+| `json/animation.json` | Saved 2D view keyframes, timing, FPS, easing, regions, and commentary references |
+| `data/` | Country and sub-territory GeoJSON used by native Fusion polygon masks |
+| `sounds/` | Uploaded narration, music, and other audio used by the animation |
 | `fusion/scene_vNNN.comp` | Versioned editable 2D Fusion graph; every Generate action creates a new version |
+
+Repeated names use numeric suffixes: `saudi_arabia`, `saudi_arabia_2`,
+`saudi_arabia_3`, and so on. Existing flat packages remain supported.
 
 ## 2D animation editor
 

@@ -13,6 +13,8 @@ from typing import Iterable
 
 import requests
 
+from core import package_layout
+
 APP_ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_DATA = APP_ROOT / "runtime" / "data"
 ADMIN1_FILE = RUNTIME_DATA / "ne_10m_admin_1_states_provinces.geojson"
@@ -104,7 +106,8 @@ def _admin_geometry_by_iso(iso: str) -> dict:
 
 def materialize(package: Path, animation: dict) -> dict:
     """Copy selected source geometry into a package and record safe paths."""
-    folder = package / "regions"
+    region_relative = package_layout.data_relative(package, "regions")
+    folder = package / region_relative
     requested = [child for group in animation.get("region_groups", [])
                  for child in group.get("children", []) if child.get("category") != "country"]
     if requested:
@@ -117,7 +120,7 @@ def materialize(package: Path, animation: dict) -> dict:
                 child.pop("geometry_file", None)
                 continue
             safe = re.sub(r"[^A-Za-z0-9_.-]", "_", child["id"])
-            relative = Path("regions") / f"geometry_{safe}.geojson"
+            relative = region_relative / f"geometry_{safe}.geojson"
             target = package / relative
             payload = {"type": "Feature", "properties": {
                 "id": child["id"], "name": child["name"],

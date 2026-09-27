@@ -13,8 +13,8 @@ Reproduces the QGIS tutorial workflow programmatically:
      - masks share the exact extent of the detailed background
      - the wide background keeps the same center but covers
        `wide_factor` x the projected width/height of the detail extent
-  4. Exports a package: satellite_detail.png, satellite_wide.png,
-     mask_<ISO>.png per country, alignment_check.jpg, metadata.json
+  4. Exports a structured package with images, JSON, geometry data, sounds,
+     and Fusion compositions in dedicated directories.
 
 No screenshots of the UI are involved: every export is rendered from raw
 tiles + raw geometry through explicit, recorded math.
@@ -36,6 +36,8 @@ from typing import Callable, Dict, List, Optional, Tuple
 import numpy as np
 import requests
 from PIL import Image, ImageDraw
+
+from core import package_layout
 
 # --------------------------------------------------------------------------
 # Constants
@@ -694,6 +696,16 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+def _available_output_dir(exports_dir: Path, name: str) -> Path:
+    candidate = exports_dir / name
+    if not candidate.exists():
+        return candidate
+    suffix = 2
+    while (exports_dir / f"{name}_{suffix}").exists():
+        suffix += 1
+    return exports_dir / f"{name}_{suffix}"
+
+
 def run_export(config: dict, progress: ProgressFn) -> dict:
     """
     config keys:
@@ -734,12 +746,9 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
 
     from core import settings
     exports_dir = settings.exports_dir()
-    out_dir = exports_dir / name
-    if out_dir.exists():
-        # keep every export reproducible & separate
-        stamp = time.strftime("%Y%m%d-%H%M%S")
-        out_dir = exports_dir / f"{name}_{stamp}"
+    out_dir = _available_output_dir(exports_dir, name)
     out_dir.mkdir(parents=True, exist_ok=True)
+    package_layout.create(out_dir)
 
     progress("extents", 5.0, "computing shared grid")
     explicit_bbox = config.get("detail_bbox_mercator")
@@ -786,8 +795,8 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
                            progress, "tiles_wide")
     progress("tiles", 100.0, "wide background stitched")
 
-    detail_path = out_dir / "satellite_detail.png"
-    wide_path = out_dir / "satellite_wide.png"
+    detail_path = out_dir / package_layout.SATELLITE_DETAIL_FILE
+    wide_path = out_dir / package_layout.SATELLITE_WIDE_FILE
     detail_img.save(detail_path)
     wide_img.save(wide_path)
 
@@ -800,23 +809,23 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         color, rgb = parse_hex_color(colors.get(iso, country_default_color(iso)))
         geometry = get_geometry(iso)
         mask_img, bounds_px = render_mask(geometry, detail_bbox, (W, H), rgb)
-        mask_path = out_dir / f"mask_{iso}.png"
+        mask_path = out_dir / package_layout.mask_png(iso)
         mask_img.save(mask_path)
         svg_text = render_mask_svg(geometry, detail_bbox, (W, H), color)
-        svg_path = out_dir / f"mask_{iso}.svg"
+        svg_path = out_dir / package_layout.mask_svg(iso)
         svg_path.write_text(svg_text, encoding="utf-8")
         # Keep the original vector source with the package. Fusion generation
         # can use these points directly instead of rasterising the PNG mask.
-        geometry_path = out_dir / f"geometry_{iso}.geojson"
+        geometry_path = out_dir / package_layout.country_geometry(iso)
         geometry_path.write_text(json.dumps({"type": "Feature", "properties": {
             "iso3": iso, "color": color}, "geometry": geometry}, indent=2), encoding="utf-8")
         masks.append({
             "iso3": iso,
             "color": color,
             "border_color": country_default_border_color(iso),
-            "file": mask_path.name,
-            "svg_file": svg_path.name,
-            "geometry_file": geometry_path.name,
+            "file": str(mask_path.relative_to(out_dir)),
+            "svg_file": str(svg_path.relative_to(out_dir)),
+            "geometry_file": str(geometry_path.relative_to(out_dir)),
             "bounds_px": {"x0": bounds_px[0], "y0": bounds_px[1],
                           "x1": bounds_px[2], "y1": bounds_px[3]},
         })
@@ -834,15 +843,15 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         alpha_all = Image.fromarray(np.maximum(cur, a_np))
     half = alpha_all.point(lambda a: a // 2)
     check = Image.composite(overlay, bg, half)
-    check_path = out_dir / "alignment_check.jpg"
+    check_path = out_dir / package_layout.ALIGNMENT_CHECK_FILE
     check.save(check_path, quality=90)
 
     # ---- metadata --------------------------------------------------------
     progress("metadata", 50.0, "writing metadata")
     files = {
-        "satellite_detail.png": detail_path,
-        "satellite_wide.png": wide_path,
-        "alignment_check.jpg": check_path,
+        str(detail_path.relative_to(out_dir)): detail_path,
+        str(wide_path.relative_to(out_dir)): wide_path,
+        str(check_path.relative_to(out_dir)): check_path,
     }
     for m in masks:
         files[m["file"]] = out_dir / m["file"]
@@ -853,6 +862,8 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
 
     metadata = {
         "app": "map-asset-app 0.1",
+        "package_layout": package_layout.manifest(),
+        "assets": package_layout.default_assets(),
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "crs": "EPSG:3857",
         "output": {
@@ -913,13 +924,13 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
         },
         "files": file_info,
     }
-    meta_path = out_dir / "metadata.json"
+    meta_path = out_dir / package_layout.METADATA_FILE
     meta_path.write_text(json.dumps(metadata, indent=2, ensure_ascii=False))
 
     progress("done", 100.0, f"export complete -> {out_dir}")
     return {
         "output_dir": str(out_dir),
-        "files": sorted(p.name for p in out_dir.iterdir()),
+        "files": sorted(str(p.relative_to(out_dir)) for p in out_dir.rglob("*") if p.is_file()),
         "metadata": metadata,
         "elapsed_sec": round(time.time() - t0, 1),
     }

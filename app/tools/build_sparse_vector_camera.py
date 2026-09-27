@@ -21,6 +21,7 @@ APP_DIR = Path(__file__).resolve().parents[1]
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
+from core import package_layout  # noqa: E402
 from fusion.generator import _camera_samples  # noqa: E402
 
 
@@ -173,8 +174,8 @@ def _max_error(samples: list[dict], indices: list[int], width: int, height: int)
 
 
 def build(package: Path, source: Path, target: Path, tolerance_px: float) -> dict:
-    metadata = json.loads((package / "metadata.json").read_text(encoding="utf-8"))
-    animation = json.loads((package / "animation.json").read_text(encoding="utf-8"))
+    metadata = json.loads(package_layout.metadata_path(package).read_text(encoding="utf-8"))
+    animation = json.loads(package_layout.animation_path(package).read_text(encoding="utf-8"))
     samples = _camera_samples(animation, metadata["output"])
     native = metadata["output"]
     output = animation["output"]
@@ -241,7 +242,7 @@ def main() -> None:
     parser.add_argument("--tolerance-px", type=float, default=0.25)
     args = parser.parse_args()
     package = args.package.resolve()
-    source = (args.source or package / "fusion" / "scene_v001.comp").resolve()
+    source = (args.source or package / package_layout.FUSION_DIR / "scene_v001.comp").resolve()
     target = (args.output or source.with_name(source.stem + "_sparse_xy_prototype.comp")).resolve()
     if source == target:
         raise SystemExit("Output must differ from the source composition")

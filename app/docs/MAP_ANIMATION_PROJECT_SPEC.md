@@ -359,19 +359,21 @@ Conceptual example:
 
 ```text
 shot_001/
-├── shot.json
-├── background_editing.png
-├── background_highres.png
-├── background_zoomed_out.png
-├── country_uk.svg
-├── country_france.svg
-├── borders.svg
-├── metadata.json
+├── images/
+│   ├── satellite_detail.png
+│   ├── satellite_wide.png
+│   └── mask_GBR.svg
+├── json/
+│   ├── metadata.json
+│   └── animation.json
+├── data/
+│   └── geometry_GBR.geojson
+├── sounds/
 └── fusion/
-    └── scene.comp
+    └── scene_v001.comp
 ```
 
-`metadata.json` may later contain:
+`json/metadata.json` contains:
 
 - extent / bounding box
 - projection / CRS
