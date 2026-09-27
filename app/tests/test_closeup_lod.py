@@ -43,6 +43,5 @@ class CloseupLodTests(unittest.TestCase):
         self.assertAlmostEqual(sample["fusion_path"]["y"], 0)
         self.assertAlmostEqual(sample["zoom"], 1.5)
 
-
 if __name__ == "__main__":
     unittest.main()
