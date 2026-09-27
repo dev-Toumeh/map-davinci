@@ -10,6 +10,7 @@ import math
 import re
 from pathlib import Path
 from core import package_layout
+from . import closeup_lod
 from .connection_geometry import connection_tools
 
 R = 6378137.0
@@ -603,15 +604,17 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\t\tLayerName1 = Input { Value = "Country performance mode", },
 \t\t\t}, ViewInfo = OperatorInfo { Pos = { 1700, 450 } },
 \t\t},''')
-        map_animation_source = "Map_Country_Layers"
+        has_country_layers = True
         layer_number = 1
     else:
-        map_animation_source = "Map_Raster_Layers"
+        has_country_layers = False
         layer_number = 1
     incomplete = [connection["name"] for connection in animation.get("connections", [])
                   if not connection.get("start") or not connection.get("end")]
     if incomplete:
         raise ValueError("Complete or delete these connections before generating Fusion: " + ", ".join(incomplete))
+    closeup_plans = closeup_lod.ensure_images(
+        package, metadata, animation, closeup_lod.plan_closeups(metadata, animation))
     for number, connection in enumerate(animation.get("connections", [])):
         connection_nodes, connection_layers = connection_tools(
             connection, width, height, duration, row_cursor + number * 180,
@@ -627,6 +630,42 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\t}},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ 120, 0 }} }},
 \t\t}},''')
+    lod_nodes = []
+    lod_source = "Map_Animation"
+    for index, plan in enumerate(closeup_plans, 1):
+        local_samples = closeup_lod.local_samples(
+            animation, plan["normalized_bbox"], plan["first"], plan["last"])
+        local_keys = _camera_timing_keys(
+            local_samples, {plan["first"], plan["frame"], plan["last"]})
+        node = f'Closeup_{index:02d}_{plan["frame"]:04d}'
+        visibility = {0: 0, plan["first"]: 0, plan["full_first"]: 1,
+                      plan["full_last"]: 1, plan["last"]: 0, duration: 0}
+        visibility_lines = "\n".join(
+            f'\t\t\t\t[{frame}] = {{ {value}, Flags = {{ Linear = true }} }},'
+            for frame, value in sorted(visibility.items()))
+        lod_nodes.append(f'''\t\t{node}_Loader = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(plan["image_path"])}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1930, {-260 - index * 130} }} }}, }},
+\t\t{node}_Displacement = BezierSpline {{ KeyFrames = {{
+{_key_lines(local_keys, local_samples, 'displacement')}
+\t\t\t}} }},
+\t\t{node}_Size = BezierSpline {{ KeyFrames = {{
+{_key_lines(local_keys, local_samples, 'size')}
+\t\t\t}} }},
+\t\t{node}_Path = PolyPath {{ Inputs = {{ Displacement = Input {{ SourceOp = "{node}_Displacement", Source = "Value", }}, PolyLine = Input {{ Value = Polyline {{ Points = {{
+{_path_points(local_samples)}
+\t\t\t\t\t\t}} }}, }} }}, }},
+\t\t{node}_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "{node}_Path", Source = "Position", }}, Size = Input {{ SourceOp = "{node}_Size", Source = "Value", }}, ClippingMode = Input {{ Value = FuID {{ "None" }}, }}, Input = Input {{ SourceOp = "{node}_Loader", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2160, {-260 - index * 130} }} }}, }},
+\t\t{node}_Visibility = BezierSpline {{ KeyFrames = {{
+{visibility_lines}
+\t\t\t}} }},
+\t\t{node}_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{lod_source}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{node}_Animation", Source = "Output", }}, Blend = Input {{ SourceOp = "{node}_Visibility", Source = "Value", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {2390 + index * 120}, {-130 - index * 80} }} }}, }},''')
+        lod_source = node + "_Composite"
+    if has_country_layers:
+        country_nodes = f'''\t\tCountry_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, ClippingMode = Input {{ Value = FuID {{ "None" }}, }}, Input = Input {{ SourceOp = "Country_Mode_Switch", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2390, 130 }} }}, }},
+\t\tMap_With_Countries = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{lod_source}", Source = "Output", }}, Foreground = Input {{ SourceOp = "Country_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2620, 0 }} }}, }},'''
+        final_map_source = "Map_With_Countries"
+    else:
+        country_nodes = ""
+        final_map_source = lod_source
     tools.append(f'''\t\tMap_AnimationDisplacement = BezierSpline {{ KeyFrames = {{
 {_key_lines(keys, samples, 'displacement')}
 \t\t\t}} }},
@@ -637,13 +676,15 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 {_path_points(samples)}
 \t\t\t\t\t\t}} }}, }} }}, }},
 {vector_controller}
-\t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, ClippingMode = Input {{ Value = FuID {{ "None" }}, }}, Input = Input {{ SourceOp = "{map_animation_source}", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2160, 0 }} }}, }},
-\t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2160, 130 }} }}, }},
-\t\tFinal_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Output_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "Map_Animation", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2390, 0 }} }}, }},
+\t\tMap_Animation = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ SourceOp = "Map_AnimationPath", Source = "Position", }}, Size = Input {{ SourceOp = "Map_AnimationSize", Source = "Value", }}, ClippingMode = Input {{ Value = FuID {{ "None" }}, }}, Input = Input {{ SourceOp = "Map_Raster_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2160, 0 }} }}, }},
+{chr(10).join(lod_nodes)}
+{country_nodes}
+\t\tOutput_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {output_width}, }}, Height = Input {{ Value = {output_height}, }}, PixelAspect = Input {{ Value = {{ 1, 1 }}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2850, 130 }} }}, }},
+\t\tFinal_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Output_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{final_map_source}", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2850, 0 }} }}, }},
 \t\tVector_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Final_Composite", Source = "Output", }},
 {chr(10).join(vector_layers)}
-\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 2620, 0 }} }}, }},
-\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 2850, 0 }} }}, }},''')
+\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 3080, 0 }} }}, }},
+\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 3310, 0 }} }}, }},''')
     content = f'''Composition {{
 \tCurrentTime = 0, RenderRange = {{ 0, {duration} }}, GlobalRange = {{ 0, {duration} }},
 \tTools = {{

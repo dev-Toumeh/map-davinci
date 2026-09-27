@@ -10,6 +10,8 @@ JSON_DIR = Path("json")
 DATA_DIR = Path("data")
 SOUNDS_DIR = Path("sounds")
 FUSION_DIR = Path("fusion")
+CLOSEUPS_DIR = IMAGES_DIR / "closeups"
+LEGACY_CLOSEUPS_DIR = Path("closeups")
 STRUCTURED_DIRS = (IMAGES_DIR, JSON_DIR, DATA_DIR, SOUNDS_DIR, FUSION_DIR)
 
 METADATA_FILE = JSON_DIR / "metadata.json"
@@ -110,6 +112,10 @@ def data_relative(package: Path, *parts: str) -> Path:
 
 def sounds_relative(package: Path, filename: str) -> Path:
     return SOUNDS_DIR / filename if structured(package) else Path(filename)
+
+
+def closeups_relative(package: Path) -> Path:
+    return CLOSEUPS_DIR if structured(package) else LEGACY_CLOSEUPS_DIR
 
 
 def asset_relative(metadata: dict, key: str, legacy_name: str) -> Path:

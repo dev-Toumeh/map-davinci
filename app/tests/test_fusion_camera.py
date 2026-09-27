@@ -4,6 +4,7 @@ import re
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from fusion.generator import (_camera_samples, _country_mask, _path_points, _key_lines,
                               _camera_timing_keys, MAX_CAMERA_TIMING_KEYS, generate)
@@ -180,6 +181,38 @@ class CameraProjectionTests(unittest.TestCase):
         self.assertLessEqual(len(keys), MAX_CAMERA_TIMING_KEYS)
         self.assertEqual(keys[0]["frame"], 0)
         self.assertEqual(keys[-1]["frame"], 199)
+
+    def test_deep_zoom_exports_cached_closeup_branch(self):
+        metadata = {
+            "output": {"width": 3840, "height": 2160, "wide_factor": 2},
+            "wide": {"bbox_mercator": {"minx": 0, "miny": 0,
+                                         "maxx": 100, "maxy": 100}},
+            "countries": [],
+        }
+        animation = {
+            "output": {"width": 2160, "height": 3840, "fps": 24,
+                       "duration_frames": 101},
+            "keyframes": [
+                {"frame": 0, "center": {"x": .5, "y": .5}, "view_width": .2},
+                {"frame": 50, "center": {"x": .5, "y": .5}, "view_width": .01},
+                {"frame": 100, "center": {"x": .5, "y": .5}, "view_width": .2},
+            ],
+            "connections": [],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            image = Path(tmp) / "closeup.png"
+
+            def cached(_package, _metadata, _animation, plans):
+                for plan in plans:
+                    plan["image_path"] = image
+                return plans
+
+            with patch("fusion.generator.closeup_lod.ensure_images", side_effect=cached):
+                text = generate(Path(tmp), metadata, animation).read_text()
+        self.assertIn("Closeup_01_0050_Loader = Loader", text)
+        self.assertIn("Closeup_01_0050_Animation = Transform", text)
+        self.assertIn('Foreground = Input { SourceOp = "Closeup_01_0050_Animation"', text)
+        self.assertIn('Foreground = Input { SourceOp = "Closeup_01_0050_Composite"', text)
 
 
 if __name__ == "__main__":

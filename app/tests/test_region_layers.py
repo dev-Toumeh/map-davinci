@@ -91,7 +91,10 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn(
             'Input1 = Input { SourceOp = "Country_Deployment_Layers", Source = "Output"',
             text)
-        self.assertIn('Input = Input { SourceOp = "Map_Country_Layers"', text)
+        self.assertIn('Country_Animation = Transform', text)
+        self.assertIn('Input = Input { SourceOp = "Country_Mode_Switch"', text)
+        self.assertIn('Map_With_Countries = Merge', text)
+        self.assertIn('Input = Input { SourceOp = "Map_Raster_Layers"', text)
         self.assertIn('Background = Input { SourceOp = "Map_Raster_Layers"', text)
         self.assertNotIn("USA_Wide_Regions", text)
         self.assertNotIn("USA_Detail_Regions", text)
