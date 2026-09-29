@@ -96,20 +96,22 @@ def local_samples(animation: dict, normalized: tuple[float, float, float, float]
     return samples
 
 
-def plan_closeups(metadata: dict, animation: dict) -> list[dict]:
+def plan_closeups(metadata: dict, animation: dict,
+                  max_detail_magnification: float = MAX_DETAIL_MAGNIFICATION,
+                  margin: float = CLOSEUP_MARGIN) -> list[dict]:
     """Choose a small set of deep authored views and their useful intervals."""
     native, output = metadata["output"], animation["output"]
     factor = float(native["wide_factor"])
     candidates = []
     for key in animation["keyframes"]:
         magnification = output["width"] / native["width"] / key["view_width"] / factor
-        if magnification > MAX_DETAIL_MAGNIFICATION:
+        if magnification > max_detail_magnification:
             candidates.append((magnification, int(key["frame"])))
     selected = []
     for magnification, frame in sorted(candidates, reverse=True):
         if any(plan["first"] <= frame <= plan["last"] for plan in selected):
             continue
-        normalized = _normalized_bbox(metadata, animation, frame, CLOSEUP_MARGIN)
+        normalized = _normalized_bbox(metadata, animation, frame, margin)
         first, last = _coverage(metadata, animation, normalized, frame)
         fade = min(6, max(1, (last - first) // 4))
         selected.append({

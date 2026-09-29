@@ -53,8 +53,8 @@ class CountryFlagTests(unittest.TestCase):
                 switch = text.split(f"{iso}_Flag_Color_Flag = Switch", 1)[1].split(
                     f"{iso}_Flag_Border_Geometry", 1)[0]
                 self.assertIn("Which = Input { Value = 0", switch)
-                self.assertIn('Name0 = Input { Value = "Color"', text)
-                self.assertIn('Name1 = Input { Value = "Flag"', text)
+                self.assertIn('Name0 = Input { Value = "Flag"', text)
+                self.assertIn('Name1 = Input { Value = "Color"', text)
                 self.assertNotIn('Name2 = Input { Value = "Transparent"', text)
                 self.assertIn('NumberOfInputs = Input { Value = 2', switch)
                 self.assertIn(f'SourceOp = "{iso}_Flag_Color_Flag"', text)
@@ -68,10 +68,10 @@ class CountryFlagTests(unittest.TestCase):
             self.assertIn("Pos = { 1330, 670 }", text.split(
                 "CAN_Flag_Color_Flag = Switch", 1)[1].split(
                 "Country_Edit_02_Enabled", 1)[0])
-            self.assertIn('Input0 = Input { SourceOp = "Country_Edit_01_Render"', text)
-            self.assertIn('Input1 = Input { SourceOp = "USA_Flag_With_Border"', text)
-            self.assertIn('Input0 = Input { SourceOp = "Country_Edit_02_Render"', text)
-            self.assertIn('Input1 = Input { SourceOp = "CAN_Flag_With_Border"', text)
+            self.assertIn('Input1 = Input { SourceOp = "Country_Edit_01_Render"', text)
+            self.assertIn('Input0 = Input { SourceOp = "USA_Flag_With_Border"', text)
+            self.assertIn('Input1 = Input { SourceOp = "Country_Edit_02_Render"', text)
+            self.assertIn('Input0 = Input { SourceOp = "CAN_Flag_With_Border"', text)
             self.assertIn("Country_Deployment = MultiMerge", text)
             self.assertIn('SourceOp = "Map_AnimationPath"', text)
             self.assertIn('SourceOp = "Map_AnimationSize"', text)

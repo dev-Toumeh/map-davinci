@@ -1,4 +1,5 @@
 """Camera projection regression checks; run with unittest discover -s app."""
+import json
 import math
 import re
 import tempfile
@@ -8,10 +9,114 @@ from unittest.mock import patch
 
 from fusion.generator import (_camera_samples, _country_mask, _path_points, _key_lines,
                               _camera_timing_keys, _shape_territory,
-                              MAX_CAMERA_TIMING_KEYS, generate)
+                              _detail_footprint, MAX_CAMERA_TIMING_KEYS, generate)
 
 
 class CameraProjectionTests(unittest.TestCase):
+    def test_3d_satellite_flow_uses_one_horizontal_row(self):
+        animation = {"output": {"width": 3840, "height": 2160,
+                                "duration_frames": 25},
+                     "keyframes": [{"frame": 0, "center": {"x": .5, "y": .5},
+                                    "view_width": .3}], "connections": []}
+        metadata = {"output": {"width": 3840, "height": 2160,
+                               "wide_factor": 2}, "countries": []}
+
+        def position(content, name):
+            match = re.search(
+                rf'\b{re.escape(name)} = \w+ \{{.*?ViewInfo = OperatorInfo '
+                r'\{ Pos = \{ (-?\d+), (-?\d+) \}', content, re.S)
+            self.assertIsNotNone(match, name)
+            return tuple(map(int, match.groups()))
+
+        for count in (0, 1, 10):
+            with self.subTest(closeups=count), tempfile.TemporaryDirectory() as tmp:
+                package = Path(tmp)
+                plans = [{"frame": index + 5,
+                          "normalized_bbox": (.4, .4, .6, .6),
+                          "first": index + 4, "full_first": index + 5,
+                          "full_last": index + 5, "last": index + 6,
+                          "image_path": package / f"closeup_{index}.png"}
+                         for index in range(count)]
+                with patch("fusion.generator.closeup_lod.plan_closeups",
+                           return_value=plans), patch(
+                               "fusion.generator.closeup_lod.ensure_images",
+                               return_value=plans):
+                    content = generate(package, metadata, animation,
+                                       mode="3d").read_text()
+                image_names = ["Map_Wide", "Map_Detail"] + [
+                    f"Map_Closeup_{index:02d}_{plan['frame']:04d}_Loader"
+                    for index, plan in enumerate(plans, 1)]
+                image_positions = [position(content, name) for name in image_names]
+                self.assertEqual(len({y for _x, y in image_positions}), 1)
+                self.assertTrue(all(b[0] - a[0] == 500 for a, b in zip(
+                    image_positions, image_positions[1:])))
+                plane_names = ["Map_3D_Satellite", "Map_3D_Detail"] + [
+                    f"Map_Closeup_{index:02d}_{plan['frame']:04d}_Plane"
+                    for index, plan in enumerate(plans, 1)]
+                plane_positions = [position(content, name) for name in plane_names]
+                self.assertTrue(all(plane[1] > image[1] for image, plane in zip(
+                    image_positions, plane_positions)))
+                scene = position(content, "Map_3D_Scene")
+                renderer = position(content, "Map_3D_Renderer")
+                output = position(content, "MediaOut1")
+                self.assertGreater(scene[0], max(x for x, _y in plane_positions))
+                self.assertGreater(renderer[0], scene[0])
+                self.assertGreater(output[0], renderer[0])
+                defined = set(re.findall(
+                    r'^\s*([A-Za-z]\w*) = [A-Za-z]\w* \{', content, re.M))
+                references = set(re.findall(r'SourceOp = "([^"]+)"', content))
+                self.assertFalse(references - defined)
+
+    def test_3d_detail_uses_saved_geographic_footprint(self):
+        metadata = {"output": {"wide_factor": 2},
+                    "wide": {"bbox_mercator": {"minx": 0, "miny": 0,
+                                                "maxx": 100, "maxy": 100}},
+                    "detail": {"bbox_mercator": {"minx": 30, "miny": 20,
+                                                  "maxx": 80, "maxy": 70}}}
+        self.assertEqual(_detail_footprint(metadata), (.3, .3, .8, .8))
+
+    def test_3d_mode_reuses_map_and_moves_camera(self):
+        animation = {"output": {"width": 2160, "height": 3840,
+                                "duration_frames": 25},
+                     "keyframes": [
+                         {"frame": 0, "center": {"x": .5, "y": .5},
+                          "view_width": .3, "easing": "linear"},
+                         {"frame": 24, "center": {"x": .52, "y": .48},
+                          "view_width": .15, "easing": "smooth"}],
+                     "connections": []}
+        metadata = {"output": {"width": 3840, "height": 2160,
+                               "wide_factor": 2},
+                    "wide": {"bbox_mercator": {"minx": -1e6, "miny": -1e6,
+                                                "maxx": 1e6, "maxy": 1e6}},
+                    "countries": [{"iso3": "TST", "color": "#123456",
+                                   "border_color": "#ffffff",
+                                   "geometry_file": "geometry_TST.geojson"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            package = Path(tmp)
+            (package / "geometry_TST.geojson").write_text(json.dumps({
+                "type": "Feature", "properties": {}, "geometry": {
+                    "type": "Polygon", "coordinates": [[
+                        [0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]}}))
+            target = generate(package, metadata, animation, mode="3d")
+            content = target.read_text()
+        self.assertTrue(target.name.endswith("_3d.comp"))
+        self.assertIn('Map_3D_Satellite = ImagePlane3D', content)
+        self.assertIn('Map_3D_Detail = ImagePlane3D', content)
+        self.assertIn('MaterialInput = Input { SourceOp = "Map_Wide"', content)
+        self.assertIn('MaterialInput = Input { SourceOp = "Map_Detail"', content)
+        self.assertNotIn('Map_Raster_Layers = MultiMerge', content)
+        self.assertNotIn('Place_Detail = Transform', content)
+        self.assertIn('Map_3D_Camera = Camera3D', content)
+        self.assertIn('Map_3D_Renderer = Renderer3D', content)
+        self.assertIn('Country_Edit_01_Plane = ImagePlane3D', content)
+        self.assertIn('MaterialInput = Input { SourceOp = "Country_Edit_01_Mode"', content)
+        self.assertIn('SceneInput3 = Input { SourceOp = "Country_Edit_01_Plane"', content)
+        self.assertNotIn('Country_Vector_Canvas = Background', content)
+        self.assertIn('Width = Input { Value = 2160', content)
+        self.assertIn('Height = Input { Value = 3840', content)
+        self.assertNotIn('Map_Animation = Transform', content)
+        self.assertNotIn('Final_Composite = Merge', content)
+
     def test_browser_projection_at_every_frame(self):
         for output in [(2160, 3840), (1920, 1080), (1080, 1080)]:
             for easing in ["linear", "smooth"]:
@@ -275,6 +380,40 @@ class CameraProjectionTests(unittest.TestCase):
         self.assertIn('Name0 = Input { Value = "EDIT - base map only"', quality)
         self.assertIn(
             'Name1 = Input { Value = "RENDER - enable close-up imagery"', quality)
+
+    def test_3d_closeup_keeps_full_resolution_on_registered_plane(self):
+        metadata = {"output": {"width": 3840, "height": 2160, "wide_factor": 2},
+                    "wide": {"bbox_mercator": {"minx": 0, "miny": 0,
+                                                "maxx": 100, "maxy": 100}},
+                    "countries": []}
+        animation = {"output": {"width": 3840, "height": 2160,
+                                "duration_frames": 101},
+                     "keyframes": [
+                         {"frame": 0, "center": {"x": .5, "y": .5},
+                          "view_width": .5},
+                         {"frame": 50, "center": {"x": .5, "y": .5},
+                          "view_width": .12},
+                         {"frame": 100, "center": {"x": .5, "y": .5},
+                          "view_width": .5}], "connections": []}
+        with tempfile.TemporaryDirectory() as tmp:
+            image = Path(tmp) / "closeup.png"
+
+            def cached(_package, _metadata, _animation, plans):
+                for plan in plans:
+                    plan["image_path"] = image
+                return plans
+
+            with patch("fusion.generator.closeup_lod.ensure_images", side_effect=cached):
+                content = generate(Path(tmp), metadata, animation, mode="3d").read_text()
+        self.assertNotIn('Map_Raster_Layers = MultiMerge', content)
+        self.assertIn('Map_Closeup_01_0050_Loader = Loader', content)
+        self.assertIn('Map_Closeup_01_0050_Plane = ImagePlane3D', content)
+        self.assertIn('MaterialInput = Input { SourceOp = "Map_Closeup_01_0050_Fade"', content)
+        self.assertIn('SceneInput3 = Input { SourceOp = "Map_Closeup_01_0050_Plane"', content)
+        self.assertNotIn('Map_Raster_Layers = Merge', content)
+        self.assertIn('MaterialInput = Input { SourceOp = "Map_Wide"', content)
+        self.assertIn('MaterialInput = Input { SourceOp = "Map_Detail"', content)
+        self.assertNotIn('Map_Animation = Transform', content)
 
     def test_closeup_imagery_and_shape_territory_share_final_working_canvas(self):
         geometry = {"type": "Polygon", "coordinates": [[

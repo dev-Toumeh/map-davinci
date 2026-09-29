@@ -44,23 +44,39 @@ Then open **http://127.0.0.1:8787** in a browser.
 | `json/animation.json` | Saved 2D view keyframes, timing, FPS, easing, regions, and commentary references |
 | `data/` | Country and sub-territory GeoJSON used by native Fusion polygon masks |
 | `sounds/` | Uploaded narration, music, and other audio used by the animation |
-| `fusion/scene_vNNN.comp` | Versioned editable 2D Fusion graph; every Generate action creates a new version |
+| `fusion/scene_vNNN.comp` | Versioned editable 2D Fusion graph |
+| `fusion/scene_vNNN_3d.comp` | Versioned Fusion scene with map planes and an animated 3D camera |
+| `videos/` | Folder for rendered videos from the project |
 
 Repeated names use numeric suffixes: `saudi_arabia`, `saudi_arabia_2`,
 `saudi_arabia_3`, and so on. Existing flat packages remain supported.
-Generated compositions have a Color/Flag switch for each whole country. Color
-is the default, and sub-territories retain their saved colors. Flag textures
+Generated compositions have a Color/Flag switch for each whole country. Flag
+is the default when an asset is available, and all Edit territory controls start
+enabled. Sub-territories retain their saved colors. Flag textures
 use the pinned Flag Icons v7.5.0 SVGs in `resources/flag_icons/` and are created
 inside the package when a new composition is generated. If a flag is unavailable,
 the generation result reports that its color fill was kept. On macOS, CairoSVG
 also needs the Homebrew `cairo` library (`brew install cairo`).
 
-## 2D animation editor
+## Animation editor
 
 The editor is available after an export through **Animate this export**, or directly
 at `http://127.0.0.1:8787/static/animation.html`. It supports source-matched
 landscape output plus vertical Full HD (1080×1920) and 4K (2160×3840) targets.
-The Fusion generator creates an explicit final canvas at the selected dimensions,
+Choose **3D camera scene** (the default) or **2D map animation** beside Generate Fusion.
+Both choices use the same saved map assets and create a new composition version.
+The 3D scene places the saved wide and detail satellite images on separate
+registered planes, followed by any close-up and locally rendered territory
+planes. Each territory mask and border uses a canvas fitted to its own bounds;
+the scene camera uses the shot's pan and zoom keys and adds a mild perspective orbit.
+In Fusion Flow, all satellite images form one horizontal row above the territory
+groups, even when a shot has many close-ups.
+It supports the selected horizontal or vertical output dimensions. When a shot
+zooms beyond the saved detail image's useful resolution, the 3D generator places
+a locally cached close-up satellite image on its own registered 3D plane and
+fades it in around that view. The 3D generator stops if the shot contains map
+connections, which do not yet follow the 3D camera.
+The 2D generator creates an explicit final canvas at the selected dimensions,
 so the landscape source map cannot force a portrait timeline back to 16:9.
 
 Keyframes store a time, view center, zoom, and easing *into* that keyframe. Smooth

@@ -10,9 +10,10 @@ JSON_DIR = Path("json")
 DATA_DIR = Path("data")
 SOUNDS_DIR = Path("sounds")
 FUSION_DIR = Path("fusion")
+VIDEOS_DIR = Path("videos")
 CLOSEUPS_DIR = IMAGES_DIR / "closeups"
 LEGACY_CLOSEUPS_DIR = Path("closeups")
-STRUCTURED_DIRS = (IMAGES_DIR, JSON_DIR, DATA_DIR, SOUNDS_DIR, FUSION_DIR)
+STRUCTURED_DIRS = (IMAGES_DIR, JSON_DIR, DATA_DIR, SOUNDS_DIR, FUSION_DIR, VIDEOS_DIR)
 
 METADATA_FILE = JSON_DIR / "metadata.json"
 ANIMATION_FILE = JSON_DIR / "animation.json"
@@ -33,7 +34,7 @@ def manifest() -> dict:
         "directories": {
             "images": str(IMAGES_DIR), "json": str(JSON_DIR),
             "data": str(DATA_DIR), "sounds": str(SOUNDS_DIR),
-            "fusion": str(FUSION_DIR),
+            "fusion": str(FUSION_DIR), "videos": str(VIDEOS_DIR),
         },
         "files": {"metadata": str(METADATA_FILE), "animation": str(ANIMATION_FILE)},
     }
@@ -50,7 +51,7 @@ def default_assets() -> dict:
 def legacy_manifest() -> dict:
     return {
         "version": 1,
-        "directories": {"fusion": str(FUSION_DIR)},
+        "directories": {"fusion": str(FUSION_DIR), "videos": str(VIDEOS_DIR)},
         "files": {"metadata": str(LEGACY_METADATA_FILE),
                   "animation": str(LEGACY_ANIMATION_FILE)},
     }

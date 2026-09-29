@@ -25,6 +25,8 @@ class PackageLayoutTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             package = Path(folder)
             package_layout.create(package)
+            self.assertTrue((package / "videos").is_dir())
+            self.assertEqual(package_layout.manifest()["directories"]["videos"], "videos")
             metadata = {
                 "package_layout": package_layout.manifest(),
                 "assets": package_layout.default_assets(),

@@ -27,6 +27,7 @@ class CloseupLodTests(unittest.TestCase):
 
     def test_only_deep_zoom_creates_a_closeup(self):
         self.assertEqual(plan_closeups(self.metadata(), self.animation(.05)), [])
+        self.assertEqual(len(plan_closeups(self.metadata(), self.animation(.05), 3.0)), 1)
         plans = plan_closeups(self.metadata(), self.animation(.01))
         self.assertEqual(len(plans), 1)
         self.assertEqual(plans[0]["frame"], 50)

@@ -71,8 +71,8 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("Country_Mode_Switch = Switch", text)
         self.assertIn('LINKS_Name = "USA - Entire country"', text)
         self.assertIn('LINKS_Name = "USA - Texas Annexation"', text)
-        self.assertIn('Expression = "Country_Edit_Controller.Show_01"', text)
-        self.assertIn('Expression = "Country_Edit_Controller.Show_02"', text)
+        self.assertIn('Expression = "1 - Country_Edit_Controller.Show_01"', text)
+        self.assertIn('Expression = "1 - Country_Edit_Controller.Show_02"', text)
         self.assertIn('SourceOp = "Country_Edit_01_Enabled"', text)
         self.assertIn('SourceOp = "Country_Edit_02_Enabled"', text)
         deployment = text.split("Country_Deployment = MultiMerge", 1)[1].split(
@@ -134,11 +134,28 @@ class RegionLayerTests(unittest.TestCase):
         edit = text.split("Country_Edit_Controller = CustomTool", 1)[1].split(
             "Country_Deployment = MultiMerge", 1)[0]
         self.assertIn('Show_01 = Input { Value = 1', edit)
-        self.assertIn('Show_02 = Input { Value = 0', edit)
+        self.assertIn('Show_02 = Input { Value = 1', edit)
+        controller = edit.split('USA_Flag_Adjust = CustomTool', 1)[0]
+        self.assertNotIn('INP_Default = 0', controller)
+        flag_switches = re.findall(
+            r'([A-Z]{3}_Flag_Color_Flag = Switch).*?Which = Input \{ Value = (\d)',
+            edit, re.S)
+        self.assertEqual(flag_switches, [
+            ('USA_Flag_Color_Flag = Switch', '0'),
+            ('CAN_Flag_Color_Flag = Switch', '0'),
+        ])
         self.assertIn('LINKS_Name = "USA - Entire country"', edit)
         self.assertIn('LINKS_Name = "CAN - Entire country"', edit)
         self.assertIn('Country_Edit_01_Enabled = Switch', edit)
         self.assertIn('Country_Edit_02_Enabled = Switch', edit)
+        for index in (1, 2):
+            enabled = edit.split(f'Country_Edit_{index:02d}_Enabled = Switch', 1)[1].split(
+                'ViewInfo', 1)[0]
+            self.assertIn(f'Input0 = Input {{ SourceOp = "', enabled)
+            self.assertIn('Name1 = Input { Value = "OFF"', enabled)
+            self.assertIn(
+                f'Which = Input {{ Expression = "1 - Country_Edit_Controller.Show_{index:02d}"',
+                enabled)
         selected = text.split("Country_Edit_Selected = MultiMerge", 1)[1].split(
             "Country_Mode_Switch = Switch", 1)[0]
         self.assertIn('SourceOp = "Country_Edit_01_Enabled"', selected)
@@ -148,6 +165,45 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn('SourceOp = "USA_Flag_Color_Flag"', deployment)
         self.assertIn('SourceOp = "CAN_Flag_Color_Flag"', deployment)
         self.assertEqual(text.count("Country_Mode_Switch = Switch"), 1)
+
+    def test_3d_countries_keep_independent_local_masks_and_flag_switches(self):
+        metadata = self.metadata()
+        metadata["countries"].append({
+            "iso3": "CAN", "color": "#ff0000", "border_color": "#ffffff",
+            "geometry_file": "geometry_CAN.geojson",
+        })
+        animation = normalize_animation(self.base_animation(), metadata)
+        with tempfile.TemporaryDirectory() as folder:
+            package = Path(folder)
+            for iso3 in ("USA", "CAN"):
+                (package / f"geometry_{iso3}.geojson").write_text(
+                    json.dumps({"geometry": GEOMETRY}))
+            content = generate(package, metadata, animation, mode="3d").read_text()
+        self.assertNotIn("Map_3D_Country = ImagePlane3D", content)
+        self.assertNotIn("Country_Vector_Canvas = Background", content)
+        self.assertIn("Country_Edit_01_Local = sTransform", content)
+        self.assertIn("Country_Edit_02_Local = sTransform", content)
+        self.assertIn("Country_Edit_01_Plane = ImagePlane3D", content)
+        self.assertIn("Country_Edit_02_Plane = ImagePlane3D", content)
+        self.assertIn('SceneInput3 = Input { SourceOp = "Country_Edit_01_Plane"', content)
+        self.assertIn('SceneInput4 = Input { SourceOp = "Country_Edit_02_Plane"', content)
+        self.assertIn("Country_Mode_Switch = CustomTool", content)
+        self.assertEqual(content.count('Expression = "Country_Mode_Switch.Deployment"'), 2)
+        for index in (1, 2):
+            self.assertIn(f'Show_{index:02d} = Input {{ Value = 1', content)
+            enabled = content.split(f"Country_Edit_{index:02d}_Enabled = Switch", 1)[1].split(
+                "ViewInfo", 1)[0]
+            self.assertIn(
+                f'Which = Input {{ Expression = "1 - Country_Edit_Controller.Show_{index:02d}"',
+                enabled)
+            self.assertIn('Input0 = Input { SourceOp = "', enabled)
+            self.assertIn(f'Input1 = Input {{ SourceOp = "Country_Edit_{index:02d}_Canvas"', enabled)
+            self.assertIn(f'Name1 = Input {{ Value = "OFF"', enabled)
+        for iso3 in ("USA", "CAN"):
+            switch = content.split(f"{iso3}_Flag_Color_Flag = Switch", 1)[1].split(
+                "ViewInfo", 1)[0]
+            self.assertIn("Which = Input { Value = 0", switch)
+            self.assertIn('Name0 = Input { Value = "Flag"', switch)
 
     def test_small_exterior_islands_are_retained_but_disconnected(self):
         metadata = self.metadata()

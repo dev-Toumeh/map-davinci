@@ -1,0 +1,29 @@
+{
+	Tools = ordered() {
+		MacroTool1 = MacroOperator {
+			CtrlWZoom = false,
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "Country_Edit_01_Enabled",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				Country_Edit_01_Enabled = Switch {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Which = Input { Expression = "Country_Edit_Controller.Show_01", },
+						Name0 = Input { Value = "OFF", },
+						Name1 = Input { Value = "PAK - Entire country", }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1550, 360 } },
+					Colors = { TileColor = { R = 0.725490196078431, G = 0.690196078431373, B = 0.592156862745098 }, }
+				}
+			},
+		}
+	},
+	ActiveTool = "MacroTool1"
+}

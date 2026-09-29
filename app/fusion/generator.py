@@ -1,7 +1,7 @@
-"""Generate an editable 2D Fusion composition for a map-video shot.
+"""Generate editable 2D or 3D Fusion compositions for a map-video shot.
 
-Satellite imagery remains raster. Country highlights remain native Fusion
-Shape geometry until the final camera-aware render.
+Satellite imagery remains raster. Country highlights retain native Fusion
+Shape geometry and are rendered on local plates for 3D scenes.
 """
 from __future__ import annotations
 
@@ -59,6 +59,14 @@ EDIT_SWITCH_X = 1570
 EDIT_SELECTED_X = 1800
 EDIT_CONTROLLER_X = 2020
 EDIT_MODE_X = 2040
+# Satellite sources form one horizontal lane above the territory groups in 3D.
+# Keep the source, optional fade, and plane in the same column.
+IMAGERY_START_X = 500
+IMAGERY_COLUMN_STEP = 500
+IMAGERY_SOURCE_Y = -1080
+IMAGERY_FADE_Y = -820
+IMAGERY_PLANE_Y = -540
+IMAGERY_PLANE_OFFSET_X = 160
 SWITCH_TILE_COLOR = (0.572549019608, 0.572549019608, 0.572549019608)
 
 
@@ -308,10 +316,13 @@ def _rgb(hex_color: str) -> tuple[float, float, float]:
 
 
 def _switch_tool(name: str, inputs: list[tuple[str, str]], pos: tuple[int, int],
-                 which_expression: str | None = None) -> str:
+                 which_expression: str | None = None,
+                 default_index: int = 0) -> str:
     """Serialize a native Fusion Switch with named image inputs."""
     if not inputs:
         raise ValueError(f"{name} requires at least one input")
+    if not 0 <= default_index < len(inputs):
+        raise ValueError(f"{name} has invalid default input {default_index}")
     lines = [
         f"\t\t{name} = Switch {{",
         "\t\t\tNameSet = true,",
@@ -322,7 +333,7 @@ def _switch_tool(name: str, inputs: list[tuple[str, str]], pos: tuple[int, int],
         lines.append(
             f'\t\t\t\tWhich = Input {{ Expression = "{which_expression}", }},')
     else:
-        lines.append("\t\t\t\tWhich = Input { Value = 0, },")
+        lines.append(f"\t\t\t\tWhich = Input {{ Value = {default_index}, }},")
     for index, (label, source) in enumerate(inputs, 1):
         safe_label = str(label).replace('"', "'")
         lines.extend([
@@ -343,7 +354,7 @@ def _switch_tool(name: str, inputs: list[tuple[str, str]], pos: tuple[int, int],
 def _checkbox_controller(name: str, labels: list[str], pos: tuple[int, int]) -> str:
     """Serialize a CustomTool containing one independent territory checkbox."""
     inputs = "\n".join(
-        f'\t\t\t\tShow_{index:02d} = Input {{ Value = {1 if index == 1 else 0}, }},'
+        f'\t\t\t\tShow_{index:02d} = Input {{ Value = 1, }},'
         for index in range(1, len(labels) + 1))
     controls = []
     for index, label in enumerate(labels, 1):
@@ -352,7 +363,7 @@ def _checkbox_controller(name: str, labels: list[str], pos: tuple[int, int]) -> 
 \t\t\t\t\tLINKID_DataType = "Number",
 \t\t\t\t\tINPID_InputControl = "CheckboxControl",
 \t\t\t\t\tLINKS_Name = "{safe_label}",
-\t\t\t\t\tINP_Default = {1 if index == 1 else 0},
+\t\t\t\t\tINP_Default = 1,
 \t\t\t\t}},''')
     return f'''\t\t{name} = CustomTool {{
 \t\t\tNameSet = true,
@@ -549,16 +560,23 @@ def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]
 
 def _shape_camera_render(name: str, source: str, duration: int,
                          canvas_width: int, canvas_height: int,
-                         y_aspect: float, pos: tuple[int, int]) -> tuple[str, str]:
+                         y_aspect: float, pos: tuple[int, int],
+                         static_map: bool = False) -> tuple[str, str]:
     """Move Shape geometry with the map camera, then rasterize it once."""
     camera, render = name + "_Camera", name + "_Render"
+    x_offset = 'Value = 0' if static_map else 'Expression = "Map_Animation.Center.X - 0.5"'
+    y_offset = ('Value = 0' if static_map else
+                f'Expression = "(Map_Animation.Center.Y - 0.5) * {y_aspect:.12g}"')
+    x_size = 'Value = 1' if static_map else 'Expression = "Map_Animation.Size"'
+    y_size = (f'Value = {y_aspect:.12g}' if static_map else
+              f'Expression = "Map_Animation.Size * {y_aspect:.12g}"')
     return f'''\t\t{camera} = sTransform {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
-\t\t\t\tXOffset = Input {{ Expression = "Map_Animation.Center.X - 0.5", }},
-\t\t\t\tYOffset = Input {{ Expression = "(Map_Animation.Center.Y - 0.5) * {y_aspect:.12g}", }},
-\t\t\t\tXSize = Input {{ Expression = "Map_Animation.Size", }},
-\t\t\t\tYSize = Input {{ Expression = "Map_Animation.Size * {y_aspect:.12g}", }},
+\t\t\t\tXOffset = Input {{ {x_offset}, }},
+\t\t\t\tYOffset = Input {{ {y_offset}, }},
+\t\t\t\tXSize = Input {{ {x_size}, }},
+\t\t\t\tYSize = Input {{ {y_size}, }},
 \t\t\t\tInput = Input {{ SourceOp = "{source}", Source = "Output", }}
 \t\t\t}},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ {pos[0]}, {pos[1]} }} }},
@@ -574,6 +592,36 @@ def _shape_camera_render(name: str, source: str, duration: int,
 \t\t\t}},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ {pos[0] + 220}, {pos[1]} }} }},
 \t\t}},''', render
+
+
+def _territory_plane_footprint(rings: list[tuple[int, list[tuple[float, float]]]],
+                               native: dict, out: dict, samples: list[dict],
+                               warnings: list[str] | None, label: str) -> dict:
+    """Fit a local render canvas around the visible territory geometry."""
+    points = [point for level, ring in rings if level > 0 for point in ring]
+    if not points:
+        raise ValueError(f"{label} has no exterior polygon")
+    x0, x1 = min(x for x, _ in points) + .5, max(x for x, _ in points) + .5
+    y0, y1 = .5 - max(y for _, y in points), .5 - min(y for _, y in points)
+    pad_x = max((x1 - x0) * .04, 2 / native["width"])
+    pad_y = max((y1 - y0) * .04, 2 / native["height"])
+    x0, x1 = x0 - pad_x, x1 + pad_x
+    y0, y1 = y0 - pad_y, y1 + pad_y
+    bw, bh = x1 - x0, y1 - y0
+    aspect = bw * native["width"] / (bh * native["height"])
+    max_zoom = max(sample["zoom"] for sample in samples)
+    projected_width = bw * native["width"] * max_zoom
+    render_width = max(1024, math.ceil(projected_width * 1.05))
+    render_height = max(1, round(render_width / aspect))
+    cap = 3840
+    if max(render_width, render_height) > cap:
+        factor = cap / max(render_width, render_height)
+        render_width = max(1, round(render_width * factor))
+        render_height = max(1, round(render_height * factor))
+        if warnings is not None:
+            warnings.append(f"{label}: 3D territory texture capped at {cap}px; edges may soften at maximum zoom")
+    return {"bbox": (x0, y0, x1, y1), "width": render_width,
+            "height": render_height}
 
 
 def _fit_camera_handles(samples: list[dict], start: dict, end: dict,
@@ -737,15 +785,263 @@ def _camera_samples(animation: dict, native: dict) -> list[dict]:
 
 
 
+def _detail_footprint(metadata: dict) -> tuple[float, float, float, float]:
+    """Locate the saved detail image within the saved wide map."""
+    wide = metadata.get("wide", {}).get("bbox_mercator")
+    detail = metadata.get("detail", {}).get("bbox_mercator")
+    if wide and detail:
+        dx = wide["maxx"] - wide["minx"]
+        dy = wide["maxy"] - wide["miny"]
+        if dx > 0 and dy > 0:
+            return ((detail["minx"] - wide["minx"]) / dx,
+                    (wide["maxy"] - detail["maxy"]) / dy,
+                    (detail["maxx"] - wide["minx"]) / dx,
+                    (wide["maxy"] - detail["miny"]) / dy)
+    factor = float(metadata["output"]["wide_factor"])
+    margin = (1 - 1 / factor) / 2
+    return margin, margin, 1 - margin, 1 - margin
+
+
+def _imagery_column_x(index: int) -> int:
+    """One unwrapped column per satellite image: wide, detail, close-ups."""
+    return IMAGERY_START_X + index * IMAGERY_COLUMN_STEP
+
+
+def _three_d_scene_x(closeup_count: int) -> int:
+    """Leave room to the right of the final satellite plane."""
+    return max(2860, _imagery_column_x(closeup_count + 1) + 520)
+
+
+def _three_d_country_nodes(territories: list[dict], flag_plans: list[dict],
+                           native: dict, out: dict, duration: int) -> tuple[str, list[str]]:
+    """Render every territory in its own local texture before the 3D camera."""
+    nodes = [_checkbox_controller(
+        "Country_Edit_Controller", [plan["label"] for plan in territories],
+        (EDIT_CONTROLLER_X, 530))]
+    nodes.append('''\t\tCountry_Mode_Switch = CustomTool { NameSet = true,
+\t\t\tInputs = { Deployment = Input { Value = 0, }, },
+\t\t\tUserControls = ordered() { Deployment = {
+\t\t\t\tLINKID_DataType = "Number", INPID_InputControl = "CheckboxControl",
+\t\t\t\tLINKS_Name = "Deployment mode", INP_Default = 0,
+\t\t\t}, },
+\t\t\tViewInfo = OperatorInfo { Pos = { 2040, 445 } }, },''')
+    plane_names = []
+    source_aspect = native["width"] / native["height"]
+    for index, plan in enumerate(territories, 1):
+        base = f"Country_Edit_{index:02d}"
+        x0, y0, x1, y1 = plan["footprint"]["bbox"]
+        bw, bh = x1 - x0, y1 - y0
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        width, height = plan["footprint"]["width"], plan["footprint"]["height"]
+        y_scale = height / width / bh
+        row = plan["row"]
+        nodes.append(f'''\t\t{base}_Canvas = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 230, {row} }} }}, }},
+\t\t{base}_Local = sTransform {{ NameSet = true, Inputs = {{
+\t\t\t\tXOffset = Input {{ Value = {-(cx - .5) / bw:.12g}, }},
+\t\t\t\tYOffset = Input {{ Value = {-(.5 - cy) * y_scale:.12g}, }},
+\t\t\t\tXSize = Input {{ Value = {1 / bw:.12g}, }},
+\t\t\t\tYSize = Input {{ Value = {y_scale:.12g}, }},
+\t\t\t\tInput = Input {{ SourceOp = "{plan['shape_source']}", Source = "Output", }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {row} }} }}, }},
+\t\t{base}_Render = sRender {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Input = Input {{ SourceOp = "{base}_Local", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 670, {row} }} }}, }},''')
+        render_output = f"{base}_Render"
+        matching = next((flag for flag in flag_plans if flag["edit_index"] == index), None)
+        if matching:
+            prefix = f"{matching['iso3']}_Flag"
+            placement = matching["placement"]
+            flag_cx, flag_cy = placement["center_x"], placement["center_y"]
+            center_expression = (
+                f"Point(0.5 + ({flag_cx:.12g} - {cx:.12g} + {prefix}_Adjust.Offset_X) / {bw:.12g}, "
+                f"0.5 + ({cy:.12g} - {flag_cy:.12g} + {prefix}_Adjust.Offset_Y) * {y_scale:.12g})")
+            size_expression = (
+                f"{prefix}_Adjust.Scale * {width / (native['width'] * bw * placement['scale']):.12g}")
+            nodes.append(_flag_adjust_controller(f"{prefix}_Adjust", (650, row + 180)))
+            nodes.append(f'''\t\t{prefix}_Loader = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(matching['texture'])}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {row + 80} }} }}, }},
+\t\t{prefix}_Masked_On_Working_Canvas = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{base}_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Loader", Source = "Output", }}, Center = Input {{ Expression = "{center_expression}", }}, Size = Input {{ Expression = "{size_expression}", }}, Blend = Input {{ Expression = "{prefix}_Adjust.Opacity", }}, EffectMask = Input {{ SourceOp = "{base}_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 850, {row + 100} }} }}, }},''')
+            border_inputs = "\n".join(
+                f'\t\t\t\tInput{border_index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
+                for border_index, source in enumerate(matching["border_sources"], 1))
+            nodes.append(f'''\t\t{prefix}_Border_Geometry = sMerge {{ NameSet = true, Inputs = {{
+{border_inputs}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {row + 220} }} }}, }},
+\t\t{prefix}_Border_Local = sTransform {{ NameSet = true, Inputs = {{ XOffset = Input {{ Value = {-(cx - .5) / bw:.12g}, }}, YOffset = Input {{ Value = {-(.5 - cy) * y_scale:.12g}, }}, XSize = Input {{ Value = {1 / bw:.12g}, }}, YSize = Input {{ Value = {y_scale:.12g}, }}, Input = Input {{ SourceOp = "{prefix}_Border_Geometry", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 670, {row + 220} }} }}, }},
+\t\t{prefix}_Border_Render = sRender {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {width}, }}, Height = Input {{ Value = {height}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, Input = Input {{ SourceOp = "{prefix}_Border_Local", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 890, {row + 220} }} }}, }},
+\t\t{prefix}_With_Border = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{prefix}_Masked_On_Working_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Border_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1150, {row + 100} }} }}, }},''')
+            switch_name = f"{prefix}_Color_Flag"
+            nodes.append(_switch_tool(switch_name, [
+                ("Flag", f"{prefix}_With_Border"), ("Color", render_output)],
+                (1330, row)))
+            render_output = switch_name
+        enabled_name = f"{base}_Enabled"
+        nodes.append(_switch_tool(enabled_name, [
+            (plan["label"], render_output), ("OFF", f"{base}_Canvas")],
+            (1550, row), f"1 - Country_Edit_Controller.Show_{index:02d}"))
+        mode_name = f"{base}_Mode"
+        nodes.append(_switch_tool(mode_name, [
+            ("EDIT", enabled_name), ("DEPLOYMENT", render_output)],
+            (1800, row), "Country_Mode_Switch.Deployment"))
+        plane_name = f"{base}_Plane"
+        nodes.append(f'''\t\t{plane_name} = ImagePlane3D {{ NameSet = true, Inputs = {{
+\t\t\t\t["Transform3DOp.Scale.X"] = Input {{ Value = {4 * bw:.12g}, }},
+\t\t\t\t["Transform3DOp.Scale.Y"] = Input {{ Value = {4 / source_aspect * bh * width / height:.12g}, }},
+\t\t\t\t["Transform3DOp.Scale.Z"] = Input {{ Value = {4 * bw:.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.X"] = Input {{ Value = {4 * (cx - .5):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.Y"] = Input {{ Value = {4 / source_aspect * (.5 - cy):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.Z"] = Input {{ Value = {0.001 + index * .00001:.12g}, }},
+\t\t\t\tMaterialInput = Input {{ SourceOp = "{mode_name}", Source = "Output", }},
+\t\t\t\t["MtlStdInputs.UseTwoSidedLighting"] = Input {{ Value = 1, }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 2420, {row} }} }}, }},''')
+        plane_names.append(plane_name)
+    return "\n".join(nodes), plane_names
+
+
+def _three_d_nodes(samples: list[dict], duration: int, native: dict, out: dict,
+                   country_planes: list[str], closeups: list[dict],
+                   detail_footprint: tuple[float, float, float, float]) -> str:
+    """Place existing map layers on registered planes and animate a 3D camera."""
+    plane_width = 4.0
+    source_aspect = native["width"] / native["height"]
+    output_aspect = out["width"] / out["height"]
+    half_fov = math.tan(math.radians(12.0))
+    first, last = samples[0]["frame"], samples[-1]["frame"]
+    selected = [sample for sample in samples
+                if sample["frame"] % 4 == 0 or sample["frame"] in (first, last)]
+    values = {axis: [] for axis in ("X", "Y", "Z", "Target_X", "Target_Y")}
+    for sample in selected:
+        frame = sample["frame"]
+        zoom = sample["zoom"]
+        path = sample["fusion_path"]
+        target_x = -path["x"] / zoom * plane_width
+        target_y = -path["y"] / zoom * plane_width / source_aspect
+        view_width = out["width"] / native["width"] / zoom
+        distance = plane_width * view_width / (2 * half_fov * output_aspect)
+        progress = (frame - first) / max(1, last - first)
+        orbit = math.sin(math.pi * progress)
+        positions = {
+            "X": target_x + distance * 0.08 * orbit,
+            "Y": target_y - distance * 0.16 * orbit,
+            "Z": distance,
+            "Target_X": target_x,
+            "Target_Y": target_y,
+        }
+        for axis, value in positions.items():
+            values[axis].append(
+                f'\t\t\t\t[{frame}] = {{ {value:.12g}, Flags = {{ Linear = true }} }},')
+    splines = "\n".join(
+        f'\t\tMap_3D_Camera_{axis} = BezierSpline {{ KeyFrames = {{\n'
+        + "\n".join(values[axis]) + '\n\t\t\t} },'
+        for axis in values)
+    plane_scale = '\n'.join(
+        f'\t\t\t\t["Transform3DOp.Scale.{axis}"] = Input {{ Value = {plane_width}, }},'
+        for axis in "XYZ")
+    scene_x = _three_d_scene_x(len(closeups))
+    closeup_nodes = []
+    closeup_inputs = []
+    for index, plan in enumerate(closeups, 1):
+        node = f'Map_Closeup_{index:02d}_{plan["frame"]:04d}'
+        column_x = _imagery_column_x(index + 1)
+        x0, y0, x1, y1 = plan["normalized_bbox"]
+        center_x, center_y = (x0 + x1) / 2, (y0 + y1) / 2
+        scale = plane_width * (x1 - x0)
+        expected_height = plane_width / source_aspect * (y1 - y0)
+        actual_height = scale / output_aspect
+        if abs(actual_height - expected_height) > 0.0001:
+            raise ValueError("close-up image does not match its geographic bounds")
+        visibility = {0: 0, plan["first"]: 0, plan["full_first"]: 1,
+                      plan["full_last"]: 1, plan["last"]: 0, duration: 0}
+        visibility_lines = "\n".join(
+            f'\t\t\t\t[{frame}] = {{ {value}, Flags = {{ Linear = true }} }},'
+            for frame, value in sorted(visibility.items()))
+        # Keep the texture at its full resolution until Renderer3D samples it.
+        # Compositing it into the base map first would shrink it to its small
+        # geographic footprint and discard the pixels needed at close zoom.
+        closeup_nodes.append(f'''\t\t{node}_Loader = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(plan["image_path"])}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {column_x}, {IMAGERY_SOURCE_Y} }} }}, }},
+\t\t{node}_Visibility = BezierSpline {{ KeyFrames = {{
+{visibility_lines}
+\t\t\t}} }},
+\t\t{node}_Transparent = Background {{ NameSet = true, Inputs = {{ GlobalOut = Input {{ Value = {duration}, }}, Width = Input {{ Value = {out['width']}, }}, Height = Input {{ Value = {out['height']}, }}, UseFrameFormatSettings = Input {{ Value = 0, }}, TopLeftAlpha = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {column_x - 80}, {IMAGERY_FADE_Y} }} }}, }},
+\t\t{node}_Fade = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{node}_Transparent", Source = "Output", }}, Foreground = Input {{ SourceOp = "{node}_Loader", Source = "Output", }}, Blend = Input {{ SourceOp = "{node}_Visibility", Source = "Value", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {column_x + IMAGERY_PLANE_OFFSET_X}, {IMAGERY_FADE_Y} }} }}, }},
+\t\t{node}_Plane = ImagePlane3D {{ NameSet = true, Inputs = {{
+\t\t\t\t["Transform3DOp.Scale.X"] = Input {{ Value = {scale:.12g}, }},
+\t\t\t\t["Transform3DOp.Scale.Y"] = Input {{ Value = {scale:.12g}, }},
+\t\t\t\t["Transform3DOp.Scale.Z"] = Input {{ Value = {scale:.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.X"] = Input {{ Value = {plane_width * (center_x - 0.5):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.Y"] = Input {{ Value = {plane_width / source_aspect * (0.5 - center_y):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.Z"] = Input {{ Value = 0.0005, }},
+\t\t\t\tMaterialInput = Input {{ SourceOp = "{node}_Fade", Source = "Output", }},
+\t\t\t\t["MtlStdInputs.UseTwoSidedLighting"] = Input {{ Value = 1, }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ {column_x + IMAGERY_PLANE_OFFSET_X}, {IMAGERY_PLANE_Y} }} }}, }},''')
+        closeup_inputs.append(f'\t\t\t\tSceneInput{index + 2} = Input {{ SourceOp = "{node}_Plane", Source = "Output", }},')
+    country_index = len(closeups) + 3
+    country_inputs = "".join(
+        f'\n\t\t\t\tSceneInput{country_index + index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
+        for index, source in enumerate(country_planes))
+    camera_index = country_index + len(country_planes)
+    closeup_scene_inputs = "\n" + "\n".join(closeup_inputs) if closeup_inputs else ""
+    detail_x0, detail_y0, detail_x1, detail_y1 = detail_footprint
+    detail_center_x = (detail_x0 + detail_x1) / 2
+    detail_center_y = (detail_y0 + detail_y1) / 2
+    return f'''{splines}
+{chr(10).join(closeup_nodes)}
+\t\tMap_3D_Satellite = ImagePlane3D {{ NameSet = true, Inputs = {{
+{plane_scale}
+\t\t\t\tMaterialInput = Input {{ SourceOp = "Map_Wide", Source = "Output", }},
+\t\t\t\t["MtlStdInputs.UseTwoSidedLighting"] = Input {{ Value = 1, }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ {_imagery_column_x(0) + IMAGERY_PLANE_OFFSET_X}, {IMAGERY_PLANE_Y} }} }}, }},
+\t\tMap_3D_Detail = ImagePlane3D {{ NameSet = true, Inputs = {{
+\t\t\t\t["Transform3DOp.Scale.X"] = Input {{ Value = {plane_width * (detail_x1 - detail_x0):.12g}, }},
+\t\t\t\t["Transform3DOp.Scale.Y"] = Input {{ Value = {plane_width * (detail_y1 - detail_y0):.12g}, }},
+\t\t\t\t["Transform3DOp.Scale.Z"] = Input {{ Value = {plane_width * (detail_x1 - detail_x0):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.X"] = Input {{ Value = {plane_width * (detail_center_x - 0.5):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.Y"] = Input {{ Value = {plane_width / source_aspect * (0.5 - detail_center_y):.12g}, }},
+\t\t\t\t["Transform3DOp.Translate.Z"] = Input {{ Value = 0.00025, }},
+\t\t\t\tMaterialInput = Input {{ SourceOp = "Map_Detail", Source = "Output", }},
+\t\t\t\t["MtlStdInputs.UseTwoSidedLighting"] = Input {{ Value = 1, }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ {_imagery_column_x(1) + IMAGERY_PLANE_OFFSET_X}, {IMAGERY_PLANE_Y} }} }}, }},
+\t\tMap_3D_Camera = Camera3D {{ NameSet = true, Inputs = {{
+\t\t\t\tAoV = Input {{ Value = 24, }},
+\t\t\t\t["Transform3DOp.Translate.X"] = Input {{ SourceOp = "Map_3D_Camera_X", Source = "Value", }},
+\t\t\t\t["Transform3DOp.Translate.Y"] = Input {{ SourceOp = "Map_3D_Camera_Y", Source = "Value", }},
+\t\t\t\t["Transform3DOp.Translate.Z"] = Input {{ SourceOp = "Map_3D_Camera_Z", Source = "Value", }},
+\t\t\t\t["Transform3DOp.UseTarget"] = Input {{ Value = 1, }},
+\t\t\t\t["Transform3DOp.Target.X"] = Input {{ SourceOp = "Map_3D_Camera_Target_X", Source = "Value", }},
+\t\t\t\t["Transform3DOp.Target.Y"] = Input {{ SourceOp = "Map_3D_Camera_Target_Y", Source = "Value", }},
+\t\t\t\t["Transform3DOp.Target.Z"] = Input {{ Value = 0, }},
+\t\t\t\t["Stereo.Mode"] = Input {{ Value = FuID {{ "Mono" }}, }},
+\t\t\t\tApertureW = Input {{ Value = {0.831496062992 * output_aspect / source_aspect:.12g}, }},
+\t\t\t\tApertureH = Input {{ Value = 0.467716535433, }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ {scene_x - 220}, 390 }} }}, }},
+\t\tMap_3D_Scene = Merge3D {{ NameSet = true, Inputs = {{
+\t\t\t\tSceneInput1 = Input {{ SourceOp = "Map_3D_Satellite", Source = "Output", }},
+\t\t\t\tSceneInput2 = Input {{ SourceOp = "Map_3D_Detail", Source = "Output", }},{closeup_scene_inputs}{country_inputs}
+\t\t\t\tSceneInput{camera_index} = Input {{ SourceOp = "Map_3D_Camera", Source = "Output", }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ {scene_x}, 100 }} }}, }},
+\t\tMap_3D_Renderer = Renderer3D {{ NameSet = true, CustomData = {{ ToolVersion = 2, }}, Inputs = {{
+\t\t\t\tGlobalOut = Input {{ Value = {duration}, }},
+\t\t\t\tWidth = Input {{ Value = {out['width']}, }},
+\t\t\t\tHeight = Input {{ Value = {out['height']}, }},
+\t\t\t\tUseFrameFormatSettings = Input {{ Value = 0, }},
+\t\t\t\tSceneInput = Input {{ SourceOp = "Map_3D_Scene", Source = "Output", }},
+\t\t\t\tRendererType = Input {{ Value = FuID {{ "RendererOpenGL" }}, }}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ {scene_x + 220}, 100 }} }}, }},'''
+
+
 def generate(package: Path, metadata: dict, animation: dict,
-             warnings: list[str] | None = None) -> Path:
+             warnings: list[str] | None = None, mode: str = "2d") -> Path:
+    if mode not in ("2d", "3d"):
+        raise ValueError("Fusion scene type must be 2d or 3d")
+    if mode == "3d" and animation.get("connections"):
+        raise ValueError("3D Fusion generation does not yet support map connections")
     out, native = animation["output"], metadata["output"]
     samples = _camera_samples(animation, native)
     authored_frames = {key["frame"] for key in animation["keyframes"]}
     keys = _camera_timing_keys(samples, authored_frames)
     duration, width, height = out["duration_frames"] - 1, native["width"], native["height"]
     output_width, output_height = out["width"], out["height"]
-    vector_width, vector_height = max(width, output_width), max(height, output_height)
+    # Country artwork uses the native map canvas in 3D; the 2D output canvas
+    # may be taller than the map for portrait shots.
+    vector_width, vector_height = ((width, height) if mode == "3d" else
+                                   (max(width, output_width), max(height, output_height)))
     vector_x_scale, vector_y_scale = width / vector_width, height / vector_height
     vector_controller = ""
     if animation.get("connections"):
@@ -770,14 +1066,21 @@ def generate(package: Path, metadata: dict, animation: dict,
         metadata, "satellite_wide", str(package_layout.LEGACY_SATELLITE_WIDE_FILE))
     detail_image = package / package_layout.asset_relative(
         metadata, "satellite_detail", str(package_layout.LEGACY_SATELLITE_DETAIL_FILE))
-    tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(wide_image)}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 0 }} }}, }},''']
-    # Detail remains a raster layer, geographically placed over the wide map.
+    wide_pos = ((_imagery_column_x(0), IMAGERY_SOURCE_Y) if mode == "3d"
+                else (-700, 0))
+    detail_pos = ((_imagery_column_x(1), IMAGERY_SOURCE_Y) if mode == "3d"
+                  else (-700, 130))
+    tools = [f'''\t\tMap_Wide = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(wide_image)}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {wide_pos[0]}, {wide_pos[1]} }} }}, }},''']
+    # In 3D, the detail Loader goes directly to its own plane at full resolution.
+    # In 2D, it remains a geographically placed raster layer.
     factor = float(native["wide_factor"])
-    tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(detail_image)}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -700, 130 }} }}, }},
-\t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
+    tools.append(f'''\t\tMap_Detail = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(detail_image)}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {detail_pos[0]}, {detail_pos[1]} }} }}, }},''')
+    if mode == "2d":
+        tools.append(f'''\t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
     vector_layers = []
     country_shape_sources: list[str] = []
     country_edit_inputs: list[tuple[str, str, int]] = []
+    territory_plans: list[dict] = []
     flag_plans: list[dict] = []
     countries = {country["iso3"]: country for country in metadata.get("countries", [])}
     groups = animation.get("region_groups")
@@ -840,8 +1143,15 @@ def generate(package: Path, metadata: dict, animation: dict,
                 elif warnings is not None:
                     warnings.append(f"{group['iso3']}: no matching flag asset; using color fill")
             safe_name = _territory_label(child).replace('"', "'")
-            country_edit_inputs.append(
-                (f"{group['iso3']} - {safe_name}", shape_output, row))
+            label = f"{group['iso3']} - {safe_name}"
+            country_edit_inputs.append((label, shape_output, row))
+            if mode == "3d":
+                active_rings = [rings[index - 1] for index in active_indexes]
+                territory_plans.append({
+                    "label": label, "shape_source": shape_output, "row": row,
+                    "footprint": _territory_plane_footprint(
+                        active_rings, native, out, samples, warnings, label),
+                })
             ring_rows = max(1, math.ceil(len(rings) / SHAPE_GRID_COLUMNS))
             row_cursor += 360 if grouped_optional else ring_rows * SHAPE_ROW_STEP + 140
         row_cursor += 80
@@ -851,8 +1161,14 @@ def generate(package: Path, metadata: dict, animation: dict,
                   if not connection.get("start") or not connection.get("end")]
     if incomplete:
         raise ValueError("Complete or delete these connections before generating Fusion: " + ", ".join(incomplete))
+    # The 3D plate is sampled before the camera; use a closer image as soon as
+    # the saved detail would be enlarged more than 3×. The older 2D path keeps
+    # its existing threshold and camera-space close-up branch.
+    planned_closeups = closeup_lod.plan_closeups(
+        metadata, animation, 3.0 if mode == "3d" else closeup_lod.MAX_DETAIL_MAGNIFICATION,
+        margin=0.20 if mode == "3d" else closeup_lod.CLOSEUP_MARGIN)
     closeup_plans = closeup_lod.ensure_images(
-        package, metadata, animation, closeup_lod.plan_closeups(metadata, animation))
+        package, metadata, animation, planned_closeups)
     for number, connection in enumerate(animation.get("connections", [])):
         connection_nodes, connection_layers = connection_tools(
             connection, width, height, duration, row_cursor + number * 180,
@@ -860,7 +1176,8 @@ def generate(package: Path, metadata: dict, animation: dict,
         tools.append(connection_nodes)
         vector_layers.append(connection_layers)
         layer_number += 2 if connection['line_style'] == 'solid' and connection['arrowhead'] else 1
-    tools.append(f'''\t\tMap_Raster_Layers = MultiMerge {{
+    if mode == "2d":
+        tools.append(f'''\t\tMap_Raster_Layers = MultiMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{ Background = Input {{ SourceOp = "Map_Wide", Source = "Output", }},
 \t\t\t\t["Layer1.Foreground"] = Input {{ SourceOp = "Place_Detail", Source = "Output", }},
@@ -870,7 +1187,7 @@ def generate(package: Path, metadata: dict, animation: dict,
 \t\t}},''')
     lod_nodes = []
     lod_source = "Map_Animation"
-    for index, plan in enumerate(closeup_plans, 1):
+    for index, plan in enumerate(closeup_plans if mode == "2d" else [], 1):
         local_samples = closeup_lod.local_samples(
             animation, plan["normalized_bbox"], plan["first"], plan["last"])
         local_keys = _camera_timing_keys(
@@ -899,7 +1216,9 @@ def generate(package: Path, metadata: dict, animation: dict,
 \t\t\t}} }},
 \t\t{node}_Composite = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{lod_source}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{node}_Animation", Source = "Output", }}, Blend = Input {{ SourceOp = "{node}_Visibility", Source = "Value", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {2390 + index * 120}, {-130 - index * 80} }} }}, }},''')
         lod_source = node + "_Composite"
-    if closeup_plans:
+    if mode == "3d":
+        map_source = "Map_Raster_Layers"
+    elif closeup_plans:
         lod_nodes.append(_switch_tool("Map_Quality_Switch", [
             ("EDIT - base map only", "Map_Animation"),
             ("RENDER - enable close-up imagery", lod_source),
@@ -907,7 +1226,12 @@ def generate(package: Path, metadata: dict, animation: dict,
         map_source = "Map_Quality_Switch"
     else:
         map_source = "Map_Animation"
-    if has_country_layers:
+    country_nodes = ""
+    country_planes: list[str] = []
+    if mode == "3d" and has_country_layers:
+        country_nodes, country_planes = _three_d_country_nodes(
+            territory_plans, flag_plans, native, out, duration)
+    if mode == "2d" and has_country_layers:
         canvas_width, canvas_height = vector_width, vector_height
         y_aspect = height / width
         edit_render_inputs = []
@@ -929,17 +1253,23 @@ def generate(package: Path, metadata: dict, animation: dict,
             center_x = placement["center_x"]
             center_y = placement["center_y"]
             texture_scale = placement["scale"]
-            center_expression = (
-                "Point(0.5 + (Map_Animation.Center.X - 0.5) + "
-                f"({center_x:.12g} - 0.5 + {prefix}_Adjust.Offset_X) * Map_Animation.Size, "
-                "0.5 + (Map_Animation.Center.Y - 0.5) * "
-                f"{y_aspect:.12g} + (0.5 - {center_y:.12g} + {prefix}_Adjust.Offset_Y) * "
-                f"{y_aspect:.12g} * Map_Animation.Size)"
-            )
+            if mode == "3d":
+                center_expression = (
+                    f"Point({center_x:.12g} + {prefix}_Adjust.Offset_X, "
+                    f"0.5 + (0.5 - {center_y:.12g} + {prefix}_Adjust.Offset_Y) * {y_aspect:.12g})")
+                size_expression = f"{prefix}_Adjust.Scale / {texture_scale:.12g}"
+            else:
+                center_expression = (
+                    "Point(0.5 + (Map_Animation.Center.X - 0.5) + "
+                    f"({center_x:.12g} - 0.5 + {prefix}_Adjust.Offset_X) * Map_Animation.Size, "
+                    "0.5 + (Map_Animation.Center.Y - 0.5) * "
+                    f"{y_aspect:.12g} + (0.5 - {center_y:.12g} + {prefix}_Adjust.Offset_Y) * "
+                    f"{y_aspect:.12g} * Map_Animation.Size)")
+                size_expression = f"Map_Animation.Size / {texture_scale:.12g} * {prefix}_Adjust.Scale"
             country_nodes.append(_flag_adjust_controller(
                 f"{prefix}_Adjust", (650, flag_y + 180)))
             country_nodes.append(f'''\t\t{prefix}_Loader = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(plan['texture'])}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {flag_y + 80} }} }}, }},
-\t\t{prefix}_Masked_On_Working_Canvas = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Loader", Source = "Output", }}, Center = Input {{ Expression = "{center_expression}", }}, Size = Input {{ Expression = "Map_Animation.Size / {texture_scale:.12g} * {prefix}_Adjust.Scale", }}, Blend = Input {{ Expression = "{prefix}_Adjust.Opacity", }}, EffectMask = Input {{ SourceOp = "Country_Edit_{plan['edit_index']:02d}_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 850, {flag_y + 100} }} }}, }},''')
+\t\t{prefix}_Masked_On_Working_Canvas = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Loader", Source = "Output", }}, Center = Input {{ Expression = "{center_expression}", }}, Size = Input {{ Expression = "{size_expression}", }}, Blend = Input {{ Expression = "{prefix}_Adjust.Opacity", }}, EffectMask = Input {{ SourceOp = "Country_Edit_{plan['edit_index']:02d}_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 850, {flag_y + 100} }} }}, }},''')
             border_inputs = "\n".join(
                 f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
                 for index, source in enumerate(plan["border_sources"], 1))
@@ -948,13 +1278,14 @@ def generate(package: Path, metadata: dict, animation: dict,
 \t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {flag_y + 220} }} }}, }},''')
             border_nodes, border_output = _shape_camera_render(
                 f"{prefix}_Border", f"{prefix}_Border_Geometry", duration,
-                canvas_width, canvas_height, y_aspect, (670, flag_y + 220))
+                canvas_width, canvas_height, y_aspect, (670, flag_y + 220),
+                static_map=mode == "3d")
             country_nodes.append(border_nodes)
         for index, (label, shape_source, country_y) in enumerate(country_edit_inputs, 1):
             render_nodes, render_output = _shape_camera_render(
                 f"Country_Edit_{index:02d}", shape_source, duration,
                 canvas_width, canvas_height, y_aspect,
-                (450, country_y))
+                (450, country_y), static_map=mode == "3d")
             country_nodes.append(render_nodes)
             matching = next((plan for plan in flag_plans if plan["edit_index"] == index), None)
             if matching:
@@ -963,17 +1294,17 @@ def generate(package: Path, metadata: dict, animation: dict,
                 country_nodes.append(f'''\t\t{flag_output} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{prefix}_Masked_On_Working_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Border_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1150, {country_y + 100} }} }}, }},''')
                 switch_name = f"{prefix}_Color_Flag"
                 country_nodes.append(_switch_tool(switch_name, [
-                    ("Color", render_output),
                     ("Flag", flag_output),
+                    ("Color", render_output),
                 ], (1330, country_y)))
                 render_output = switch_name
             deployment_render_inputs.append((label, render_output))
             select_name = f"Country_Edit_{index:02d}_Enabled"
             country_nodes.append(_switch_tool(select_name, [
-                ("OFF", "Country_Vector_Canvas"),
                 (label, render_output),
+                ("OFF", "Country_Vector_Canvas"),
             ], (1550, country_y),
-                f"Country_Edit_Controller.Show_{index:02d}"))
+                f"1 - Country_Edit_Controller.Show_{index:02d}"))
             edit_render_inputs.append((label, select_name))
         deployment_layers = "\n".join(
             f'''\t\t\t\t["Layer{index}.Foreground"] = Input {{ SourceOp = "{source}", Source = "Output", }},
@@ -1003,7 +1334,8 @@ def generate(package: Path, metadata: dict, animation: dict,
             ("EDIT MODE - checked countries and territories", "Country_Edit_Selected"),
             ("DEPLOYMENT - all countries and territories", deployment_output),
         ], (EDIT_MODE_X, 445)))
-        country_nodes.append(f'''\t\tMap_Working_Canvas = Merge {{
+        if mode == "2d":
+            country_nodes.append(f'''\t\tMap_Working_Canvas = Merge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{map_source}", Source = "Output", }} }},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ 2300, 50 }} }},
@@ -1016,9 +1348,11 @@ def generate(package: Path, metadata: dict, animation: dict,
         country_nodes = "\n".join(country_nodes)
         final_map_source = "Map_With_Countries"
     else:
-        country_nodes = ""
+        if mode == "2d":
+            country_nodes = ""
         final_map_source = map_source
-    tools.append(f'''\t\tMap_AnimationDisplacement = BezierSpline {{ KeyFrames = {{
+    if mode == "2d":
+        tools.append(f'''\t\tMap_AnimationDisplacement = BezierSpline {{ KeyFrames = {{
 {_key_lines(keys, samples, 'displacement')}
 \t\t\t}} }},
 \t\tMap_AnimationSize = BezierSpline {{ KeyFrames = {{
@@ -1037,6 +1371,14 @@ def generate(package: Path, metadata: dict, animation: dict,
 {chr(10).join(vector_layers)}
 \t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 3080, 0 }} }}, }},
 \t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 3310, 0 }} }}, }},''')
+    else:
+        tools.append(country_nodes)
+        tools.append(_three_d_nodes(samples, duration, native, out,
+                                    country_planes,
+                                    closeup_plans, _detail_footprint(metadata)))
+        scene_x = _three_d_scene_x(len(closeup_plans))
+        tools.append(f'''\t\tVector_Layers = MultiMerge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Map_3D_Renderer", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {scene_x + 440}, 0 }} }}, }},
+\t\tMediaOut1 = MediaOut {{ Inputs = {{ Input = Input {{ SourceOp = "Vector_Layers", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ {scene_x + 660}, 0 }} }}, }},''')
     content = f'''Composition {{
 \tCurrentTime = 0, RenderRange = {{ 0, {duration} }}, GlobalRange = {{ 0, {duration} }},
 \tTools = {{
@@ -1047,7 +1389,8 @@ def generate(package: Path, metadata: dict, animation: dict,
     fusion_dir = package / package_layout.FUSION_DIR
     fusion_dir.mkdir(exist_ok=True)
     versions = [int(m.group(1)) for path in fusion_dir.glob("scene_v*.comp")
-                if (m := re.fullmatch(r"scene_v(\d+)\.comp", path.name))]
-    target = fusion_dir / f"scene_v{max(versions, default=0) + 1:03d}.comp"
+                if (m := re.fullmatch(r"scene_v(\d+)(?:_[A-Za-z0-9_-]+)?\.comp", path.name))]
+    suffix = "_3d" if mode == "3d" else ""
+    target = fusion_dir / f"scene_v{max(versions, default=0) + 1:03d}{suffix}.comp"
     target.write_text(content, encoding="utf-8")
     return target

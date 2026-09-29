@@ -509,14 +509,18 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/fusion", path)):
                 package = self._package(m.group(1))
+                fusion_mode = str(config.get("fusion_mode", "3d"))
+                if fusion_mode not in ("2d", "3d"):
+                    raise ValueError("Fusion scene type must be 2d or 3d")
                 metadata = self._metadata(package)
                 animation = self._normalize_animation(package, config)
                 package_layout.animation_path(package).write_text(
                     json.dumps(animation, indent=2) + "\n", encoding="utf-8")
                 warnings = []
-                target = fusion_generator.generate(package, metadata, animation, warnings)
+                target = fusion_generator.generate(
+                    package, metadata, animation, warnings, mode=fusion_mode)
                 relative = target.relative_to(app_settings.exports_dir())
-                self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative),
+                self._json({"ok": True, "mode": fusion_mode, "file": str(relative), "url": "/exports/" + str(relative),
                             "warnings": warnings})
                 return
             if (m := re.fullmatch(r"/api/export/([A-Za-z0-9_.-]+)/delete", path)):
