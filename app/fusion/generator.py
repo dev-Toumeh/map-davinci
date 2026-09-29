@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 from core import package_layout
 from . import closeup_lod
+from . import flag_assets
 from .connection_geometry import connection_tools
 
 R = 6378137.0
@@ -306,31 +307,6 @@ def _rgb(hex_color: str) -> tuple[float, float, float]:
     return tuple(int(value[i:i + 2], 16) / 255 for i in (0, 2, 4))
 
 
-def _visibility_spline(name: str, start: int | None, end: int | None,
-                       last_frame: int, fps: int) -> tuple[str, str]:
-    """Return a Fusion visibility spline and its Input value."""
-    if start is None and end is None:
-        return "", "Input { Value = 1, }"
-    fade = max(1, round(fps * .25))
-    if start is not None and end is not None:
-        fade = min(fade, max(1, (end - start) // 2))
-    keys: dict[int, float] = {0: 1.0 if start is None else 0.0,
-                              last_frame: 1.0 if end is None else 0.0}
-    if start is not None:
-        keys[start] = 0.0
-        keys[min(last_frame, start + fade)] = 1.0
-    if end is not None:
-        keys[max(0, end - fade)] = 1.0
-        keys[end] = 0.0
-    lines = "\n".join(
-        f'\t\t\t\t[{frame}] = {{ {value:.12g}, Flags = {{ Linear = true }} }},'
-        for frame, value in sorted(keys.items()))
-    node = f'''\t\t{name} = BezierSpline {{ KeyFrames = {{
-{lines}
-\t\t\t}} }},'''
-    return node, f'Input {{ Value = 0, SourceOp = "{name}", Source = "Value", }}'
-
-
 def _switch_tool(name: str, inputs: list[tuple[str, str]], pos: tuple[int, int],
                  which_expression: str | None = None) -> str:
     """Serialize a native Fusion Switch with named image inputs."""
@@ -390,19 +366,31 @@ def _checkbox_controller(name: str, labels: list[str], pos: tuple[int, int]) -> 
 \t\t}},'''
 
 
-def _effective_interval(group: dict, child: dict) -> tuple[int | None, int | None]:
-    """Intersect country-level and territory-level visibility intervals."""
-    starts = [value for value in (group.get("start_frame"),
-                                   child.get("start_frame")) if value is not None]
-    ends = [value for value in (group.get("end_frame"),
-                                 child.get("end_frame")) if value is not None]
-    return (max(starts) if starts else None, min(ends) if ends else None)
+def _flag_adjust_controller(name: str, pos: tuple[int, int]) -> str:
+    """Expose camera-relative flag placement and opacity in the Inspector."""
+    return f'''\t\t{name} = CustomTool {{
+\t\t\tNameSet = true,
+\t\t\tInputs = {{
+\t\t\t\tOffset_X = Input {{ Value = 0, }},
+\t\t\t\tOffset_Y = Input {{ Value = 0, }},
+\t\t\t\tScale = Input {{ Value = 1.02, }},
+\t\t\t\tOpacity = Input {{ Value = 1, }},
+\t\t\t}},
+\t\t\tUserControls = ordered() {{
+\t\t\t\tOffset_X = {{ LINKID_DataType = "Number", INPID_InputControl = "SliderControl", LINKS_Name = "Horizontal Position", INP_Default = 0, INP_MinScale = -0.25, INP_MaxScale = 0.25, INP_MinAllowed = -1, INP_MaxAllowed = 1, }},
+\t\t\t\tOffset_Y = {{ LINKID_DataType = "Number", INPID_InputControl = "SliderControl", LINKS_Name = "Vertical Position", INP_Default = 0, INP_MinScale = -0.25, INP_MaxScale = 0.25, INP_MinAllowed = -1, INP_MaxAllowed = 1, }},
+\t\t\t\tScale = {{ LINKID_DataType = "Number", INPID_InputControl = "SliderControl", LINKS_Name = "Flag Scale", INP_Default = 1.02, INP_MinScale = 0.5, INP_MaxScale = 2, INP_MinAllowed = 0.1, INP_MaxAllowed = 10, }},
+\t\t\t\tOpacity = {{ LINKID_DataType = "Number", INPID_InputControl = "SliderControl", LINKS_Name = "Flag Opacity", INP_Default = 1, INP_MinScale = 0, INP_MaxScale = 1, INP_MinAllowed = 0, INP_MaxAllowed = 1, }},
+\t\t\t}},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {pos[0]}, {pos[1]} }} }},
+\t\t}},'''
 
 
 def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]]],
                      fill: tuple[float, float, float],
                      border: tuple[float, float, float],
-                     alpha_input: str, row: int) -> tuple[str, str]:
+                     alpha_input: str, row: int,
+                     group_optional: bool = False) -> tuple[str, str]:
     """Serialize one territory as a compact grid with instanced borders."""
     nodes = []
     exterior_areas = [_ring_area(points) for level, points in rings if level > 0]
@@ -417,21 +405,50 @@ def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]
         index for index, (level, _points) in enumerate(rings, 1)
         if level > 0 and index not in essential_indexes
     ]
+    compact_group = group_optional and bool(optional_indexes)
+    compact_rows_per_column = 4
+    compact_column_step = 160
+    compact_row_step = 55
+    compact_fill_offset_y = 22
+    essential_rank = {index: rank for rank, index in enumerate(essential_indexes)}
+    optional_rank = {index: rank for rank, index in enumerate(optional_indexes)}
+    essential_columns = max(
+        1, math.ceil(len(essential_indexes) / compact_rows_per_column))
+    optional_columns = max(
+        1, math.ceil(len(optional_indexes) / compact_rows_per_column))
+    # All country groups share the same right edge. Wider groups grow leftward.
+    # Essentials come first, followed by a visible lane and optional columns.
+    compact_group_right_x = 50
+    compact_merge_x = compact_group_right_x - 180
+    optional_start_x = (compact_merge_x -
+                        optional_columns * compact_column_step - 160)
+    essential_start_x = (optional_start_x - 100 -
+                         essential_columns * compact_column_step)
     for index, (_level, points) in enumerate(rings, 1):
         fill_name = f"{name}_Ring_{index:02d}_Fill"
         border_name = f"{name}_Ring_{index:02d}_Border"
         border_width = (TINY_ISLAND_BORDER_WIDTH
                         if territory_is_tiny or index in optional_indexes
                         else DEFAULT_BORDER_WIDTH)
-        # Keep all disconnected land rings belonging to the territory in one
-        # compact block.  A long vertical strip made countries overlap in the
-        # Flow even though their render graph was correct.
-        grid_index = index - 1
-        column = grid_index % SHAPE_GRID_COLUMNS
-        grid_row = grid_index // SHAPE_GRID_COLUMNS
-        fill_x = SHAPE_GRID_X + column * SHAPE_COLUMN_STEP
-        border_x = fill_x + SHAPE_BORDER_OFFSET_X
-        node_y = row + grid_row * SHAPE_ROW_STEP
+        if compact_group:
+            is_optional = index in optional_rank
+            grid_index = optional_rank[index] if is_optional else essential_rank[index]
+            column = grid_index // compact_rows_per_column
+            grid_row = grid_index % compact_rows_per_column
+            fill_x = ((optional_start_x if is_optional else essential_start_x) +
+                      column * compact_column_step)
+            border_x = fill_x
+            border_y = row + grid_row * compact_row_step
+            fill_y = border_y + compact_fill_offset_y
+        else:
+            # Keep disconnected land rings in a grid. A long vertical strip
+            # made countries overlap in the Flow even when rendering correctly.
+            grid_index = index - 1
+            column = grid_index % SHAPE_GRID_COLUMNS
+            grid_row = grid_index // SHAPE_GRID_COLUMNS
+            fill_x = SHAPE_GRID_X + column * SHAPE_COLUMN_STEP
+            border_x = fill_x + SHAPE_BORDER_OFFSET_X
+            fill_y = border_y = row + grid_row * SHAPE_ROW_STEP
         nodes.append(f'''\t\t{fill_name} = sPolygon {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
@@ -441,7 +458,7 @@ def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]
 \t\t\t\tBlue = Input {{ Value = {fill[2]:.12g}, }},
 \t\t\t\tAlpha = {alpha_input}
 \t\t\t}},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {fill_x}, {node_y} }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {fill_x}, {fill_y} }} }},
 \t\t}},
 \t\t{border_name} = sPolygon {{
 \t\t\tNameSet = true,
@@ -453,7 +470,7 @@ def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]
 \t\t\t\tGreen = Input {{ Value = {border[1]:.12g}, }},
 \t\t\t\tBlue = Input {{ Value = {border[2]:.12g}, }}
 \t\t\t}},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {border_x}, {node_y} }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {border_x}, {border_y} }} }},
 \t\t}},''')
     essential_sources = [source for index in essential_indexes
                          for source in (f"{name}_Ring_{index:02d}_Fill",
@@ -462,12 +479,15 @@ def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]
         f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
         for index, source in enumerate(essential_sources, 1))
     output = name + "_Shapes"
+    active_merge_x = compact_merge_x if compact_group else SHAPE_ACTIVE_MERGE_X
+    active_merge_y = (row + 25 if compact_group else
+                      row + ((len(rings) - 1) // SHAPE_GRID_COLUMNS) * 45)
     nodes.append(f'''\t\t{output} = sMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
 {inputs}
 \t\t\t}},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {SHAPE_ACTIVE_MERGE_X}, {row + ((len(rings) - 1) // SHAPE_GRID_COLUMNS) * 45} }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {active_merge_x}, {active_merge_y} }} }},
 \t\t}},''')
     if optional_indexes:
         optional_sources = [source for index in optional_indexes
@@ -476,13 +496,54 @@ def _shape_territory(name: str, rings: list[tuple[int, list[tuple[float, float]]
         optional_inputs = "\n".join(
             f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
             for index, source in enumerate(optional_sources, 1))
+        optional_merge_x = compact_merge_x if compact_group else SHAPE_OPTIONAL_MERGE_X
+        optional_merge_y = (row + 140 if compact_group else
+                            row + ((len(rings) - 1) // SHAPE_GRID_COLUMNS) * 45)
         nodes.append(f'''\t\t{name}_Optional_Islands = sMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
 {optional_inputs}
 \t\t\t}},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {SHAPE_OPTIONAL_MERGE_X}, {row + ((len(rings) - 1) // SHAPE_GRID_COLUMNS) * 45} }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ {optional_merge_x}, {optional_merge_y} }} }},
 \t\t}},''')
+        if group_optional:
+            output_sources = ([f"{name}_Ring_{index:02d}_Border"
+                               for index in essential_indexes] +
+                              [output, f"{name}_Optional_Islands"])
+            group_outputs = "\n".join(
+                f'''\t\t\t\tOutput{index} = InstanceOutput {{
+\t\t\t\t\tSourceOp = "{source}",
+\t\t\t\t\tSource = "Output",
+\t\t\t\t}},'''
+                for index, source in enumerate(output_sources, 1))
+            inner_tools = "\n".join(
+                "\t" + line for line in "\n".join(nodes).splitlines())
+            group_top_y = row - 20
+            group_height = 330
+            group_left_x = essential_start_x - 90
+            group_right_x = compact_group_right_x
+            group_width = group_right_x - group_left_x
+            group_pos_x = (group_left_x + group_right_x) / 2
+            group_name = f"{name}_Optional_Group"
+            grouped = f'''\t\t{group_name} = GroupOperator {{
+\t\t\tNameSet = true,
+\t\t\tOutputs = {{
+{group_outputs}
+\t\t\t}},
+\t\t\tViewInfo = GroupInfo {{
+\t\t\t\tPos = {{ {group_pos_x:.12g}, {group_top_y} }},
+\t\t\t\tFlags = {{ Expanded = true, AllowPan = false, AutoSnap = true, RemoveRouters = true }},
+\t\t\t\tSize = {{ {group_width}, {group_height}, {group_width / 2:.12g}, 24 }},
+\t\t\t\tDirection = "Horizontal",
+\t\t\t\tPipeStyle = "Direct",
+\t\t\t\tScale = 1,
+\t\t\t\tOffset = {{ {-group_pos_x:.12g}, {-group_top_y} }},
+\t\t\t}},
+\t\t\tTools = ordered() {{
+{inner_tools}
+\t\t\t}},
+\t\t}},'''
+            return grouped, output
     return "\n".join(nodes), output
 
 
@@ -676,7 +737,8 @@ def _camera_samples(animation: dict, native: dict) -> list[dict]:
 
 
 
-def generate(package: Path, metadata: dict, animation: dict) -> Path:
+def generate(package: Path, metadata: dict, animation: dict,
+             warnings: list[str] | None = None) -> Path:
     out, native = animation["output"], metadata["output"]
     samples = _camera_samples(animation, native)
     authored_frames = {key["frame"] for key in animation["keyframes"]}
@@ -715,7 +777,8 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
     vector_layers = []
     country_shape_sources: list[str] = []
-    country_edit_inputs: list[tuple[str, str]] = []
+    country_edit_inputs: list[tuple[str, str, int]] = []
+    flag_plans: list[dict] = []
     countries = {country["iso3"]: country for country in metadata.get("countries", [])}
     groups = animation.get("region_groups")
     if groups is None:
@@ -742,20 +805,45 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
             ring_limit = RING_LIMITS.get(child["id"], DEFAULT_RING_LIMIT)
             rings = _prepared_rings(
                 geometry, wide_bbox, 1.0, 1.0, static_tolerance, ring_limit)
-            start, end = _effective_interval(group, child)
-            visibility_node, visibility_input = _visibility_spline(
-                child_base + "_Visibility", start, end, duration, int(out["fps"]))
-            if visibility_node:
-                tools.append(visibility_node)
+            largest = max((_ring_area(points) for level, points in rings if level > 0),
+                          default=0)
+            active_indexes = [
+                index for index, (level, points) in enumerate(rings, 1)
+                if level < 0 or largest <= 0 or
+                _ring_area(points) / largest >= ESSENTIAL_RING_AREA_RATIO
+            ]
+            grouped_optional = (child.get("category") == "country" and
+                                len(active_indexes) < len(rings))
             shape_nodes, shape_output = _shape_territory(
                 child_base, rings, (red, green, blue),
-                (border_red, border_green, border_blue), visibility_input, row)
+                (border_red, border_green, border_blue),
+                "Input { Value = 1, }", row,
+                group_optional=child.get("category") == "country")
             tools.append(shape_nodes)
             country_shape_sources.append(shape_output)
+            if child.get("category") == "country":
+                code = flag_assets.flag_code(group["iso3"], country.get("iso2"))
+                if code:
+                    active = [rings[index - 1] for index in active_indexes]
+                    texture, placement, flag_warnings = flag_assets.make_texture(
+                        package, group["iso3"], code, active, width, height,
+                        max(sample["zoom"] for sample in samples))
+                    flag_plans.append({"iso3": group["iso3"], "base": child_base,
+                                       "texture": texture, "placement": placement,
+                                       "warnings": flag_warnings,
+                                       "border_sources": [f"{child_base}_Ring_{index:02d}_Border"
+                                                          for index in active_indexes],
+                                       "edit_index": len(country_edit_inputs) + 1,
+                                       "layout_y": row})
+                    if warnings is not None:
+                        warnings.extend(flag_warnings)
+                elif warnings is not None:
+                    warnings.append(f"{group['iso3']}: no matching flag asset; using color fill")
             safe_name = _territory_label(child).replace('"', "'")
-            country_edit_inputs.append((f"{group['iso3']} - {safe_name}", shape_output))
+            country_edit_inputs.append(
+                (f"{group['iso3']} - {safe_name}", shape_output, row))
             ring_rows = max(1, math.ceil(len(rings) / SHAPE_GRID_COLUMNS))
-            row_cursor += ring_rows * SHAPE_ROW_STEP + 140
+            row_cursor += 360 if grouped_optional else ring_rows * SHAPE_ROW_STEP + 140
         row_cursor += 80
     has_country_layers = bool(country_shape_sources)
     layer_number = 1
@@ -823,6 +911,7 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
         canvas_width, canvas_height = vector_width, vector_height
         y_aspect = height / width
         edit_render_inputs = []
+        deployment_render_inputs = []
         country_nodes = []
         country_nodes.append(f'''\t\tCountry_Vector_Canvas = Background {{
 \t\t\tNameSet = true,
@@ -830,35 +919,74 @@ def generate(package: Path, metadata: dict, animation: dict) -> Path:
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ 1640, 150 }} }},
 \t\t}},''')
         country_nodes.append(_checkbox_controller(
-            "Country_Edit_Controller", [label for label, _source in country_edit_inputs],
+            "Country_Edit_Controller", [label for label, _source, _row in country_edit_inputs],
             (EDIT_CONTROLLER_X, 530)))
-        for index, (label, shape_source) in enumerate(country_edit_inputs, 1):
+        for flag_index, plan in enumerate(flag_plans):
+            iso = plan["iso3"]
+            prefix = f"{iso}_Flag"
+            flag_y = plan["layout_y"]
+            placement = plan["placement"]
+            center_x = placement["center_x"]
+            center_y = placement["center_y"]
+            texture_scale = placement["scale"]
+            center_expression = (
+                "Point(0.5 + (Map_Animation.Center.X - 0.5) + "
+                f"({center_x:.12g} - 0.5 + {prefix}_Adjust.Offset_X) * Map_Animation.Size, "
+                "0.5 + (Map_Animation.Center.Y - 0.5) * "
+                f"{y_aspect:.12g} + (0.5 - {center_y:.12g} + {prefix}_Adjust.Offset_Y) * "
+                f"{y_aspect:.12g} * Map_Animation.Size)"
+            )
+            country_nodes.append(_flag_adjust_controller(
+                f"{prefix}_Adjust", (650, flag_y + 180)))
+            country_nodes.append(f'''\t\t{prefix}_Loader = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(plan['texture'])}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {flag_y + 80} }} }}, }},
+\t\t{prefix}_Masked_On_Working_Canvas = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Loader", Source = "Output", }}, Center = Input {{ Expression = "{center_expression}", }}, Size = Input {{ Expression = "Map_Animation.Size / {texture_scale:.12g} * {prefix}_Adjust.Scale", }}, Blend = Input {{ Expression = "{prefix}_Adjust.Opacity", }}, EffectMask = Input {{ SourceOp = "Country_Edit_{plan['edit_index']:02d}_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 850, {flag_y + 100} }} }}, }},''')
+            border_inputs = "\n".join(
+                f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
+                for index, source in enumerate(plan["border_sources"], 1))
+            country_nodes.append(f'''\t\t{prefix}_Border_Geometry = sMerge {{ NameSet = true, Inputs = {{
+{border_inputs}
+\t\t\t}}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {flag_y + 220} }} }}, }},''')
+            border_nodes, border_output = _shape_camera_render(
+                f"{prefix}_Border", f"{prefix}_Border_Geometry", duration,
+                canvas_width, canvas_height, y_aspect, (670, flag_y + 220))
+            country_nodes.append(border_nodes)
+        for index, (label, shape_source, country_y) in enumerate(country_edit_inputs, 1):
             render_nodes, render_output = _shape_camera_render(
                 f"Country_Edit_{index:02d}", shape_source, duration,
                 canvas_width, canvas_height, y_aspect,
-                (EDIT_CAMERA_X, 320 + index * 90))
+                (450, country_y))
             country_nodes.append(render_nodes)
+            matching = next((plan for plan in flag_plans if plan["edit_index"] == index), None)
+            if matching:
+                prefix = f"{matching['iso3']}_Flag"
+                flag_output = f"{prefix}_With_Border"
+                country_nodes.append(f'''\t\t{flag_output} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{prefix}_Masked_On_Working_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Border_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1150, {country_y + 100} }} }}, }},''')
+                switch_name = f"{prefix}_Color_Flag"
+                country_nodes.append(_switch_tool(switch_name, [
+                    ("Color", render_output),
+                    ("Flag", flag_output),
+                ], (1330, country_y)))
+                render_output = switch_name
+            deployment_render_inputs.append((label, render_output))
             select_name = f"Country_Edit_{index:02d}_Enabled"
             country_nodes.append(_switch_tool(select_name, [
                 ("OFF", "Country_Vector_Canvas"),
                 (label, render_output),
-            ], (EDIT_SWITCH_X, 320 + index * 90),
+            ], (1550, country_y),
                 f"Country_Edit_Controller.Show_{index:02d}"))
             edit_render_inputs.append((label, select_name))
-        deployment_inputs = "\n".join(
-            f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
-            for index, source in enumerate(country_shape_sources, 1))
-        country_nodes.append(f'''\t\tCountry_Deployment_Geometry = sMerge {{
+        deployment_layers = "\n".join(
+            f'''\t\t\t\t["Layer{index}.Foreground"] = Input {{ SourceOp = "{source}", Source = "Output", }},
+\t\t\t\tLayerName{index} = Input {{ Value = "{label.replace(chr(34), chr(39))}", }},'''
+            for index, (label, source) in enumerate(deployment_render_inputs, 1))
+        country_nodes.append(f'''\t\tCountry_Deployment = MultiMerge {{
 \t\t\tNameSet = true,
-\t\t\tInputs = {{
-{deployment_inputs}
+\t\t\tInputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }},
+{deployment_layers}
 \t\t\t}},
-\t\t\tViewInfo = OperatorInfo {{ Pos = {{ 350, 180 }} }},
+\t\t\tViewInfo = OperatorInfo {{ Pos = {{ 1920, 180 }} }},
 \t\t}},''')
-        deployment_nodes, deployment_output = _shape_camera_render(
-            "Country_Deployment", "Country_Deployment_Geometry", duration,
-            canvas_width, canvas_height, y_aspect, (600, 180))
-        country_nodes.append(deployment_nodes)
+        deployment_output = "Country_Deployment"
         edit_layers = "\n".join(
             f'''\t\t\t\t["Layer{index}.Foreground"] = Input {{ SourceOp = "{source}", Source = "Output", }},
 \t\t\t\tLayerName{index} = Input {{ Value = "{label.replace(chr(34), chr(39))}", }},'''

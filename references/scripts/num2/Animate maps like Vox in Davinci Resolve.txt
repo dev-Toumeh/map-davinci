@@ -1,0 +1,865 @@
+00:03 foreign
+00:08 
+
+00:08 [Music]
+00:22 
+
+00:22 drag and drop your map inside your media
+00:25 
+
+00:25 pool and make sure that under project
+00:27 
+
+00:27 settings you have 30 frames per second
+00:30 
+
+00:30 selected that's what I like and under
+00:32 
+
+00:32 image scaling make sure you have Center
+00:34 
+
+00:34 crop no resizing save that and you're
+00:37 
+
+00:37 good to go now go under your effects Tab
+00:40 
+
+00:40 and search for Fusion composition drag
+00:43 
+
+00:43 it inside timeline and let's make it 10
+00:45 
+
+00:45 seconds long
+00:47 
+
+00:47 foreign
+00:48 
+
+00:48 click on your composition and go inside
+00:51 
+
+00:51 the fusion tab
+00:53 
+
+00:53 drag your map inside of the notes box
+00:57 
+
+00:57 and hit Ctrl space to open up this
+00:60 
+
+00:60 window and search for image plane 3D
+01:03 
+
+01:03 [Music]
+01:04 
+
+01:04 control space on image plane 3D and
+01:07 
+
+01:07 search for camera 3D this will create a
+01:10 
+
+01:10 merge 3D and a camera 3D node hit
+01:13 
+
+01:13 controls based on merge 3D and search
+01:15 
+
+01:15 for a render 3D and then connect your
+01:18 
+
+01:18 rendered 3D to your media out you can
+01:21 
+
+01:21 hit number 2 to show your media out in
+01:23 
+
+01:23 your second viewport and I like to have
+01:26 
+
+01:26 merge 3D in my first viewport like you
+01:29 
+
+01:29 see here
+01:30 
+
+01:30 as you can see there is nothing in media
+01:32 
+
+01:32 out screen so that's because the camera
+01:35 
+
+01:35 is right inside our image pane so we're
+01:38 
+
+01:38 gonna pull it back a little bit and now
+01:40 
+
+01:40 we can have something show up in our
+01:43 
+
+01:43 media out one thing I like to do is
+01:45 
+
+01:45 scale up our image plane 3D to around
+01:48 
+
+01:48 five or four so that we don't need to
+01:50 
+
+01:50 scroll Zoom a lot in every time
+01:53 
+
+01:53 and pull back the camera back so we have
+01:56 
+
+01:56 everything in frame I'm just gonna
+01:58 
+
+01:58 adjust the position of camera so
+01:60 
+
+02:00 something like this click on your media
+02:03 
+
+02:03 in control space and add a normal merge
+02:06 
+
+02:06 to that merge we're also gonna add a
+02:08 
+
+02:08 background and connect those two and to
+02:10 
+
+02:10 background we're gonna add a polyline
+02:12 
+
+02:12 because that's what we are going to use
+02:14 
+
+02:14 to create a path on our map one thing we
+02:18 
+
+02:18 need to make sure of is that we have the
+02:19 
+
+02:19 same resolution on all of our nodes so
+02:22 
+
+02:22 for example media out is our 1920x1080
+02:25 
+
+02:25 but our media in the map size is over 8
+02:30 
+
+02:30 000 pixels on the white side meanwhile
+02:32 
+
+02:32 our polygon and background is at 1920 by
+02:35 
+
+02:35 1080 so we need to make sure that our
+02:37 
+
+02:37 background and media in is the same size
+02:40 
+
+02:40 so I am going to change my background
+02:42 
+
+02:42 node to the same size as media in so I
+02:46 
+
+02:46 like to pull up our map on the first
+02:48 
+
+02:48 screen and you can see top right corner
+02:51 
+
+02:51 it says the resolution then I'm gonna
+02:52 
+
+02:52 hit background and uncheck Auto
+02:55 
+
+02:55 resolution and type in the resolution of
+02:58 
+
+02:58 our map now our background and media in
+03:01 
+
+03:01 are the same resolution one thing we're
+03:03 
+
+03:03 going to quickly do is click on the
+03:05 
+
+03:05 polygon node and down here it says right
+03:07 
+
+03:07 click here for shape animation we're
+03:09 
+
+03:09 gonna right click and hit remove polygon
+03:11 
+
+03:11 polyline now I have my polygon selected
+03:13 
+
+03:13 and I have media in also our map in our
+03:17 
+
+03:17 first Viewpoint and you can see that by
+03:20 
+
+03:20 those white dots under the node so yeah
+03:22 
+
+03:22 polygon node is selected we have the pen
+03:25 
+
+03:25 tool selected at the top right there and
+03:27 
+
+03:27 I'm just gonna start drawing a line and
+03:30 
+
+03:30 I'm just gonna speed this process up
+03:32 
+
+03:32 because it's not very fun to watch now
+03:35 
+
+03:35 we have created our line all the way
+03:37 
+
+03:37 from Hamburg to Copenhagen to Stockholm
+03:40 
+
+03:40 to Oslo and finish in my city chroname
+03:43 
+
+03:43 under the polygon node we can change the
+03:45 
+
+03:45 Border width the thickness of a line and
+03:47 
+
+03:47 we can change the color of a background
+03:49 
+
+03:49 by selecting it and going to color and
+03:52 
+
+03:52 selecting whatever color we want I'm
+03:54 
+
+03:54 going to go for a bright yellow now
+03:56 
+
+03:56 we're going to make the line appear from
+03:58 
+
+03:58 the starting point and go to the end
+03:60 
+
+03:60 point so go to the first frame and
+04:03 
+
+04:03 keyframe the length under the polygon
+04:05 
+
+04:05 node at the first frame we're going to
+04:07 
+
+04:07 put the zero then I'm going to go
+04:09 
+
+04:09 forward in time
+04:11 
+
+04:11 maybe around
+04:13 
+
+04:13 270 something like that no actually 240
+04:17 
+
+04:17 and complete the length of the line by
+04:19 
+
+04:19 building it to one so now you can see
+04:20 
+
+04:20 that the line is appearing more and more
+04:22 
+
+04:22 with each frame passing next I'm going
+04:25 
+
+04:25 to pull up my merge 3D on the first
+04:28 
+
+04:28 viewport here by either clicking on this
+04:31 
+
+04:31 white dot under or hitting one on your
+04:33 
+
+04:33 keyboard and I'm just gonna pull the
+04:35 
+
+04:35 camera down so I can see where the line
+04:38 
+
+04:38 is starting yes it looks beautiful
+04:42 
+
+04:42 so now what we are going to do is
+04:44 
+
+04:44 animate our camera to follow the line
+04:46 
+
+04:46 I'm going to select the camera and maybe
+04:49 
+
+04:49 zoom in a little bit as just the
+04:51 
+
+04:51 position to where you want the camera to
+04:53 
+
+04:53 start and make sure that you are on
+04:55 
+
+04:55 frame 0. under the camera 3D node we're
+04:57 
+
+04:57 gonna go on the transfer right click on
+04:60 
+
+04:60 translate and animate translate group
+05:01 
+
+05:02 we're gonna do the same for the rotation
+05:04 
+
+05:04 so that we have red diamonds on the
+05:06 
+
+05:06 right side over here that means we are
+05:08 
+
+05:08 ready to keyframe our camera position
+05:10 
+
+05:10 I'm gonna move a little bit further in
+05:12 
+
+05:12 time maybe to frame 60 and then move my
+05:17 
+
+05:17 camera so that my line is in the center
+05:19 
+
+05:19 I also like to rotate my camera for that
+05:21 
+
+05:21 cool look like this
+05:25 
+
+05:25 maybe 20 degrees or 30 is enough
+05:29 
+
+05:29 then I'm gonna move even further in time
+05:31 
+
+05:31 maybe 120 when we are in Stockholm and
+05:35 
+
+05:35 I'm gonna move my camera up and increase
+05:38 
+
+05:38 the rotation on y-axis to 30 make sure
+05:41 
+
+05:41 that my the end of the line is in the
+05:43 
+
+05:43 middle I'm gonna move even further in
+05:46 
+
+05:47 time to somewhere when we are in Oslo at
+05:51 
+
+05:51 around frame 190 180 182 and move my
+05:56 
+
+05:56 camera so that the place is in the
+05:58 
+
+05:58 center of my screen I'm gonna move even
+06:01 
+
+06:01 further to 240 when the on Where the
+06:04 
+
+06:04 Line ends and move my camera accordingly
+06:10 
+
+06:10 so now you can see that the camera is
+06:12 
+
+06:12 approximately following a line perfect
+06:14 
+
+06:14 we ended at the frame 240 but I want a
+06:17 
+
+06:17 slow zoom in at the end so I'm gonna
+06:20 
+
+06:20 move to frame 270 and push my camera
+06:24 
+
+06:24 even more in actually I changed my mind
+06:26 
+
+06:26 I wanted to be pushing until the end the
+06:28 
+
+06:28 frame 290 not 270 so we can go under the
+06:32 
+
+06:32 keyframes at the top there select the
+06:34 
+
+06:34 camera and just move the keyframes we
+06:37 
+
+06:37 want
+06:38 
+
+06:38 further back close the keyframes and now
+06:40 
+
+06:40 you see that after we have completed our
+06:42 
+
+06:42 journey the camera is slowly pushing and
+06:45 
+
+06:45 at the end so it's not just a still
+06:48 
+
+06:48 image but there's some movement so it's
+06:50 
+
+06:50 not too boring and also make sure to
+06:52 
+
+06:52 save your project so you don't lose it
+06:54 
+
+06:54 if something goes wrong actually I
+06:57 
+
+06:57 changed my mind again sorry for that and
+06:59 
+
+06:59 I want it at the end to pull back and
+07:02 
+
+07:02 reveal the whole route not just the
+07:05 
+
+07:05 ending point so I'm gonna make my Fusion
+07:09 
+
+07:09 composition a little bit longer five
+07:11 
+
+07:11 seconds longer adjust that go back to
+07:13 
+
+07:13 fusion and now you can see we have even
+07:16 
+
+07:16 more frames here at the ending so I'm
+07:18 
+
+07:18 just gonna quickly keyframe the
+07:20 
+
+07:20 translation and rotation to review the
+07:24 
+
+07:24 whole map first I'm gonna go one second
+07:26 
+
+07:26 forward in time and reset my rotation so
+07:29 
+
+07:29 it's kind of not zooms all the way out
+07:31 
+
+07:31 but a little bit out and changes the
+07:34 
+
+07:34 rotation and after that I'm gonna Zoom
+07:36 
+
+07:36 all the way out
+07:37 
+
+07:37 [Music]
+07:39 
+
+07:39 so you can just play around with it and
+07:41 
+
+07:41 you don't need to follow this tutorial
+07:43 
+
+07:43 exactly play around with the keyframes
+07:45 
+
+07:45 until you're happy with the result so
+07:47 
+
+07:47 now I'm adjusting my last keyframe where
+07:50 
+
+07:50 I want my camera to end and also I like
+07:53 
+
+07:53 that push slow push in effect at the end
+07:56 
+
+07:56 now we're going to smooth out our
+07:59 
+
+07:59 keyframes by going to the spline tab at
+08:01 
+
+08:02 the top check off for the camera 3D and
+08:04 
+
+08:04 select the points and hit the smooth
+08:07 
+
+08:07 curve at the bottom left there and do
+08:09 
+
+08:09 that for all of your keyframes so I
+08:13 
+
+08:13 would not recommend just selecting all
+08:15 
+
+08:15 keyframes and hitting the smooth smooth
+08:17 
+
+08:17 amount button but rather go one by one
+08:20 
+
+08:20 let's go back to the edit page and see
+08:21 
+
+08:21 how our result looks I'm gonna make sure
+08:25 
+
+08:25 that our render cache is either set to
+08:28 
+
+08:28 smart or user under playback and right
+08:30 
+
+08:30 click on our fusion fusion composition
+08:32 
+
+08:32 hit render cache Fusion output and
+08:34 
+
+08:34 either Select Auto or on so that you get
+08:38 
+
+08:38 a blue line at the top and you can see
+08:40 
+
+08:40 it's a very smooth
+08:44 
+
+08:44 our animation looks good the only thing
+08:47 
+
+08:47 I don't like is that like small jiggle
+08:50 
+
+08:50 at the end when it zooms out and I think
+08:52 
+
+08:52 the reason for that is I have too many
+08:54 
+
+08:54 keyframes at the end so I'm gonna delete
+08:56 
+
+08:56 a couple and make sure that there's no
+08:59 
+
+08:59 like jiggly effect so that's why it's
+09:01 
+
+09:01 nice to go keyframes one by one and make
+09:04 
+
+09:04 sure they look good next we're gonna hit
+09:06 
+
+09:06 on the render 3D note go under controls
+09:09 
+
+09:09 a render type and change it to opengl
+09:11 
+
+09:11 render because we're gonna create depth
+09:15 
+
+09:15 of field under accumulation effect to
+09:17 
+
+09:17 check for enable accumulation effect my
+09:19 
+
+09:19 computer is not the most powerful in the
+09:20 
+
+09:20 world so I'm gonna change the quality to
+09:23 
+
+09:23 4 and amount of blur to 0.02 go to our
+09:27 
+
+09:27 camera 3D node and go controls Ctrl
+09:30 
+
+09:30 visibility and check for focal plane and
+09:34 
+
+09:34 I like to set it to around 3. and we get
+09:37 
+
+09:37 this green rectangle on our camera and
+09:39 
+
+09:39 it basically tells us where the focus is
+09:41 
+
+09:41 go to the first frame and understand 3D
+09:44 
+
+09:44 we can change the focal plane I like to
+09:46 
+
+09:47 right click in the viewport and go to
+09:48 
+
+09:48 camera and change it to top so I can see
+09:51 
+
+09:51 where the image plane is and where the
+09:53 
+
+09:53 focal plane is for some reason there is
+09:55 
+
+09:55 this glitch effect in DaVinci that it
+09:57 
+
+09:57 doesn't show you the image plane on the
+09:59 
+
+09:59 focal plane when you go to the top view
+10:01 
+
+10:01 so the way I fix it is to show my
+10:02 
+
+10:02 background in the viewport 1 and then
+10:04 
+
+10:04 change it to merge 3d1 and now we can
+10:07 
+
+10:07 see both so at the first frame under
+10:09 
+
+10:09 camera 3D node we are gonna go to focal
+10:12 
+
+10:12 plane and hit the diamond button because
+10:14 
+
+10:14 we're gonna keyframe the focal plane and
+10:17 
+
+10:17 what I like to do is go every 30 frames
+10:20 
+
+10:20 meaning 1 seconds because we have 30
+10:23 
+
+10:23 frames per second timeline and adjust
+10:25 
+
+10:25 the focal plane and do it for the rest
+10:26 
+
+10:26 of the clip
+10:29 
+
+10:29 [Music]
+10:34 
+
+10:34 after you've done that you can mess
+10:36 
+
+10:36 around with the quality and amount of
+10:39 
+
+10:39 Blur by going under render 3D node and
+10:42 
+
+10:42 you can increase the blur for a more
+10:44 
+
+10:44 dramatic effect I really like it but
+10:46 
+
+10:46 then you need to be really precise with
+10:48 
+
+10:48 the position of the focal plane because
+10:50 
+
+10:50 if you are not maybe what you want to
+10:52 
+
+10:53 show will not be in focus and the last
+10:55 
+
+10:55 thing you can do is add motion blur but
+10:58 
+
+10:58 be warned that it's really really heavy
+11:00 
+
+11:00 on computer and my computer cannot
+11:02 
+
+11:02 handle checking on this motion blur box
+11:06 
+
+11:06 but if you have a real powerful computer
+11:09 
+
+11:09 you can do that and you get a really
+11:10 
+
+11:10 nice attack when the camera moves from
+11:12 
+
+11:12 one place to another you can also smooth
+11:14 
+
+11:14 out the focal plane
+11:17 
+
+11:17 under the spline
+11:19 
+
+11:19 if you want to I don't find it really
+11:21 
+
+11:21 necessary just you can make sure that
+11:23 
+
+11:23 there are no hard focal focal plane
+11:26 
+
+11:26 changes when you have done everything
+11:29 
+
+11:29 you can go and Export your map finally
+11:32 
+
+11:32 so go to deliver page select MP4 codec
+11:37 
+
+11:37 264 resolution 1920 and frame rate 30
+11:40 
+
+11:40 and you're good to go
+11:43 
+
+11:43 easy as that I wouldn't say this is an
+11:46 
+
+11:46 easy tutorial it's more of a
+11:48 
+
+11:48 intermediate to Advanced but it's really
+11:51 
+
+11:51 good to know how to make these types of
+11:54 
+
+11:54 animations in DaVinci and fusion because
+11:57 
+
+11:57 you can use it for anything not only
+11:60 
+
+11:60 Maps because now you know how to create
+12:02 
+
+12:02 a 3D camera and and an image plane 3D so
+12:06 
+
+12:06 there's Endless Possibilities that you
+12:08 
+
+12:08 can try and do so yeah this was it for
+12:11 
+
+12:11 this tutorial I hope you learned
+12:13 
+
+12:13 something please leave a comment if you
+12:15 
+
+12:15 understood this tutorial because I would
+12:17 
+
+12:17 like to improve and your feedback is
+12:20 
+
+12:20 very important to me don't stress if you
+12:22 
+
+12:22 didn't understood everything from the
+12:24 
+
+12:24 beginning it may take a couple of tries
+12:26 
+
+12:26 and errors but you'll get there
+12:27 
+
+12:27 eventually yeah thank you for watching
+12:29 
+
+12:29 see you next one peace out

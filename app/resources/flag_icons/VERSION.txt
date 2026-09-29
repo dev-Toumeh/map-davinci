@@ -1,0 +1,1 @@
+Flag Icons v7.5.0 (https://github.com/lipis/flag-icons/releases/tag/v7.5.0). SVGs from flags/4x3; see LICENSE.

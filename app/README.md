@@ -9,7 +9,7 @@ pixel-aligned assets ready to import into DaVinci Resolve Fusion.
 ```bash
 # from the project root (one-time setup if .venv doesn't exist yet)
 python3 -m venv .venv
-.venv/bin/pip install Pillow numpy requests
+.venv/bin/pip install Pillow numpy requests CairoSVG
 
 # start the app
 .venv/bin/python app/server.py
@@ -39,6 +39,7 @@ Then open **http://127.0.0.1:8787** in a browser.
 | Path | Content |
 |---|---|
 | `images/` | Satellite backgrounds, PNG/SVG masks, and the alignment-check image |
+| `images/flags/` | Generated country flag textures and the Flag Icons MIT license notice |
 | `json/metadata.json` | CRS, extents, pixel transforms, tile zooms, per-country pixel bounds, hashes, and attribution |
 | `json/animation.json` | Saved 2D view keyframes, timing, FPS, easing, regions, and commentary references |
 | `data/` | Country and sub-territory GeoJSON used by native Fusion polygon masks |
@@ -47,6 +48,12 @@ Then open **http://127.0.0.1:8787** in a browser.
 
 Repeated names use numeric suffixes: `saudi_arabia`, `saudi_arabia_2`,
 `saudi_arabia_3`, and so on. Existing flat packages remain supported.
+Generated compositions have a Color/Flag switch for each whole country. Color
+is the default, and sub-territories retain their saved colors. Flag textures
+use the pinned Flag Icons v7.5.0 SVGs in `resources/flag_icons/` and are created
+inside the package when a new composition is generated. If a flag is unavailable,
+the generation result reports that its color fill was kept. On macOS, CairoSVG
+also needs the Homebrew `cairo` library (`brew install cairo`).
 
 ## 2D animation editor
 

@@ -1,0 +1,1761 @@
+Composition {
+	CurrentTime = 57,
+	RenderRange = { 0, 304 },
+	GlobalRange = { 0, 312 },
+	CurrentID = 191,
+	PlaybackUpdateMode = 0,
+	StereoMode = false,
+	Version = "DaVinci Resolve 21.1.0.0015",
+	SavedOutputs = 1,
+	HeldTools = 0,
+	DisabledTools = 0,
+	LockedTools = 0,
+	AudioOffset = 0,
+	Resumable = true,
+	OutputClips = {
+	},
+	Tools = {
+		ImagePlane3D3Opacity = BezierSpline {
+			SplineColor = { Red = 179, Green = 28, Blue = 244 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0, RH = { 3.33333333333333, 0 }, Flags = { Linear = true } },
+				[10] = { 0, LH = { 6.66666666666667, 0 }, RH = { 21.6666666666667, 0.333333333333333 }, Flags = { Linear = true } },
+				[45] = { 1, LH = { 33.3333333333333, 0.666666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		Right = AudioDisplay {
+			CtrlWZoom = false,
+		},
+		Left = AudioDisplay {
+			CtrlWZoom = false,
+		},
+		ImagePlane3D8 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = 0.2374401, },
+				["Transform3DOp.Translate.Y"] = Input { Value = -0.0911347, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -1.92, },
+				["Transform3DOp.Scale.X"] = Input { Value = 0.492, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 9, },
+				MaterialInput = Input {
+					SourceOp = "hamsho",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 9, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -164.293, 97.4888 } },
+		},
+		Camera3D1ZRotation = BezierSpline {
+			SplineColor = { Red = 128, Green = 128, Blue = 255 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0, RH = { 14, 0 }, Flags = { Linear = true } },
+				[42] = { 0, LH = { 28, 0 }, RH = { 48.3333333333333, 0 } },
+				[61] = { 0, LH = { 54.6666666666667, 0 }, RH = { 65.6666666666667, 0 } },
+				[75] = { 0, LH = { 70.3333333333333, 0 }, RH = { 76.6664999723434, 0 } },
+				[80] = { 0, LH = { 78.3335000276566, 0 }, RH = { 96.6666666666667, 0 } },
+				[130] = { 0, LH = { 113.333333333333, 0 }, RH = { 162, 0 }, Flags = { Linear = true } },
+				[226] = { 0, LH = { 194, 0 }, RH = { 244, 0 }, Flags = { Linear = true } },
+				[280] = { 0, LH = { 262, 0 }, Flags = { Linear = true } }
+			}
+		},
+		hamsho = Loader {
+			NameSet = true,
+			CustomData = { MEDIA_ID = "c2082db9-733f-45d0-8bea-711d04b578f0", MediaProps = {
+					MEDIA_FORMAT_TYPE = "PNG",
+					MEDIA_HEIGHT = 2025,
+					MEDIA_ID = "c2082db9-733f-45d0-8bea-711d04b578f0",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "hamsho_01.png",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/syria-peace/images/٢/hamsho_01.png",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 3600
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 312, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "c2082db9-733f-45d0-8bea-711d04b578f0", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -299.224, 108.463 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/syria-peace/images/٢/hamsho_01.png",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalEnd = 312,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		Camera3D1ZOffset = BezierSpline {
+			SplineColor = { Red = 254, Green = 207, Blue = 46 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 1.0778479, RH = { 14, 1.0778479 }, Flags = { Linear = true } },
+				[42] = { 1.0778479, LH = { 28, 1.0778479 }, RH = { 48.3333333333333, 1.0778479 } },
+				[61] = { 0.91472026008299, LH = { 54.6666666666667, 0.91472026008299 }, RH = { 65.6666666666667, 0.91472026008299 } },
+				[75] = { 0.913624342722697, LH = { 70.3333333333333, 0.913989648509461 }, RH = { 76.6664999723434, 0.913493889419082 } },
+				[80] = { 0.47, LH = { 78.3335000276566, 0.47 }, RH = { 96.6666666666667, 0.47 } },
+				[130] = { 0.47, LH = { 113.333333333333, 0.47 }, RH = { 153.330999612808, 0.47 }, Flags = { Linear = true } },
+				[200] = { 0.3, LH = { 176.669000387192, 0.3 }, RH = { 208.666666666667, 0.3 } },
+				[226] = { 0.3, LH = { 217.333333333333, 0.3 }, RH = { 243.998199701309, 0.3 }, Flags = { Linear = true } },
+				[280] = { 1.08, LH = { 262, 1.08 } }
+			}
+		},
+		ImagePlane3D7 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = -0.232, },
+				["Transform3DOp.Translate.Y"] = Input { Value = -0.065, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -0.48, },
+				["Transform3DOp.ScaleLock"] = Input { Value = 0, },
+				["Transform3DOp.Scale.X"] = Input { Value = 2.835, },
+				["Transform3DOp.Scale.Y"] = Input { Value = 2.638, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 6, },
+				MaterialInput = Input {
+					SourceOp = "shafaf_dark",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 6, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -368.92, 53.1799 } },
+		},
+		ColorCurves1 = ColorCurves {
+			PickColor = true,
+			Inputs = {
+				Red = Input {
+					SourceOp = "ColorCurves1Red",
+					Source = "Value",
+				},
+				Green = Input {
+					SourceOp = "ColorCurves1Green",
+					Source = "Value",
+				},
+				Blue = Input {
+					SourceOp = "ColorCurves1Blue",
+					Source = "Value",
+				},
+				Alpha = Input {
+					SourceOp = "ColorCurves1Alpha",
+					Source = "Value",
+				},
+				NumberOfSamplesOnMatchCurve = Input { Value = 64, },
+				IgnoreTransparent = Input { Value = 1, },
+				Input = Input {
+					SourceOp = "MediaIn1",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { -22.2649, -87.068 } },
+			Tools = {
+				ColorCurves1Red = LUTBezier {
+					KeyColorSplines = {
+						[0] = {
+							[0] = { 0, RH = { 0.249098831451773, 0 }, Flags = { Linear = true } },
+							[0.747296494355318] = { 0, LH = { 0.498197662903545, 0 }, RH = { 0.831530996236879, 0.333333333333333 }, Flags = { Linear = true } },
+							[1] = { 1, LH = { 0.915765498118439, 0.666666666666667 }, Flags = { Linear = true } }
+						}
+					},
+					SplineColor = { Red = 255, Green = 52, Blue = 52 },
+					CtrlWZoom = false,
+				},
+				ColorCurves1Green = LUTBezier {
+					KeyColorSplines = {
+						[0] = {
+							[0] = { 0, RH = { 0.249098831451773, 0 }, Flags = { Linear = true } },
+							[0.747296494355318] = { 0, LH = { 0.498197662903545, 0 }, RH = { 0.831530996236879, 0.333333333333333 }, Flags = { Linear = true } },
+							[1] = { 1, LH = { 0.915765498118439, 0.666666666666667 }, Flags = { Linear = true } }
+						}
+					},
+					SplineColor = { Red = 0, Green = 255, Blue = 0 },
+					CtrlWZoom = false,
+				},
+				ColorCurves1Alpha = LUTBezier {
+					KeyColorSplines = {
+						[0] = {
+							[0] = { 0, RH = { 0.249098831451773, 0 }, Flags = { Linear = true } },
+							[0.747296494355318] = { 0, LH = { 0.498197662903545, 0 }, RH = { 0.831530996236879, 0.333333333333333 }, Flags = { Linear = true } },
+							[1] = { 1, LH = { 0.915765498118439, 0.666666666666667 }, Flags = { Linear = true } }
+						}
+					},
+					SplineColor = { Red = 204, Green = 204, Blue = 204 },
+					CtrlWZoom = false,
+				},
+				ColorCurves1Blue = LUTBezier {
+					KeyColorSplines = {
+						[0] = {
+							[0] = { 0, RH = { 0.249098831451773, 0 }, Flags = { Linear = true } },
+							[0.747296494355318] = { 0, LH = { 0.498197662903545, 0 }, RH = { 0.831530996236879, 0.333333333333333 }, Flags = { Linear = true } },
+							[1] = { 1, LH = { 0.915765498118439, 0.666666666666667 }, Flags = { Linear = true } }
+						}
+					},
+					SplineColor = { Red = 68, Green = 68, Blue = 255 },
+					CtrlWZoom = false,
+				}
+			},
+		},
+		Camera3D1YOffset = BezierSpline {
+			SplineColor = { Red = 252, Green = 131, Blue = 47 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0, RH = { 14, 0 }, Flags = { Linear = true } },
+				[42] = { 0, LH = { 28, 0 }, RH = { 48.3333333333333, 0 } },
+				[61] = { 0, LH = { 54.6666666666667, 0 }, RH = { 65.6666666666667, 0 } },
+				[75] = { 0, LH = { 70.3333333333333, 0 }, RH = { 76.6664999723434, 0 } },
+				[80] = { 0, LH = { 78.3335000276566, 0 }, RH = { 96.6666666666667, 0 } },
+				[130] = { 0, LH = { 113.333333333333, 0 }, RH = { 162, 0 }, Flags = { Linear = true } },
+				[226] = { 0, LH = { 194, 0 }, RH = { 244, 0.000666666666666667 }, Flags = { Linear = true } },
+				[280] = { 0.002, LH = { 262, 0.00133333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		rami_01 = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 306, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "1", },
+				ClipTimeEnd = Input { Value = 306, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -187.694, -38.3741 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 306,
+					TrimOut = 306,
+				}
+			}
+		},
+		ImagePlane3D6 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = -0.49383026418625, },
+				["Transform3DOp.Translate.Y"] = Input { Value = -0.0338594861739561, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -1.64391530004946, },
+				["Transform3DOp.Scale.X"] = Input { Value = 0.346, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 5, },
+				MaterialInput = Input {
+					SourceOp = "sunni_woman",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 5, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -108.49, 165.706 } },
+		},
+		shafaf_dark = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 306, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "7", },
+				ClipTimeEnd = Input { Value = 306, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -568.92, 37.5712 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 306,
+					TrimOut = 306,
+				}
+			}
+		},
+		sunni_woman = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 306, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "5", },
+				ClipTimeEnd = Input { Value = 306, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -468.487, 173.417 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 306,
+					TrimOut = 306,
+				}
+			}
+		},
+		bashar = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 306, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "4", },
+				ClipTimeEnd = Input { Value = 306, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -259.282, 67.9064 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 306,
+					TrimOut = 306,
+				}
+			}
+		},
+		MediaIn1 = Loader {
+			CustomData = { MEDIA_ID = "69560c09-3c26-4d59-81a4-9c5dd4bf39f2", MediaProps = {
+					MEDIA_FORMAT_TYPE = "JPEG",
+					MEDIA_HEIGHT = 3264,
+					MEDIA_ID = "69560c09-3c26-4d59-81a4-9c5dd4bf39f2",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "textured white paper with wrinkled.jpg",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/images/backgrounds/textured white paper with wrinkled.jpg",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 5824
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 312, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "69560c09-3c26-4d59-81a4-9c5dd4bf39f2", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -139.008, -86.0463 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/general/images/backgrounds/textured white paper with wrinkled.jpg",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalEnd = 312,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		mahir = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 306, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "3", },
+				ClipTimeEnd = Input { Value = 306, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -300.375, 129.943 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 306,
+					TrimOut = 306,
+				}
+			}
+		},
+		ImagePlane3D4 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = 0.2278189, },
+				["Transform3DOp.Translate.Y"] = Input { Value = -0.0279059689878159, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -2.01375371803942, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 3, },
+				MaterialInput = Input {
+					SourceOp = "mahir",
+					Source = "Output",
+				},
+				["MtlStdInputs.Diffuse.Opacity"] = Input {
+					SourceOp = "ImagePlane3D4Opacity",
+					Source = "Value",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 3, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -158.312, 124.648 } },
+		},
+		shafaf_light_1 = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 312, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "6", },
+				ClipTimeEnd = Input { Value = 312, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -607.078, 115.586 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 312,
+					TrimOut = 312,
+				}
+			}
+		},
+		ImagePlane3D9 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = -0.0885628, },
+				["Transform3DOp.Translate.Z"] = Input { Value = 0.520107345311499, },
+				["Transform3DOp.ScaleLock"] = Input { Value = 0, },
+				["Transform3DOp.Scale.X"] = Input { Value = 1.977, },
+				["Transform3DOp.Scale.Y"] = Input { Value = 1.853, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 10, },
+				MaterialInput = Input {
+					SourceOp = "shafaf_light",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 10, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -361.248, -19.9699 } },
+		},
+		ImagePlane3D3YOffset = BezierSpline {
+			SplineColor = { Red = 252, Green = 131, Blue = 47 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[30] = { -0.111, RH = { 35, -0.074 } },
+				[45] = { 0, LH = { 40, -0.037 }, Flags = { Linear = true } }
+			}
+		},
+		ImagePlane3D1 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = -0.088, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -2.03, },
+				["Transform3DOp.Scale.X"] = Input { Value = 3.111, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 8, },
+				MaterialInput = Input {
+					SourceOp = "ColorCurves1",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 8, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 93.3691, -87.7258 } },
+		},
+		ImagePlane3D3 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.Y"] = Input {
+					SourceOp = "ImagePlane3D3YOffset",
+					Source = "Value",
+				},
+				["Transform3DOp.Translate.Z"] = Input {
+					SourceOp = "ImagePlane3D3ZOffset",
+					Source = "Value",
+				},
+				["Transform3DOp.Rotate.X"] = Input {
+					SourceOp = "ImagePlane3D3XRotation",
+					Source = "Value",
+				},
+				["Transform3DOp.Scale.X"] = Input { Value = 0.446, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 2, },
+				MaterialInput = Input {
+					SourceOp = "rami_01",
+					Source = "Output",
+				},
+				["MtlStdInputs.Diffuse.Opacity"] = Input {
+					SourceOp = "ImagePlane3D3Opacity",
+					Source = "Value",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 2, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -1.45452, -26.5407 } },
+		},
+		ImagePlane3D2 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = -0.413, },
+				["Transform3DOp.Translate.Y"] = Input { Value = -0.101, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -0.45, },
+				["Transform3DOp.Scale.X"] = Input { Value = 0.412, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 1, },
+				MaterialInput = Input {
+					SourceOp = "samir_01",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 1, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -40.7401, 37.9578 } },
+		},
+		Background1 = Background {
+			Inputs = {
+				GlobalOut = Input { Value = 312, },
+				Width = Input { Value = 1920, },
+				Height = Input { Value = 1080, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -338.881, -87.2016 } },
+		},
+		ImagePlane3D3ZOffset = BezierSpline {
+			SplineColor = { Red = 254, Green = 56, Blue = 46 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0.587883173349023, Flags = { Linear = true } }
+			}
+		},
+		Camera3D1YRotation = BezierSpline {
+			SplineColor = { Red = 128, Green = 255, Blue = 128 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0, RH = { 14, 0 }, Flags = { Linear = true } },
+				[42] = { 0, LH = { 28, 0 }, RH = { 48.3333333333333, 0 } },
+				[61] = { 0, LH = { 54.6666666666667, 0 }, RH = { 65.6666666666667, 0 } },
+				[75] = { 0, LH = { 70.3333333333333, 0 }, RH = { 76.6664999723434, 0 } },
+				[80] = { 0, LH = { 78.3335000276566, 0 }, RH = { 96.6666666666667, 0 } },
+				[130] = { 0, LH = { 113.333333333333, 0 }, RH = { 162, 0 }, Flags = { Linear = true } },
+				[226] = { 0, LH = { 194, 0 }, RH = { 244, 0 }, Flags = { Linear = true } },
+				[280] = { 0, LH = { 262, 0 }, Flags = { Linear = true } }
+			}
+		},
+		Merge3D1 = Merge3D {
+			Inputs = {
+				SceneInput1 = Input {
+					SourceOp = "ImagePlane3D1",
+					Source = "Output",
+				},
+				SceneInput2 = Input {
+					SourceOp = "ImagePlane3D2",
+					Source = "Output",
+				},
+				SceneInput3 = Input {
+					SourceOp = "ImagePlane3D7",
+					Source = "Output",
+				},
+				SceneInput10 = Input {
+					SourceOp = "ImagePlane3D9_1",
+					Source = "Output",
+				},
+				SceneInput9 = Input {
+					SourceOp = "ImagePlane3D9",
+					Source = "Output",
+				},
+				SceneInput6 = Input {
+					SourceOp = "ImagePlane3D6",
+					Source = "Output",
+				},
+				SceneInput5 = Input {
+					SourceOp = "ImagePlane3D4",
+					Source = "Output",
+				},
+				SceneInput8 = Input {
+					SourceOp = "ImagePlane3D8",
+					Source = "Output",
+				},
+				SceneInput7 = Input {
+					SourceOp = "ImagePlane3D5",
+					Source = "Output",
+				},
+				SceneInput4 = Input {
+					SourceOp = "ImagePlane3D3",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 459.902, 93.3909 } },
+		},
+		samir_01 = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 306, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "0", },
+				ClipTimeEnd = Input { Value = 306, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -235.961, 42.543 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 306,
+					TrimOut = 306,
+				}
+			}
+		},
+		ImagePlane3D4Opacity = BezierSpline {
+			SplineColor = { Red = 179, Green = 28, Blue = 244 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0, RH = { 26, 0 }, Flags = { Linear = true } },
+				[78] = { 0, LH = { 52, 0 }, RH = { 79.6666666666667, 0.333333333333333 }, Flags = { Linear = true } },
+				[83] = { 1, LH = { 81.3333333333333, 0.666666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		ImagePlane3D5Opacity = BezierSpline {
+			SplineColor = { Red = 179, Green = 28, Blue = 244 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[53] = { 0, RH = { 55.3333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+				[60] = { 1, LH = { 57.6666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		shafaf_light = Loader {
+			ExtentSet = true,
+			NameSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+							MEDIA_AUDIO_TRACK_NAME = "Fusion Clip 11"
+						},
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = 0,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 2,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 1080,
+					MEDIA_ID = "74279a91-f1a0-4887-93c6-f01313c64ae4",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_LAYERS_IN_OUT_LIST = {
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							307
+						},
+						{
+							0,
+							313
+						},
+						{
+							0,
+							307
+						}
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 304,
+					MEDIA_NAME = "Fusion Clip 11",
+					MEDIA_NUM_FRAMES = 313,
+					MEDIA_NUM_LAYERS = 8,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 1920,
+					__Queried = true,
+				}, },
+			Inputs = {
+				GlobalOut = Input { Value = 312, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "6", },
+				ClipTimeEnd = Input { Value = 312, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -568.825, -37.6889 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 313,
+					LengthSetManually = true,
+					GlobalEnd = 312,
+					TrimOut = 312,
+				}
+			}
+		},
+		Camera3D1XOffset = BezierSpline {
+			SplineColor = { Red = 250, Green = 59, Blue = 49 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0.00104467178027873, RH = { 14, 0.00104467178027873 }, Flags = { Linear = true } },
+				[42] = { 0.00104467178027873, LH = { 28, 0.00104467178027873 }, RH = { 48.3333333333333, 0.00104467178027873 } },
+				[61] = { -0.0535131, LH = { 54.6666666666667, -0.0535131 }, RH = { 65.6666666666667, -0.0535131 } },
+				[75] = { -0.0533616792568688, LH = { 70.3333333333333, -0.0534121528379125 }, RH = { 76.6664999723434, -0.0533436547808516 } },
+				[80] = { 0.092, LH = { 78.3335000276566, 0.092 }, RH = { 96.6666666666667, 0.092 } },
+				[130] = { 0.092, LH = { 113.333333333333, 0.092 }, RH = { 153.330999612808, 0.092 }, Flags = { Linear = true } },
+				[200] = { -0.169, LH = { 176.669000387192, -0.169 }, RH = { 208.666666666667, -0.169 } },
+				[226] = { -0.169, LH = { 217.333333333333, -0.169 }, RH = { 243.998199701309, -0.169 }, Flags = { Linear = true } },
+				[280] = { 0.004, LH = { 262, 0.004 } }
+			}
+		},
+		ImagePlane3D3XRotation = BezierSpline {
+			SplineColor = { Red = 255, Green = 128, Blue = 128 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { -88.7, RH = { 10, -89.8666666666667 }, Flags = { Linear = true } },
+				[30] = { -92.2, LH = { 20, -91.0333333333333 }, RH = { 35, -61.4666666666667 }, Flags = { Linear = true } },
+				[45] = { 0, LH = { 40, -30.7333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		ImagePlane3D5 = ImagePlane3D {
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = -0.402, },
+				["Transform3DOp.Translate.Y"] = Input { Value = 0.007, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -0.5, },
+				["Transform3DOp.Scale.X"] = Input { Value = 0.804, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 4, },
+				MaterialInput = Input {
+					SourceOp = "bashar",
+					Source = "Output",
+				},
+				["MtlStdInputs.Diffuse.Opacity"] = Input {
+					SourceOp = "ImagePlane3D5Opacity",
+					Source = "Value",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 4, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -31.6006, 73.7412 } },
+		},
+		ImagePlane3D9_1 = ImagePlane3D {
+			CtrlWZoom = false,
+			Inputs = {
+				SceneInput = Input {
+					SourceOp = "Camera3D1",
+					Source = "Output",
+				},
+				["Transform3DOp.Translate.X"] = Input { Value = 0.215214844094909, },
+				["Transform3DOp.Translate.Y"] = Input { Value = -0.0207240394749015, },
+				["Transform3DOp.Translate.Z"] = Input { Value = -1.98961853797056, },
+				["Transform3DOp.ScaleLock"] = Input { Value = 0, },
+				["Transform3DOp.Scale.X"] = Input { Value = 2.993, },
+				["Transform3DOp.Scale.Y"] = Input { Value = 2.52, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 10, },
+				MaterialInput = Input {
+					SourceOp = "shafaf_light_1",
+					Source = "Output",
+				},
+				["MtlStdInputs.MaterialID"] = Input { Value = 10, }
+			},
+			ViewInfo = OperatorInfo { Pos = { -443.584, 119.32 } },
+		},
+		Camera3D1 = Camera3D {
+			EnabledRegion = TimeRegion { { Start = 0, End = 312.9999 } },
+			Inputs = {
+				["Transform3DOp.Translate.X"] = Input {
+					SourceOp = "Camera3D1XOffset",
+					Source = "Value",
+				},
+				["Transform3DOp.Translate.Y"] = Input {
+					SourceOp = "Camera3D1YOffset",
+					Source = "Value",
+				},
+				["Transform3DOp.Translate.Z"] = Input {
+					SourceOp = "Camera3D1ZOffset",
+					Source = "Value",
+				},
+				["Transform3DOp.Rotate.X"] = Input {
+					SourceOp = "Camera3D1XRotation",
+					Source = "Value",
+				},
+				["Transform3DOp.Rotate.Y"] = Input {
+					SourceOp = "Camera3D1YRotation",
+					Source = "Value",
+				},
+				["Transform3DOp.Rotate.Z"] = Input {
+					SourceOp = "Camera3D1ZRotation",
+					Source = "Value",
+				},
+				AoV = Input { Value = 19.2642683071402, },
+				["Stereo.Mode"] = Input { Value = FuID { "Mono" }, },
+				FilmGate = Input { Value = FuID { "BMD_URSA_4K_16x9" }, },
+				ApertureW = Input { Value = 0.831496062992126, },
+				ApertureH = Input { Value = 0.467716535433071, },
+				["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 7, },
+				["MtlStdInputs.MaterialID"] = Input { Value = 7, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 267.559, -103.971 } },
+		},
+		Camera3D1XRotation = BezierSpline {
+			SplineColor = { Red = 255, Green = 128, Blue = 128 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[0] = { 0, RH = { 14, 0 }, Flags = { Linear = true } },
+				[42] = { 0, LH = { 28, 0 }, RH = { 48.3333333333333, 0 } },
+				[61] = { 0, LH = { 54.6666666666667, 0 }, RH = { 65.6666666666667, 0 } },
+				[75] = { 0, LH = { 70.3333333333333, 0 }, RH = { 76.6664999723434, 0 } },
+				[80] = { 0, LH = { 78.3335000276566, 0 }, RH = { 96.6666666666667, 0 } },
+				[130] = { 0, LH = { 113.333333333333, 0 }, RH = { 162, 0 }, Flags = { Linear = true } },
+				[226] = { 0, LH = { 194, 0 }, RH = { 244, 0 }, Flags = { Linear = true } },
+				[280] = { 0, LH = { 262, 0 }, Flags = { Linear = true } }
+			}
+		},
+		Renderer3D1 = Renderer3D {
+			CtrlWZoom = false,
+			CustomData = { ToolVersion = 2, },
+			Inputs = {
+				GlobalOut = Input { Value = 312, },
+				Width = Input { Value = 1920, },
+				Height = Input { Value = 1080, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				SceneInput = Input {
+					SourceOp = "Merge3D1",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 664.751, 96.1731 } },
+		},
+		MediaOut1 = Saver {
+			Inputs = {
+				Index = Input { Value = "0", },
+				Input = Input {
+					SourceOp = "Renderer3D1",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 859.549, 93.953 } },
+		}
+	},
+	Frames = {
+		{
+			FrameTypeID = "ChildFrame",
+			Mode = 3,
+			LayoutPreset = 0,
+			PresetName = "Default",
+			Left = 0,
+			Top = 0,
+			Width = 1920,
+			Height = 973,
+			ZoneInfo = { ["!Right"] = {
+				}, ["!Left"] = {
+				}, AuxLeft = { Expanded = true }, Right = { Expanded = true, }, Left = { Expanded = false, }, AuxRight = { Expanded = true } },
+			ViewInfo = { Viewer1 = { Show = false, Adjust = true, RatioX = 1.05347593582887, RatioY = 0.01, MRU = 0 }, InnerLeft = { RatioY = 100, PixelX = 420, }, MainSplit = { RatioX = 100, RatioY = 0.997658079625293, }, CenterSplit = { RatioX = 0.987307949231797, RatioY = 100, }, Viewer2 = { Show = true, RatioX = 0.946524064171121, RatioY = 0.01, }, Comments = { Show = false }, Time = { Show = true, RatioX = 100, }, InnerColumns = { RatioX = 100, RatioY = 2.00234192037471, }, Keyframes = { Show = false, }, LayoutStrip = { Show = true, }, Inspector = { Show = false, Adjust = true, RatioX = 100, RatioY = 1, MRU = 0 }, ActionStrip = { Show = true, RatioX = 100, }, InnerRight = {
+				}, OuterColumns = { RatioX = 100, RatioY = 1, }, Effects = { Show = false, }, Clips = { Show = false, }, Metadata = { Show = false, }, OuterLeft = {
+				}, ViewerSplit = { RatioX = 100, RatioY = 1, }, Nodes = { Show = true, RatioX = 1.00101580130266, RatioY = 100, }, OuterRight = { RatioY = 100, PixelX = 439, }, MediaPool = { Show = true, Adjust = false, RatioX = 1, RatioY = 100, MRU = 1 }, Spline = { Show = false, } },
+			Views = ordered() {
+				MediaPool = "MediaPoolView",
+				Effects = MultiView {
+					Active = "EffectView",
+					ViewList = ordered() {
+						EffectView = "EffectView"
+					},
+				},
+				Nodes = MultiView {
+					Active = "FlowView",
+					ViewList = ordered() {
+						FlowView = "FlowView"
+					},
+					FlowView = FlowView {
+						Flags = {
+							AutoSnap = true,
+							RemoveRouters = true
+						},
+						NavigatorSize = { 200, 140 },
+						Direction = "Horizontal",
+						PipeStyle = "Direct",
+						RootScale = 0.465241,
+						RootOffset = { 1064.98, 159.582 }
+					}
+				},
+				Keyframes = MultiView {
+					Active = "TimelineView",
+					ViewList = ordered() {
+						TimelineView = "TimelineView"
+					},
+					TimelineView = TimelineView {
+						TreeControlState = {
+						},
+						DisplayMode = "All Tools",
+						ShowCurrentTimeTools = false,
+						Filter = "Show All",
+						ShowSelectedTools = true,
+						ShowAnimatedToolsOnly = false,
+						ShowEditBoxes = false,
+						KeyFrameView = {
+							Position = { Left = 170, Bottom = 244 },
+							ScaleX = 8.49345794392523,
+							OffsetX = -1189.08411214953,
+							OffsetY = 0,
+							AutoScaling = "scroll",
+							AutoSnapTo = "frame",
+							AutoSnapToGuidelines = false,
+							GuidelinesGrabEnabled = true,
+							GuidelinesSnapTo = "none"
+						},
+						Spreadsheet = { LeftPos = 232, Visible = false }
+					}
+				},
+				Spline = MultiView {
+					Active = "SplineView",
+					ViewList = ordered() {
+						SplineView = "SplineEditorView"
+					},
+					SplineView = SplineEditorView {
+						LeftPos = 264,
+						ScaleX = 1.13137084989847,
+						ScaleY = 0.0189827323808469,
+						OffsetX = 606.41477554558,
+						OffsetY = -1.74641137903792,
+						AutoScaling = "scroll",
+						AutoSnapTo = "frame",
+						AutoSnapToGuidelines = false,
+						GuidelinesSnapTo = "frame",
+						ShowKeyMarkers = false,
+						IndependentHandles = false,
+						ShowNonSplineModifiers = false,
+						GuidelinesGrabEnabled = true,
+						ShowOneToolOnly = false,
+						ShowSelectedTools = true,
+						ShowAllInputs = false,
+						Filter = "Show All"
+					}
+				},
+				Inspector = MultiView {
+					Active = "Tools",
+					ViewList = ordered() {
+						Tools = "ControlView",
+						Modifiers = "ModifierView"
+					},
+				},
+				Viewer1 = MultiView {
+					Active = "LeftView",
+					ViewList = ordered() {
+						LeftView = "PreviewContainer"
+					},
+				},
+				Viewer2 = MultiView {
+					Active = "RightView",
+					ViewList = ordered() {
+						RightView = "PreviewContainer"
+					},
+				},
+				Time = "TimeView",
+				ActionStrip = "ActionStripView",
+				LayoutStrip = "LayoutStripView",
+				Clips = "ClipsView",
+				Metadata = "MetadataView"
+			},
+			Layout = {
+				{ ID = "LayoutStrip", FixedY = 36, Resolve = false, Flat = true },
+				{
+					{
+						{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+						{ ID = "Effects", RatioX = 1 },
+						Zone = "Left",
+						Rows = 2,
+						PaneID = "OuterLeft",
+						PixelX = 420
+					},
+					{
+						{
+							{
+								{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+								{ ID = "Effects", RatioX = 1 },
+								PaneID = "InnerLeft",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Left"
+							},
+							{
+								{
+									{ ID = "Viewer1", RatioY = 0.01, RatioX = 1 },
+									{ ID = "Viewer2", RatioX = 1 },
+									RatioY = 1,
+									Columns = 2,
+									PaneID = "ViewerSplit"
+								},
+								{ ID = "Time", FixedY = 83, Photo = false, Flat = true },
+								RatioX = 1,
+								Rows = 2
+							},
+							{
+								{ ID = "Inspector", RatioY = 1 },
+								{ ID = "Metadata", RatioY = 1, Fusion = false },
+								PaneID = "InnerRight",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Right"
+							},
+							RatioY = 2,
+							Columns = 3,
+							PaneID = "InnerColumns"
+						},
+						{ ID = "ActionStrip", FixedY = 50, Flat = true },
+						{
+							{ ID = "Nodes", RatioX = 1 },
+							{ ID = "Spline", Photo = false, RatioX = 1 },
+							{ ID = "Keyframes", Photo = false, RatioX = 1 },
+							RatioY = 1,
+							Columns = 3,
+							PaneID = "MainSplit"
+						},
+						{ Fusion = false, ID = "Clips", LARGE_FixedY = 160, MEDIUM_FixedY = 138, SMALL_FixedY = 110 },
+						RatioX = 1,
+						Rows = 4,
+						PaneID = "CenterSplit"
+					},
+					{
+						{ ID = "Inspector", RatioY = 1 },
+						{ ID = "Metadata", RatioY = 1, Fusion = false },
+						Zone = "Right",
+						Rows = 2,
+						PaneID = "OuterRight",
+						PixelX = 420
+					},
+					RatioY = 1,
+					Columns = 3,
+					PaneID = "OuterColumns"
+				},
+				RatioX = 1,
+				Rows = 2,
+				RatioY = 1
+			},
+			TopBar = {
+				Left = { "Left", "MediaPool", "Effects", "Clips", "Nodes", "Console" },
+				Right = { "Spline", "Keyframes", "Metadata", "Inspector", "Right" }
+			}
+		}
+	},
+	Prefs = {
+		Comp = {
+			Interactive = {
+				Proxy = {
+					Scale = 1,
+				},
+			},
+			Views = {
+				RightView = {
+					Viewer = {
+						Layer = ":Default",
+					},
+					View3D = { CamFront = { Rotation = { Y = 0, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamLeft = { Rotation = { Y = 90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamPersp = { Rotation = { Y = -456, X = 30, Z = 0 }, Scale = 1, Position = { Y = -0.153462275862694, X = -0.124507829546928, Z = -0.323015749454498 } }, CamTop = { Rotation = { Y = 0, X = 90, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamRight = { Rotation = { Y = -90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } } },
+				},
+				LeftView = {
+					Viewer = {
+						Layer = ":Default"
+					},
+					View3D = { CamFront = { Rotation = { Y = 0, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamLeft = { Rotation = { Y = 90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamPersp = { Rotation = { Y = -1104, X = 30, Z = 0 }, Scale = 0.276213586330414, Position = { Y = 0.249034091830254, X = 0.130686804652214, Z = 1.41326689720154 } }, CamTop = { Rotation = { Y = 0, X = 90, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamRight = { Rotation = { Y = -90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } } },
+				},
+			},
+			Paths = {
+				Map = {
+					["ResolveCaches:"] = "/Users/naseemtoumeh/edit-projects/general/CacheClip/ec6c4b2b-0756-4b8b-b311-d1b15396a04b/8d096677-cc85-4fd3-8bea-43b11a5cf6fe/16006c31-fd0d-4cc9-ad4a-9aa8ab702bc5/Fusion",
+				},
+			},
+			FrameFormat = {
+				Rate = 24,
+				GuideRatio = 1.77777777777778,
+				DepthFull = 3,
+				DepthPreview = 3,
+				DepthInteractive = 3,
+			},
+			Unsorted = {
+				GlobalEnd = 312
+			},
+			FreehandPrecDlg = {
+				Window = {
+					Top = 1291
+				}
+			},
+			SpellCheck = {
+			},
+		}
+	},
+}

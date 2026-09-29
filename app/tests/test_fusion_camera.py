@@ -320,8 +320,7 @@ class CameraProjectionTests(unittest.TestCase):
         self.assertIn("Closeup_01_0050_Animation = Transform", text)
         self.assertIn("TST_Entire_Ring_01_Fill = sPolygon", text)
         self.assertEqual(text.count("TST_Entire_Ring_01_Fill = sPolygon"), 1)
-        self.assertIn("Country_Deployment_Camera = sTransform", text)
-        self.assertIn("Country_Deployment_Render = sRender", text)
+        self.assertIn("Country_Deployment = MultiMerge", text)
         self.assertIn("Country_Vector_Canvas = Background", text)
         working = text.split("Map_Working_Canvas = Merge", 1)[1].split(
             "Map_With_Countries = Merge", 1)[0]

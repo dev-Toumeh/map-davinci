@@ -68,17 +68,8 @@ def _commentary(value: Any) -> dict:
     return {"clips": normalized}
 
 
-def _optional_frame(value: Any, name: str, duration: int) -> int | None:
-    if value in (None, ""):
-        return None
-    frame = int(_number(value, name))
-    if not 0 <= frame < duration:
-        raise ValueError(f"{name} must be inside the shot duration")
-    return frame
-
-
 def _region_groups(value: Any, metadata: dict, duration: int) -> list[dict]:
-    """Normalize timed parent-country groups and their child regions."""
+    """Normalize persistent, manually controlled country and territory layers."""
     countries = {str(item.get("iso3", "")).upper(): item
                  for item in metadata.get("countries", []) if item.get("iso3")}
     if value is None:
@@ -99,10 +90,6 @@ def _region_groups(value: Any, metadata: dict, duration: int) -> list[dict]:
         if iso3 in seen_countries:
             raise ValueError(f"only one region group is allowed for {iso3}")
         seen_countries.add(iso3)
-        start = _optional_frame(group.get("start_frame"), f"{iso3} parent start frame", duration)
-        end = _optional_frame(group.get("end_frame"), f"{iso3} parent disappear frame", duration)
-        if start is not None and end is not None and start >= end:
-            raise ValueError(f"{iso3} parent start frame must be before disappear frame")
         children_value = group.get("children") or []
         if not isinstance(children_value, list):
             raise ValueError(f"{iso3} region children must be a list")
@@ -121,15 +108,9 @@ def _region_groups(value: Any, metadata: dict, duration: int) -> list[dict]:
                 raise ValueError(f"{iso3} child region has an invalid category")
             if category == "historical" and iso3 != "USA":
                 raise ValueError("historical acquisition regions are available only for USA")
-            child_start = _optional_frame(
-                child.get("start_frame"), f"{iso3} region {child_index + 1} appear frame", duration)
-            child_end = _optional_frame(
-                child.get("end_frame"), f"{iso3} region {child_index + 1} disappear frame", duration)
-            if child_start is not None and child_end is not None and child_start >= child_end:
-                raise ValueError(f"{iso3} region {child_index + 1} appear frame must precede disappear frame")
             normalized = {"id": identifier, "name": str(child.get("name") or identifier)[:120],
-                          "category": category, "start_frame": child_start,
-                          "end_frame": child_end}
+                          "category": category, "start_frame": None,
+                          "end_frame": None}
             geometry_file = child.get("geometry_file")
             if geometry_file:
                 geometry_file = str(geometry_file)
@@ -137,7 +118,7 @@ def _region_groups(value: Any, metadata: dict, duration: int) -> list[dict]:
                     raise ValueError("sub-territory geometry file must be package-local")
                 normalized["geometry_file"] = geometry_file
             children.append(normalized)
-        groups.append({"iso3": iso3, "start_frame": start, "end_frame": end,
+        groups.append({"iso3": iso3, "start_frame": None, "end_frame": None,
                        "children": children})
     # Metadata order remains authoritative and missing groups are restored with
     # the backward-compatible entire-country child.

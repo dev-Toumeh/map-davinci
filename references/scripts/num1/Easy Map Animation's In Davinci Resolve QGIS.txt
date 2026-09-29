@@ -1,0 +1,271 @@
+00:00 this video I'm going to show you how to
+00:01 do map animations interin resolve using
+00:03 a software called qgis map animations
+00:05 have become very popular on YouTube
+00:07 recently by people like real life law
+00:09 and Johnny Harris so I'm going to show
+00:10 you how to make them indent resolve
+00:12 right so first go over to qg.com over
+00:15 here and click download So once it's
+00:17 downloaded open up
+00:19 qgis and then just click Newt project
+00:22 like this after you've done that where's
+00:25 his coordinates type
+00:28 world and then go up here to plug in
+00:31 manag and install plugins so there's
+00:33 loads of plugins here so there's loads
+00:34 of different things you can do on qgis
+00:36 but we're just going to start off simple
+00:37 search quick
+00:40 map so we'll see quick map Services here
+00:44 so I've already got it downloaded but
+00:45 you just need to click install like that
+00:48 and then once you've done that go over
+00:49 to web quick map services and then you
+00:53 can pick from any of these Maps here uh
+00:56 so but I like Google Maps satellite so
+00:58 click that and just check it for now so
+01:01 I'm going to do a map animation of the
+01:02 UK and France I'm going to click this
+01:04 and then highight the
+01:06 UK and then right click what it says
+01:08 world map export save selected features
+01:11 as and just give it a random
+01:14 name and
+01:15 then close out of this here and do the
+01:18 same for France so we'll uncheck this
+01:20 click on world map highlight France
+01:24 right click
+01:26 export save as and then a random file
+01:29 name again
+01:32 right so now we've got these two we
+01:33 won't need this anymore so we'll just
+01:35 uncheck
+01:39 that we'll zoom into the point where we
+01:41 want the animation to be so I like this
+01:44 so I'll just uncheck the satellite again
+01:46 click project new print layout okay then
+01:51 click in this empty space here where it
+01:53 says size go to
+01:55 custom change this to
+01:59 pixels and then 840 by 2160 which is the
+02:04 4K
+02:05 dimensions then click on this background
+02:07 here and change the opacity to
+02:12 zero so then just go up here and click
+02:15 add map drag it from the very
+02:18 top to the very
+02:21 bottom now once you've done that click
+02:23 here then go to iton properties and
+02:25 scroll down and click background and
+02:26 check that then go up here and click
+02:29 export as image here I'm going type UK
+02:32 save
+02:33 it let
+02:36 save and now I'll close out of this
+02:38 again uncheck UK and check France then
+02:43 go to projects new pint
+02:46 layout and then do the same as I did
+02:49 before
+02:51 custom 85 by
+02:59 2160
+03:00 and drag it again like that click on it
+03:04 get rid of the background and save it
+03:12 again so now I've done this we're going
+03:13 to do it again for the satellite so
+03:15 uncheck France and check Google
+03:17 satellite then click new print layout
+03:20 again click in the empty
+03:24 space 840 by
+03:27 2160 and we don't need to change the
+03:29 background anywhere because there's no
+03:30 opacity in the satellite image and drag
+03:34 it like this once again it'll take a
+03:37 minute to render and then just save it
+03:41 again that and call
+03:47 saite okay and now we're going to do a
+03:50 more zoomed out version of the satellite
+03:52 so we'll get this scale here copy this
+03:54 number so make sure so once the map's
+03:56 selected you can copy this number and
+03:58 then go to calculator
+04:03 paste it in and tabs it by
+04:06 two and copy this
+04:08 number paste it in here so it'll zoom
+04:11 out the map a bit just so we can start
+04:13 off the animation a bit further
+04:15 away so that now we're going to export
+04:18 as image again col
+04:25 satellite light zoomed out great so now
+04:27 I've done that we just want to go over
+04:29 into D Vinci resolve
+04:32 make a new
+04:33 timeline I'm going call it map
+04:37 animation and then make make it 4K down
+04:41 here like
+04:44 that then WR click in the media pool and
+04:47 click new Fusion composition I'm going
+04:49 to change the duration to 7
+04:52 seconds and paste it then drag it into
+04:55 the timeline then click open infusion
+04:58 page great an now going to go to our
+05:01 folder and drag them all in one by one
+05:03 so I'll do the UK
+05:05 first I'll just name it as we go I in F2
+05:10 Dr in
+05:13 France and
+05:20 satellite and then we're going to leave
+05:21 the zoomed out version for now because
+05:23 we don't need it yet I'm going to click
+05:25 on this satellite image here press shift
+05:26 space b type and then type merge then
+05:30 click on Multi merge here and drag it to
+05:33 the medeor out so okay so now we going
+05:35 to drag in this background ner
+05:37 here and give it whatever color you want
+05:39 so I'm going to make it blue and then
+05:43 I'm going to
+05:44 drag this from the UK image onto here
+05:48 which will basically mask out the
+05:49 background like that and then draging
+05:51 this
+05:53 background right here to the multi merge
+05:56 so that's just highlighted it in
+05:58 white Okay so so now I'm going to drag
+06:01 in a new background nerd I'll make it
+06:06 green and then type shift space bar and
+06:09 type in m
+06:10 control and then type key and drag in
+06:14 the Delta
+06:16 key so then just drag in the UK and
+06:19 connect it to this gray garbage mat here
+06:22 and then the gray garbage mat on the
+06:23 Delta key chug that into the multi merge
+06:27 so as you can see now it's got a big
+06:29 green background so going to go into the
+06:30 Delta key here the background color and
+06:33 click on
+06:34 this here and drag it onto the
+06:37 green and then go over to mat and adjust
+06:41 the aod
+06:42 dilate so that's going to give it an
+06:44 outline so I'm just going to make the r
+06:46 dialate
+06:49 about uh like that then change the soft
+06:53 color here to hard
+06:55 color and then I'm going to make the
+06:57 color for this
+06:58 white
+07:03 looking at I think it still needs to go
+07:05 down a little bit maybe like that okay
+07:08 so now we've done that we're just going
+07:09 to copy this whole thing here and we're
+07:11 going to actually delete this front
+07:13 image we going to copy all this here
+07:16 paste it down here and drag up then
+07:20 connect these both to the multi merge
+07:23 and then we going to drag this front
+07:25 image and replace it like that there we
+07:28 go so that's done that for the front
+07:30 image so we probably want to change the
+07:32 colors around I'm going to change it to
+07:35 red and then I'll maybe
+07:37 change this color to the
+07:43 yellow and I'll go back to the multi
+07:45 merge and change the opacity so I'll
+07:47 click on background layer one so that'll
+07:49 be the UK and change the blend to about
+07:53 .3 have that and then do the same for
+07:56 the other background layer
+07:58 not3 so now we need to do do a few more
+07:60 things to make it look nicer so click on
+08:02 this Delta key add at the end type shift
+08:04 space bar and type
+08:06 glow that's that's added a little glue I
+08:09 might adjust it just the glue size up a
+08:11 bit and the glue it's maybe a bit
+08:14 like like this looks nice so I'm just
+08:17 going to copy this and paste it onto the
+08:19 other Delta key like that right so that
+08:23 looks
+08:24 good so you can so now we're going to
+08:27 add in we're going to animate the
+08:29 countries in so I'll go to about 40
+08:30 seconds where I want the animation to
+08:32 end and I'll make a key frame on the
+08:34 blend nerd for all these layers so click
+08:37 on the first layer make a key frame do
+08:39 that for the rest of the
+08:42 layers and now go to about 15 seconds in
+08:46 and then set the blood mode to zero for
+08:49 them
+08:51 all like
+08:54 this it's an not should animating like
+08:58 this okay cool so now we're going to
+09:00 make a 3D animation with it so you could
+09:03 just have it like this if you want but I
+09:05 think it looks better 3D so I'm going to
+09:07 disconnect this multi merge here click
+09:10 on it and type shift space bar image
+09:13 plan 3D and I'll drag this out a little
+09:16 bit so it's not in the
+09:17 way and type merge
+09:20 3D rent camera 3D and render 3D so
+09:25 that's basically set up our 3D scene
+09:27 there so connect the render 3D to the
+09:29 media r
+09:30 then click on this merge 3D press one to
+09:33 show it
+09:34 here then drag the camera back and now
+09:38 we're going to position the camera to
+09:39 how we want it to end on the
+09:41 animation
+09:45 so so you can click on these two here to
+09:48 just switch it from rotation to position
+09:52 like
+09:58 this that looks
+10:02 good so then we're also going to get our
+10:05 zoomed out satellite that
+10:07 we made earlier going to drag that in
+10:11 here and then type shift Space by image
+10:14 plane
+10:15 again drag that here and then on the
+10:19 transform I'm going to move it back very
+10:21 slightly so on the Z AIS click minus 2
+10:28 0.001
+10:30 minus 0.001 like that so you want to
+10:33 move it back just enough where it's not
+10:35 noticeable but you also don't want it to
+10:37 be sort
+10:39 of merging like
+10:42 this so like if you have it at a certain
+10:44 point it'll start to look a bit weird so
+10:47 we'll make it 0.001 and then change the
+10:50 scale to two so that's just made the map
+10:53 a little bit
+10:55 bigger but it also means that once the
+10:57 camera is zoomed in here this will still
+10:58 be 4K
+11:02 but this stuff won't be so you can see
+11:03 when we zoom into the edge that this
+11:05 stuff's lower quality but it won't
+11:06 matter cuz we'll be zoomed out in the
+11:08 camera so now go back to the camera here
+11:11 click on transform and then go to where
+11:14 you want the camera animation to end so
+11:15 we'll go to
+11:16 35 make key frame for all of
+11:20 them like that then go to
+11:28 zero
+11:31 cool so now we just need to go in this
+11:33 SP editor and make sure the multi merge
+11:35 is
+11:36 disabled then zoom out and highlight
+11:39 everything right click click ease then
+11:42 out cubic there you go so that's just a
+11:44 very basic map animation you can go a
+11:46 lot further with this and I might make a
+11:47 video in the future if you've got any
+11:49 other tutorial requests comment that
+11:51 down below as well and hope you have a
+11:52 great day see you

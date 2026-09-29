@@ -1,5 +1,6 @@
 """Sub-territory schema and native Fusion hierarchy regression tests."""
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -38,7 +39,7 @@ class RegionLayerTests(unittest.TestCase):
         self.assertEqual(group["children"][0]["category"], "country")
         self.assertIsNone(group["children"][0]["start_frame"])
 
-    def test_parent_and_child_timing_generate_shape_deployment(self):
+    def test_legacy_timing_is_removed_and_shapes_remain_available(self):
         animation = self.base_animation()
         animation["region_groups"] = [{"iso3": "USA", "start_frame": 5,
             "end_frame": 110, "children": [
@@ -49,6 +50,11 @@ class RegionLayerTests(unittest.TestCase):
                  "geometry_file": "regions/geometry_texas-annexation-1845.geojson"},
             ]}]
         animation = normalize_animation(animation, self.metadata())
+        self.assertIsNone(animation["region_groups"][0]["start_frame"])
+        self.assertIsNone(animation["region_groups"][0]["end_frame"])
+        for child in animation["region_groups"][0]["children"]:
+            self.assertIsNone(child["start_frame"])
+            self.assertIsNone(child["end_frame"])
         with tempfile.TemporaryDirectory() as folder:
             package = Path(folder)
             (package / "geometry_USA.geojson").write_text(json.dumps({"geometry": GEOMETRY}))
@@ -56,13 +62,10 @@ class RegionLayerTests(unittest.TestCase):
             (package / "regions/geometry_texas-annexation-1845.geojson").write_text(
                 json.dumps({"geometry": GEOMETRY}))
             text = generate(package, self.metadata(), animation).read_text()
-        self.assertIn("USA_Entire_Visibility = BezierSpline", text)
-        self.assertIn("USA_Texas_Annexation_1845_Visibility", text)
+        self.assertNotIn("_Visibility = BezierSpline", text)
         self.assertIn("USA_Entire_Shapes = sMerge", text)
         self.assertIn("USA_Texas_Annexation_1845_Shapes = sMerge", text)
-        self.assertIn("Country_Deployment_Geometry = sMerge", text)
-        self.assertIn("Country_Deployment_Camera = sTransform", text)
-        self.assertIn("Country_Deployment_Render = sRender", text)
+        self.assertIn("Country_Deployment = MultiMerge", text)
         self.assertIn("Country_Edit_Controller = CustomTool", text)
         self.assertIn("Country_Edit_Selected = MultiMerge", text)
         self.assertIn("Country_Mode_Switch = Switch", text)
@@ -72,23 +75,19 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn('Expression = "Country_Edit_Controller.Show_02"', text)
         self.assertIn('SourceOp = "Country_Edit_01_Enabled"', text)
         self.assertIn('SourceOp = "Country_Edit_02_Enabled"', text)
-        deployment = text.split("Country_Deployment_Geometry = sMerge", 1)[1].split(
-            "Country_Deployment_Camera = sTransform", 1)[0]
-        self.assertIn('Input1 = Input { SourceOp = "USA_Entire_Shapes"', deployment)
-        self.assertIn(
-            'Input2 = Input { SourceOp = "USA_Texas_Annexation_1845_Shapes"',
-            deployment)
+        deployment = text.split("Country_Deployment = MultiMerge", 1)[1].split(
+            "Country_Edit_Selected = MultiMerge", 1)[0]
+        self.assertIn('SourceOp = "USA_Flag_Color_Flag"', deployment)
+        self.assertIn('SourceOp = "Country_Edit_02_Render"', deployment)
         self.assertIn('Name0 = Input { Value = "EDIT MODE - checked countries and territories"', text)
         self.assertIn('Name1 = Input { Value = "DEPLOYMENT - all countries and territories"', text)
-        self.assertIn(
-            'Input1 = Input { SourceOp = "Country_Deployment_Render", Source = "Output"',
-            text)
+        self.assertIn('SourceOp = "Country_Deployment", Source = "Output"', text)
         self.assertIn('Map_With_Countries = Merge', text)
         self.assertIn('Input = Input { SourceOp = "Map_Raster_Layers"', text)
         self.assertIn('Background = Input { SourceOp = "Map_Working_Canvas"', text)
         self.assertNotIn("USA_Entire_Wide", text)
         self.assertNotIn("USA_Entire_Detail", text)
-        self.assertEqual(text.count('SourceOp = "USA_Entire_Shapes"'), 2)
+        self.assertEqual(text.count('SourceOp = "USA_Entire_Shapes"'), 1)
         self.assertNotIn("Vector_AnimationDisplacement", text)
         self.assertNotIn("Vector_AnimationPath", text)
         border = text.split(
@@ -109,13 +108,15 @@ class RegionLayerTests(unittest.TestCase):
         self.assertEqual(_territory_base("USA", louisiana),
                          "USA_Louisiana_Purchase_1803")
 
-    def test_invalid_child_interval_is_rejected(self):
+    def test_invalid_legacy_child_interval_is_cleared(self):
         animation = self.base_animation()
         animation["region_groups"] = [{"iso3": "USA", "children": [{
             "id": "bad", "name": "Bad", "category": "historical",
             "start_frame": 60, "end_frame": 30}]}]
-        with self.assertRaisesRegex(ValueError, "appear frame must precede"):
-            normalize_animation(animation, self.metadata())
+        normalized = normalize_animation(animation, self.metadata())
+        child = normalized["region_groups"][0]["children"][0]
+        self.assertIsNone(child["start_frame"])
+        self.assertIsNone(child["end_frame"])
 
     def test_edit_controller_can_enable_regions_across_multiple_countries(self):
         metadata = self.metadata()
@@ -131,7 +132,7 @@ class RegionLayerTests(unittest.TestCase):
                     json.dumps({"geometry": GEOMETRY}))
             text = generate(package, metadata, animation).read_text()
         edit = text.split("Country_Edit_Controller = CustomTool", 1)[1].split(
-            "Country_Deployment_Geometry = sMerge", 1)[0]
+            "Country_Deployment = MultiMerge", 1)[0]
         self.assertIn('Show_01 = Input { Value = 1', edit)
         self.assertIn('Show_02 = Input { Value = 0', edit)
         self.assertIn('LINKS_Name = "USA - Entire country"', edit)
@@ -142,10 +143,10 @@ class RegionLayerTests(unittest.TestCase):
             "Country_Mode_Switch = Switch", 1)[0]
         self.assertIn('SourceOp = "Country_Edit_01_Enabled"', selected)
         self.assertIn('SourceOp = "Country_Edit_02_Enabled"', selected)
-        deployment = text.split("Country_Deployment_Geometry = sMerge", 1)[1].split(
-            "Country_Deployment_Camera = sTransform", 1)[0]
-        self.assertIn('SourceOp = "USA_Entire_Shapes"', deployment)
-        self.assertIn('SourceOp = "CAN_Entire_Shapes"', deployment)
+        deployment = text.split("Country_Deployment = MultiMerge", 1)[1].split(
+            "Country_Edit_Selected = MultiMerge", 1)[0]
+        self.assertIn('SourceOp = "USA_Flag_Color_Flag"', deployment)
+        self.assertIn('SourceOp = "CAN_Flag_Color_Flag"', deployment)
         self.assertEqual(text.count("Country_Mode_Switch = Switch"), 1)
 
     def test_small_exterior_islands_are_retained_but_disconnected(self):
@@ -167,7 +168,32 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("USA_Entire_Ring_01_Fill", active)
         self.assertNotIn("USA_Entire_Ring_02_Fill", active)
         self.assertIn("USA_Entire_Ring_02_Fill", optional)
-        self.assertEqual(text.count('SourceOp = "USA_Entire_Optional_Islands"'), 0)
+        self.assertIn("USA_Entire_Optional_Group = GroupOperator", text)
+        group = text.split("USA_Entire_Optional_Group = GroupOperator", 1)[1].split(
+            "Map_Raster_Layers", 1)[0]
+        self.assertIn("Tools = ordered()", group)
+        frame = re.search(
+            r'ViewInfo = GroupInfo \{.*?Pos = \{ (-?[\d.]+), \d+ \}.*?'
+            r'Size = \{ (\d+),', group, re.S)
+        self.assertIsNotNone(frame)
+        self.assertAlmostEqual(float(frame.group(1)) + int(frame.group(2)) / 2,
+                               50, places=5)
+        self.assertEqual(text.count('SourceOp = "USA_Entire_Optional_Islands"'), 1)
+        positions = {}
+        for index, kind in ((1, "Fill"), (1, "Border"),
+                            (2, "Fill"), (2, "Border")):
+            match = re.search(
+                rf'USA_Entire_Ring_{index:02d}_{kind} = sPolygon.*?Pos = \{{ (-?\d+), (\d+) \}}',
+                group, re.S)
+            self.assertIsNotNone(match)
+            positions[index, kind] = tuple(map(int, match.groups()))
+        self.assertEqual(positions[1, "Fill"][0], positions[1, "Border"][0])
+        self.assertEqual(positions[2, "Fill"][0], positions[2, "Border"][0])
+        self.assertEqual(positions[1, "Fill"][1] - positions[1, "Border"][1], 22)
+        self.assertEqual(positions[2, "Fill"][1] - positions[2, "Border"][1], 22)
+        self.assertEqual(positions[2, "Border"][1], positions[1, "Border"][1])
+        self.assertGreaterEqual(
+            positions[2, "Border"][0] - positions[1, "Border"][0], 250)
 
 
 if __name__ == "__main__":

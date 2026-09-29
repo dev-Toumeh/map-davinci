@@ -513,9 +513,11 @@ class Handler(BaseHTTPRequestHandler):
                 animation = self._normalize_animation(package, config)
                 package_layout.animation_path(package).write_text(
                     json.dumps(animation, indent=2) + "\n", encoding="utf-8")
-                target = fusion_generator.generate(package, metadata, animation)
+                warnings = []
+                target = fusion_generator.generate(package, metadata, animation, warnings)
                 relative = target.relative_to(app_settings.exports_dir())
-                self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative)})
+                self._json({"ok": True, "file": str(relative), "url": "/exports/" + str(relative),
+                            "warnings": warnings})
                 return
             if (m := re.fullmatch(r"/api/export/([A-Za-z0-9_.-]+)/delete", path)):
                 package = self._package(m.group(1))

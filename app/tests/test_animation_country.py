@@ -105,6 +105,22 @@ class AnimationCountryUITests(unittest.TestCase):
         self.assertIn('child.category==="country"&&images[group.iso3]', self.html)
         self.assertIn('country?.geometry_file?url(country.geometry_file)', self.html)
 
+    def test_territory_timing_controls_are_not_exposed(self):
+        for control in ("parentstart", "parentend", "regionstart", "regionend"):
+            self.assertNotIn(f'id="{control}"', self.html)
+        self.assertNotIn("fitRegionTimings", self.html)
+        self.assertNotIn("regionVisibility", self.html)
+        self.assertIn("available for manual control in Fusion", self.html)
+
+    def test_format_switch_fits_every_keyframe_inside_map_coverage(self):
+        self.assertIn('id="sourceformat"', self.html)
+        self.assertIn("function fitKeyframeToFormat(k,scale=1)", self.html)
+        self.assertIn("k.center={...k.center,x:clamp(k.center.x", self.html)
+        self.assertIn("for(let k of anim.keyframes)fitKeyframeToFormat(k,scale)",
+                      self.html)
+        self.assertIn("All keyframes were fitted inside the available map coverage",
+                      self.html)
+
 
 if __name__ == "__main__":
     unittest.main()

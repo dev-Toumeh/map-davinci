@@ -1,0 +1,1099 @@
+00:01 welcome back to the channel in this
+00:02 
+
+00:02 video I'm going to show you how you can
+00:04 
+
+00:04 create another map animation inside of
+00:06 
+
+00:06 DaVinci Resolve let's take a look at the
+00:09 
+
+00:09 preview and get started
+00:15 
+
+00:15 [Music]
+00:21 
+
+00:21 right so I have this image of a map over
+00:24 
+
+00:24 here I put the link in the description
+00:26 
+
+00:26 so you can go ahead and download the
+00:27 
+
+00:27 same map I'm going to drag in Fusion
+00:29 
+
+00:29 composition onto the timeline by default
+00:32 
+
+00:32 the length will be 5 Seconds which
+00:34 
+
+00:34 should be good enough for this animation
+00:35 
+
+00:35 let's go to the fusion page and start
+00:37 
+
+00:37 creating our animation
+00:39 
+
+00:39 so let's go to the media pool and drag
+00:41 
+
+00:41 in this image and then we can take a
+00:45 
+
+00:45 look at this you can see the resolution
+00:46 
+
+00:46 it's quite big our timeline is going to
+00:49 
+
+00:49 be only 1080p so I'm going to add in a
+00:51 
+
+00:51 background node click on ADD let's take
+00:54 
+
+00:54 a look at this merge one and I'm going
+00:56 
+
+00:56 to right click on it and click on Swipe
+00:58 
+
+00:58 inputs you can also press the shortcut
+00:60 
+
+00:60 key which is Ctrl t
+01:02 
+
+01:02 to swap the inputs so that now our image
+01:04 
+
+01:04 is within the 1920x1080 composition size
+01:08 
+
+01:08 then under size I can just reduce that
+01:12 
+
+01:12 value so I'm going to set this to around
+01:13 
+
+01:13 point
+01:15 
+
+01:15 5 8 so I can see the entire map right
+01:19 
+
+01:19 now I want two more copies for two of
+01:21 
+
+01:21 the continents that I'll be highlighting
+01:24 
+
+01:24 so let's just copy this and paste it
+01:27 
+
+01:27 down below
+01:28 
+
+01:28 and let's take a look at it's going to
+01:30 
+
+01:30 be same nothing will be changed now I'm
+01:33 
+
+01:33 going to do is on this media in one I'm
+01:35 
+
+01:35 going to right click and click on rename
+01:36 
+
+01:36 so this will be r
+01:38 
+
+01:38 continent one
+01:41 
+
+01:41 and I'm going to add in a polygon mask
+01:44 
+
+01:44 to this and now you can see that
+01:45 
+
+01:45 everything will be black so I'm gonna
+01:47 
+
+01:47 click on this polygon one and disable it
+01:49 
+
+01:49 for now so that we can see the map I'm
+01:51 
+
+01:51 going to zoom into the continent over
+01:53 
+
+01:53 here and just start
+01:55 
+
+01:55 tracing around or creating a shape
+01:59 
+
+01:59 around the continent
+02:01 
+
+02:01 like so
+02:03 
+
+02:03 and then finally connect it up like that
+02:05 
+
+02:05 now if you want to make changes you can
+02:07 
+
+02:07 go ahead and select any of these points
+02:09 
+
+02:09 and just drag them anywhere that you
+02:11 
+
+02:11 want and now you can just go ahead and
+02:13 
+
+02:13 enable the polygon one and now you can
+02:15 
+
+02:15 see that we have just this continent now
+02:17 
+
+02:17 we have this outline over here of this
+02:20 
+
+02:20 map the extra bit we don't want that
+02:23 
+
+02:23 right so after this node we're going to
+02:24 
+
+02:24 add in a Luma cure which will get rid of
+02:27 
+
+02:27 that outline color and we want to you
+02:30 
+
+02:30 can also see it got rid of a little bit
+02:32 
+
+02:32 of color from our map as well so let's
+02:34 
+
+02:34 just change the low and the high over
+02:36 
+
+02:36 here and change these sliders to get
+02:38 
+
+02:38 that color back like so
+02:41 
+
+02:41 and for now let's just keep it right
+02:43 
+
+02:43 over here now what we can do is let's
+02:46 
+
+02:46 copy and paste this again so I'm going
+02:49 
+
+02:49 to just copy everything we have over
+02:52 
+
+02:52 here for this group copy it and paste it
+02:55 
+
+02:55 down below and now this will be our
+02:57 
+
+02:57 second continent I'm going to
+02:60 
+
+02:60 reset the polygon for now so that there
+03:02 
+
+03:02 will be nothing over there it will be
+03:04 
+
+03:04 reset I'm going to select this polygon
+03:06 
+
+03:06 and disable this and now if we take a
+03:09 
+
+03:09 look at this merge over here you can see
+03:11 
+
+03:11 that our entire map now you might be
+03:13 
+
+03:13 thinking what happened to a map and
+03:15 
+
+03:15 that's because of this Luma here if you
+03:16 
+
+03:16 disable this this is our original map
+03:18 
+
+03:18 and this is uh with the Luma here on
+03:22 
+
+03:22 so again we're just going to find our
+03:24 
+
+03:24 continent over here make sure your
+03:26 
+
+03:26 polygon node is selected and you can
+03:28 
+
+03:28 start tracing around
+03:29 
+
+03:29 the continent
+03:33 
+
+03:33 right now enable the polygon one
+03:36 
+
+03:36 like so and there we have it we can also
+03:40 
+
+03:40 animate this polygon node you can just
+03:43 
+
+03:43 animate its border width as well maybe
+03:45 
+
+03:45 increase the soft Edge a little bit and
+03:47 
+
+03:47 you know create your
+03:49 
+
+03:49 uh visualization using the Border width
+03:53 
+
+03:53 you can animate that as well but let's
+03:56 
+
+03:56 just um skip that for now I'm going to
+03:58 
+
+03:58 use another method for this which will
+03:60 
+
+03:60 look much better than animating the
+04:02 
+
+04:02 border with cool so we have both of our
+04:05 
+
+04:05 continents over here
+04:07 
+
+04:07 now what you can do is let's go to our
+04:10 
+
+04:10 first continent over here and for the
+04:12 
+
+04:12 animation I'm actually going to use the
+04:14 
+
+04:14 Luma hero here if I change the position
+04:17 
+
+04:17 of this slider you can see that we can
+04:20 
+
+04:20 use that for our animation all right
+04:23 
+
+04:23 cool so I'm going to go to frame 120 and
+04:27 
+
+04:27 create a keyframe on this slider then go
+04:29 
+
+04:29 back to the very first frame and just
+04:31 
+
+04:31 move this slider all the way to the
+04:33 
+
+04:33 right both of these right so you it will
+04:36 
+
+04:36 be your map will disappear which is what
+04:38 
+
+04:38 we want you can do the same thing with
+04:40 
+
+04:40 other Luma here we have over here let's
+04:42 
+
+04:42 take a look at our merge uh so let's go
+04:45 
+
+04:45 to frame 120 create a keyframe on low
+04:48 
+
+04:48 and high slider then go to the first
+04:51 
+
+04:51 frame and move
+04:52 
+
+04:52 these sliders to the right
+04:55 
+
+04:55 so now we have this a cool looking
+04:58 
+
+04:58 animation
+04:60 
+
+04:60 right now let's combine all of these
+05:02 
+
+05:02 Maps so first one is our background map
+05:05 
+
+05:05 over here I'm going to combine it with
+05:07 
+
+05:07 this merge
+05:08 
+
+05:08 and then moisture we will combine it
+05:10 
+
+05:10 with our final the second continent over
+05:13 
+
+05:13 here
+05:14 
+
+05:14 so if you take a look at merge 2 it says
+05:17 
+
+05:17 how it is going to look you'll see that
+05:19 
+
+05:19 our animation is not there that's
+05:21 
+
+05:21 because we just have to right click
+05:24 
+
+05:24 almost two and click on Swap inputs all
+05:26 
+
+05:26 right so even if we change that you can
+05:28 
+
+05:28 see nothing really happens and that's
+05:30 
+
+05:30 because we need to go to the to the
+05:32 
+
+05:32 previous merge and change the operator
+05:34 
+
+05:34 to mask and now you can see that we have
+05:37 
+
+05:37 essentially must out from our original
+05:40 
+
+05:40 map and now we can just go ahead and in
+05:44 
+
+05:44 the background node and change the color
+05:46 
+
+05:46 of this shape to any color that you want
+05:49 
+
+05:49 all right and you can do the same thing
+05:52 
+
+05:52 with this node over here as well let's
+05:54 
+
+05:54 fill this right click click on Swap
+05:57 
+
+05:57 inputs and then on the merge let's
+05:59 
+
+05:59 change the operator and set that to mask
+06:02 
+
+06:02 go ahead in in the background and change
+06:05 
+
+06:05 it to any color that you want
+06:07 
+
+06:07 right cool so after this post three what
+06:09 
+
+06:09 you can do is you can either use the
+06:12 
+
+06:12 image print 3D and use the 3D
+06:15 
+
+06:15 environment to create your cool 3D look
+06:18 
+
+06:18 3D animation to this or you can also use
+06:21 
+
+06:21 a dve node so let's just uh first of all
+06:23 
+
+06:23 let me show you with the dve node it's a
+06:26 
+
+06:26 pretty cool note so if we just drag that
+06:28 
+
+06:28 and you can you know just you know start
+06:30 
+
+06:30 rotating your
+06:32 
+
+06:32 uh image around and you know create a
+06:35 
+
+06:35 cool camera angle maybe change the
+06:37 
+
+06:37 perspective and all that stuff
+06:39 
+
+06:39 um so you get the idea so you can you
+06:41 
+
+06:41 know do the same thing what you do using
+06:43 
+
+06:43 the camera 3D but it's like very very
+06:46 
+
+06:46 easy to do using the dve node so so you
+06:50 
+
+06:50 can you know come up with any camera
+06:51 
+
+06:51 angle uh you know play around with a
+06:54 
+
+06:54 different uh rotation axes and you know
+06:57 
+
+06:57 start animating all of these properties
+06:59 
+
+06:59 such as Central x z move and the XYZ
+07:03 
+
+07:03 axis all right uh but I kind of like to
+07:07 
+
+07:07 use the image plane 3D way because we
+07:10 
+
+07:10 have more control over it such as we can
+07:12 
+
+07:12 also add in a depth of field uh blur
+07:15 
+
+07:15 which really uh you know sells this
+07:17 
+
+07:17 animation so let's just add the image
+07:20 
+
+07:20 plane 3D and
+07:22 
+
+07:22 uh let's take a look at it so now we
+07:24 
+
+07:24 have our world map in a 3D scene now
+07:28 
+
+07:28 what we can do is after this image plane
+07:30 
+
+07:30 3D we can add in a merge 3D and after
+07:34 
+
+07:34 this merge we can add a renderer 3D
+07:38 
+
+07:38 on this merge 3D let's select it and add
+07:41 
+
+07:41 in a camera 3D as well all right cool so
+07:44 
+
+07:44 if I take a look at most 3D you won't be
+07:46 
+
+07:46 able to see anything and that's because
+07:47 
+
+07:47 we need to select our camera 3D and go
+07:50 
+
+07:50 to transform and we just have to pull
+07:52 
+
+07:52 the camera back in the Z space so let me
+07:55 
+
+07:55 just do that again but inside the mouse
+07:57 
+
+07:57 3D so if I go to merge 3D view it you
+07:60 
+
+07:60 can see that our camera is kind of in
+08:03 
+
+08:03 front of the map so what we are
+08:06 
+
+08:06 essentially doing is just pulling it
+08:07 
+
+08:07 back on the Z axis so I'm going to
+08:10 
+
+08:10 select the camera and just pull it back
+08:13 
+
+08:13 right and when you do that then you will
+08:15 
+
+08:15 be able to see your image so again just
+08:18 
+
+08:18 increase it so that we can see the
+08:20 
+
+08:20 entire image and now you can create any
+08:23 
+
+08:23 sort of animation on the camera 3D so
+08:26 
+
+08:26 let's just do that I'm actually going to
+08:27 
+
+08:27 use the target over here this option use
+08:30 
+
+08:30 Target and what that will allow you to
+08:33 
+
+08:33 do is if I take a look at merge 3D you
+08:35 
+
+08:35 can see that we have this little Target
+08:37 
+
+08:37 in the middle so you can use that to you
+08:42 
+
+08:42 know animate the camera around you can
+08:44 
+
+08:44 just put this Target on any thing that
+08:46 
+
+08:47 you want in Focus so in our case we want
+08:49 
+
+08:49 the map in Focus I'm going to just pull
+08:51 
+
+08:51 it back on the z-axis slightly
+08:55 
+
+08:55 and now on the camera 3D
+08:57 
+
+08:57 you can go ahead and just create any
+08:60 
+
+08:60 sort of Animation using the on the
+09:02 
+
+09:02 translation or rotation you can see that
+09:04 
+
+09:04 if I change the X slider it it retains
+09:08 
+
+09:08 the position of the map image but if I
+09:12 
+
+09:12 had this Target off then you can see
+09:15 
+
+09:15 that it just you know shifts the entire
+09:17 
+
+09:17 image you can you know better visualize
+09:19 
+
+09:19 this in the merge 3D so if I take a look
+09:23 
+
+09:23 at it this is our most 3D and if I go
+09:27 
+
+09:27 back to my camera 3D over here
+09:29 
+
+09:29 click on use Target and change the image
+09:32 
+
+09:32 you can see that change the translation
+09:34 
+
+09:34 you can see that how our camera behaves
+09:37 
+
+09:37 you know it keeps the uh image in Focus
+09:40 
+
+09:40 all the time actually it's looking at
+09:42 
+
+09:42 this target not the image but since our
+09:44 
+
+09:44 Target is on that image so it's gonna
+09:47 
+
+09:47 keep that in Focus if I just reset this
+09:51 
+
+09:51 and uncheck use Target and now if I
+09:54 
+
+09:54 change the X position you can actually
+09:57 
+
+09:57 see that our camera doesn't really focus
+09:59 
+
+09:59 on that image so when you use the target
+10:01 
+
+10:02 it kind of makes it easy for the
+10:04 
+
+10:04 animation so let's just um you know use
+10:06 
+
+10:06 that for now I'm going to click on use
+10:07 
+
+10:07 Target
+10:08 
+
+10:08 and now on the image plane 3D I'm
+10:10 
+
+10:10 actually going to just slightly tilt it
+10:13 
+
+10:13 on the x axis
+10:16 
+
+10:16 and something like that and then go to
+10:19 
+
+10:19 camera 3D and I can just zoom into this
+10:23 
+
+10:23 a little bit
+10:24 
+
+10:24 now I can see that as I am rotating it
+10:27 
+
+10:27 it will keep my map in Focus all the
+10:31 
+
+10:31 time
+10:32 
+
+10:32 so you can create any kind of movement
+10:35 
+
+10:35 any kind of angle to this
+10:37 
+
+10:37 and change the position
+10:39 
+
+10:39 and all that stuff all right so I'm
+10:42 
+
+10:42 gonna kind of start from this position
+10:44 
+
+10:44 I'm gonna go back to the very first
+10:46 
+
+10:46 frame I'm gonna right click under
+10:47 
+
+10:47 translation and click on animate
+10:49 
+
+10:49 translate group I'm going to also right
+10:52 
+
+10:52 click on the target click on animate
+10:53 
+
+10:53 Target group and also let's just store
+10:55 
+
+10:56 that on rotation as well because why not
+10:58 
+
+10:58 so let's just do that and go to the very
+11:00 
+
+11:00 end of our animation and start changing
+11:04 
+
+11:04 the position so I'm going to rotate
+11:07 
+
+11:07 around like so maybe zoom in a little
+11:10 
+
+11:10 bit change the position again and you
+11:13 
+
+11:13 can see that how easy it becomes when we
+11:16 
+
+11:16 use the target to change our
+11:20 
+
+11:20 to change our position camera position
+11:23 
+
+11:23 I can disable high quality for smoother
+11:26 
+
+11:26 playback
+11:27 
+
+11:27 but there you have it we have this
+11:29 
+
+11:29 really cool animation now we can also do
+11:32 
+
+11:32 is we can add in a text plus node and
+11:36 
+
+11:36 start typing something so let's do South
+11:39 
+
+11:39 America
+11:41 
+
+11:41 right then we can add in a image plain
+11:44 
+
+11:44 3D to this as well
+11:46 
+
+11:46 and hook it up to merge 3D like so
+11:52 
+
+11:52 right now we have our text in our scene
+11:54 
+
+11:54 and now what we have to do is go to
+11:56 
+
+11:56 image plane 3D for our text and we start
+11:59 
+
+11:59 changing the values over here first of
+12:01 
+
+12:01 all I'm just going to reduce the scale
+12:02 
+
+12:02 quite a bit something like that and I
+12:05 
+
+12:05 want it to be placed on this continent
+12:08 
+
+12:08 over here for South America and I'm just
+12:10 
+
+12:10 going to change the position and maybe
+12:13 
+
+12:13 rotation as well so that it's facing the
+12:16 
+
+12:16 camera
+12:17 
+
+12:17 like that
+12:19 
+
+12:19 and change the position
+12:22 
+
+12:22 a little bit to the left
+12:26 
+
+12:26 like so and
+12:29 
+
+12:29 somewhere
+12:31 
+
+12:31 over here I guess you just keep playing
+12:34 
+
+12:34 with the different settings over here
+12:36 
+
+12:36 and try and position it properly
+12:42 
+
+12:42 all right maybe somewhere over here so
+12:44 
+
+12:44 at the first frame we have our text and
+12:48 
+
+12:48 at the last frame we have it right on
+12:50 
+
+12:50 that continent if we take a look at the
+12:52 
+
+12:52 result we can see that our text is
+12:55 
+
+12:55 animating with the camera and really
+12:58 
+
+12:58 sells the animation so you can copy this
+13:02 
+
+13:02 text and image plane 3D and for you know
+13:05 
+
+13:05 replace the text with Africa continent
+13:07 
+
+13:07 over here
+13:08 
+
+13:08 but that is essentially how you can add
+13:10 
+
+13:10 the text after the renderer 3D I'm going
+13:12 
+
+13:12 to just hook it up directly to Media out
+13:14 
+
+13:14 and before we wrap things up go to
+13:17 
+
+13:17 render.3d change render type to opengl
+13:20 
+
+13:20 and under accumulation effects I'm going
+13:23 
+
+13:23 to click on enable accumulation effect
+13:25 
+
+13:25 now I'm just going to reduce the amount
+13:28 
+
+13:28 of blur right now I'm going to set the
+13:31 
+
+13:31 depth of blur to 0.002 for now and I'm
+13:35 
+
+13:35 going to go back to my camera 3D go to
+13:37 
+
+13:37 controls and I can change the focal
+13:39 
+
+13:39 plane
+13:40 
+
+13:40 and I'm going to make sure that the text
+13:43 
+
+13:43 is in Focus so let's just change the
+13:45 
+
+13:45 focal plane again you can see that
+13:48 
+
+13:48 it's not in Focus right now but as soon
+13:51 
+
+13:51 as I reach
+13:53 
+
+13:53 this value 0.065 it is in focus
+13:56 
+
+13:56 so uh let's just create a keyframe there
+13:58 
+
+13:58 focal plane for now and I'm going to go
+14:01 
+
+14:01 to the end of my animation and you can
+14:03 
+
+14:03 see that our text is still in focus and
+14:06 
+
+14:06 maybe you can just
+14:08 
+
+14:08 increase the slider a little bit yeah
+14:11 
+
+14:11 there we have it so I'm gonna make sure
+14:13 
+
+14:13 that the text is still in focus let's go
+14:16 
+
+14:16 to render 3D and maybe increase the
+14:17 
+
+14:17 depth of field blur a little bit so uh
+14:21 
+
+14:21 that is essentially it you can play
+14:23 
+
+14:23 around with the the focal plane angle of
+14:26 
+
+14:26 view to create a different looking
+14:29 
+
+14:29 animation but yeah that is pretty much
+14:31 
+
+14:31 it if you go to your edit page you can
+14:33 
+
+14:33 see your animation will be right over
+14:35 
+
+14:35 here right so let's take a look at this
+14:37 
+
+14:37 animation so we have
+14:39 
+
+14:39 this cool animation going on I know we
+14:43 
+
+14:43 can just you know improve on the focal
+14:46 
+
+14:46 plane over here so you know that's
+14:48 
+
+14:48 pretty easy you can just go ahead and
+14:50 
+
+14:50 change the focal plane and try and focus
+14:52 
+
+14:53 on the text over here
+14:54 
+
+14:54 and you know add some more keyframes and
+14:57 
+
+14:57 you know try and focus on the continents
+14:60 
+
+14:60 over here but that is the basics of how
+15:02 
+
+15:02 you can create this sort of Animation I
+15:05 
+
+15:05 hope this video is helpful hope you
+15:06 
+
+15:06 learned something new if it did then
+15:08 
+
+15:08 please make sure you leave a like and
+15:09 
+
+15:09 also subscribe to the channel thank you
+15:11 
+
+15:11 so much for watching and I'll see you
+15:12 
+
+15:12 guys in the next one
+15:15 
+
+15:15 [Music]
+15:20 
+
+15:20 [Music]
