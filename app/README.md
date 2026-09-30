@@ -9,7 +9,7 @@ pixel-aligned assets ready to import into DaVinci Resolve Fusion.
 ```bash
 # from the project root (one-time setup if .venv doesn't exist yet)
 python3 -m venv .venv
-.venv/bin/pip install Pillow numpy requests CairoSVG
+.venv/bin/pip install Pillow numpy requests CairoSVG opencv-python
 
 # start the app
 .venv/bin/python app/server.py
@@ -78,6 +78,20 @@ fades it in around that view. The 3D generator stops if the shot contains map
 connections, which do not yet follow the 3D camera.
 The 2D generator creates an explicit final canvas at the selected dimensions,
 so the landscape source map cannot force a portrait timeline back to 16:9.
+
+### Scan reference movement
+
+Place an MP4, MOV, M4V, or WebM reference in the export package's `videos/`
+folder. In the animation editor, choose it under **Reference movement** and click
+**Scan pan and zoom**. The editor compares sampled video frames with the saved
+wide satellite image and previews editable camera keys for zoom and movement in
+all four directions. Scrub the reference and map together, inspect any reported
+low-confidence time ranges, then click **Apply draft** or **Discard**. Applying
+changes only the editor draft; **Save shot** writes `animation.json`.
+
+This first pass follows pan and zoom. Reference cuts, rotation, camera tilt, and
+overlays may need manual camera adjustments. OpenCV is used only when a scan is
+requested; other editing and Fusion generation remain available without it.
 
 Keyframes store a time, view center, zoom, and easing *into* that keyframe. Smooth
 uses the defined cubic `3t² − 2t³`; linear uses constant interpolation. The generated

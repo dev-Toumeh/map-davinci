@@ -19,6 +19,8 @@ Endpoints:
    GET  /api/export/status/<id>    -> job progress/result
    GET  /api/exports                -> available export packages
    GET/POST /api/animation/<name>   -> read/save a shot animation
+   GET  /api/animation/<name>/reference-videos -> list package videos
+   POST /api/animation/<name>/scan-motion -> propose camera keyframes
    POST /api/animation/<name>/fusion -> generate scene.comp
    POST /api/export/<name>/delete     -> permanently remove one package
 """
@@ -36,8 +38,9 @@ import traceback
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import quote, unquote
 
-from core import animation_schema, exporter, package_layout, regions, settings as app_settings
+from core import animation_schema, exporter, motion_scan, package_layout, regions, settings as app_settings
 from fusion import generator as fusion_generator
 
 APP_ROOT = Path(__file__).resolve().parent
@@ -65,6 +68,9 @@ MIME = {
     ".json": "application/json",
     ".svg": "image/svg+xml",
     ".ico": "image/x-icon",
+    ".mp4": "video/mp4",
+    ".mov": "video/quicktime",
+    ".m4v": "video/x-m4v",
     ".mp3": "audio/mpeg",
     ".wav": "audio/wav",
     ".m4a": "audio/mp4",
@@ -97,14 +103,40 @@ class Handler(BaseHTTPRequestHandler):
     def _file(self, path: Path, root: Path) -> None:
         try:
             resolved = path.resolve()
-            if not str(resolved).startswith(str(root.resolve())):
+            if not resolved.is_relative_to(root.resolve()):
                 self._json({"error": "forbidden"}, 403)
                 return
             if not resolved.is_file():
                 self._json({"error": "not found"}, 404)
                 return
-            data = resolved.read_bytes()
             content_type = MIME.get(resolved.suffix.lower(), "application/octet-stream")
+            if resolved.suffix.lower() == ".webm" and resolved.parent.name == "videos":
+                content_type = "video/webm"
+            if content_type.startswith("video/"):
+                size = resolved.stat().st_size
+                requested = self.headers.get("Range", "")
+                match = re.fullmatch(r"bytes=(\d+)-(\d*)", requested)
+                if match:
+                    start = int(match.group(1))
+                    end = min(size - 1, int(match.group(2))) if match.group(2) else size - 1
+                    if start >= size or end < start:
+                        self.send_response(416)
+                        self.send_header("Content-Range", f"bytes */{size}")
+                        self.send_header("Content-Length", "0")
+                        self.end_headers()
+                        return
+                    with resolved.open("rb") as source:
+                        source.seek(start)
+                        data = source.read(end - start + 1)
+                    self.send_response(206)
+                    self.send_header("Content-Type", content_type)
+                    self.send_header("Content-Length", str(len(data)))
+                    self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+                    self.send_header("Accept-Ranges", "bytes")
+                    self.end_headers()
+                    self.wfile.write(data)
+                    return
+            data = resolved.read_bytes()
             # Earlier uploads truncated long filenames, which also removed the
             # extension. Recognize existing MP3 files so their media elements
             # receive a playable content type.
@@ -359,7 +391,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._file(STATIC_DIR / path[len("/static/"):], STATIC_DIR)
             elif path.startswith("/exports/"):
                 exports_dir = app_settings.exports_dir()
-                self._file(exports_dir / path[len("/exports/"):], exports_dir)
+                self._file(exports_dir / unquote(path[len("/exports/"):]), exports_dir)
             elif path == "/api/health":
                 self._json({"ok": True})
             elif path == "/api/countries":
@@ -421,6 +453,16 @@ class Handler(BaseHTTPRequestHandler):
                                      "countries": [c.get("iso3") for c in metadata.get("countries", [])],
                                      "has_animation": package_layout.animation_path(candidate).is_file()})
                 self._json({"exports": packages})
+            elif (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/reference-videos", path)):
+                package = self._package(m.group(1))
+                video_dir = package / package_layout.VIDEOS_DIR
+                videos = []
+                if video_dir.is_dir():
+                    for item in sorted(video_dir.iterdir()):
+                        if item.is_file() and item.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
+                            videos.append({"name": item.name,
+                                           "url": f"/exports/{quote(package.name)}/videos/{quote(item.name)}"})
+                self._json({"videos": videos})
             elif (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
                 self._json(self._animation_response(self._package(m.group(1))))
             else:
@@ -497,6 +539,23 @@ class Handler(BaseHTTPRequestHandler):
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/country", path)):
                 package = self._package(m.group(1))
                 self._json(self._add_animation_country(package, config))
+                return
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/scan-motion", path)):
+                package = self._package(m.group(1))
+                filename = str(config.get("video", ""))
+                if (not filename or Path(filename).name != filename or
+                        Path(filename).suffix.lower() not in (".mp4", ".mov", ".m4v", ".webm")):
+                    raise ValueError("select a video from this export package")
+                video_dir = (package / package_layout.VIDEOS_DIR).resolve()
+                video = (video_dir / filename).resolve()
+                if video.parent != video_dir or not video.is_file():
+                    raise ValueError("reference video was not found in this export package")
+                metadata = self._metadata(package)
+                wide = package / package_layout.asset_relative(
+                    metadata, "satellite_wide", str(package_layout.LEGACY_SATELLITE_WIDE_FILE))
+                output = config.get("output") or {}
+                result = motion_scan.scan(video, wide, metadata["output"], output)
+                self._json({"ok": True, **result})
                 return
             if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)", path)):
                 package = self._package(m.group(1))
