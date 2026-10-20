@@ -1,0 +1,138 @@
+{
+	Tools = ordered() {
+		curved_arrow = MacroOperator {
+			CtrlWZoom = false,
+			Outputs = {
+				Output1 = InstanceOutput {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				Output2 = InstanceOutput {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+				MainOutput1 = InstanceOutput {
+					SourceOp = "CurveReveal_Output",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				CurveReveal_Path = PolylineMask {
+					DrawMode = "ClickAppend",
+					DrawMode2 = "InsertAndModify",
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = { Path = { Map = { ["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/" } }, },
+					Inputs = {
+						SoftEdge = Input { Value = 0.006, },
+						BorderWidth = Input { Value = 0.65, },
+						Solid = Input { Value = 0, },
+						WriteLength = Input {
+							SourceOp = "CurveReveal_PathLength",
+							Source = "Value",
+						},
+						MaskWidth = Input { Value = 512, },
+						MaskHeight = Input { Value = 512, },
+						PixelAspect = Input { Value = { 1, 1 }, },
+						ClippingMode = Input { Value = FuID { "None" }, },
+						Polyline = Input {
+							Value = Polyline {
+								Points = {
+									{ X = -0.4, Y = 0.72, RX = 0, RY = -0.18 },
+									{ X = -0.39, Y = 0.12, LX = -0.015, LY = 0.2, RX = 0.04, RY = -0.15 },
+									{ X = -0.18, Y = -0.16, LX = -0.1, LY = 0.07, RX = 0.12, RY = -0.08 },
+									{ X = 0.2, Y = -0.23, LX = -0.12, LY = 0, RX = 0.15, RY = 0 },
+									{ X = 0.68, Y = -0.23, LX = -0.16, LY = 0 }
+								}
+							},
+						},
+						Polyline2 = Input {
+							Value = Polyline {
+							},
+							Disabled = true,
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1408.56, 1874.84 } },
+				},
+				CurveReveal_PathLength = BezierSpline {
+					SplineColor = { Red = 255, Green = 128, Blue = 64 },
+					CtrlWZoom = false,
+					CustomData = { Path = { Map = { ["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/" } }, },
+					KeyFrames = {
+						[479] = { 0, RH = { 487, 0 } },
+						[503] = { 1, LH = { 495, 1 } }
+					}
+				},
+				MediaIn7 = MediaIn {
+					CtrlWShown = false,
+					CustomData = { MEDIA_ID = "e612f9fc-69b4-4455-907f-1210b479fa7a", MediaProps = { MEDIA_PAR = 1, MEDIA_NUM_LAYERS = 0, MEDIA_FORMAT_TYPE = "PNG", MEDIA_HEIGHT = 512, MEDIA_SRC_FRAME_RATE = 24, MEDIA_LAYER_DESC = {
+							}, MEDIA_NAME = "curved-arrow.png", MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/icons/curved-arrow.png", MEDIA_ID = "e612f9fc-69b4-4455-907f-1210b479fa7a", MEDIA_IS_SOURCE_RES = true, __Queried = true, MEDIA_MARK_OUT = 0, MEDIA_WIDTH = 512, MEDIA_NUM_FRAMES = 1, MEDIA_MARK_IN = 0, MEDIA_START_FRAME = 0 }, },
+					Inputs = {
+						MediaSource = Input { Value = FuID { "MediaPool" }, },
+						MediaID = Input { Value = "e612f9fc-69b4-4455-907f-1210b479fa7a", },
+						AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+						Layer = Input { Value = "", },
+						ClipTimeEnd = Input { Value = 0, },
+						Loop = Input { Value = 1, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						DeepOutputMode = Input {
+							Value = 0,
+							Disabled = true,
+						},
+						LeftAudio = Input {
+							SourceOp = "Left",
+							Source = "Data",
+						},
+						RightAudio = Input {
+							SourceOp = "Right",
+							Source = "Data",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1418.99, 1897.89 } },
+					Version = 1
+				},
+				Left = AudioDisplay {
+					CtrlWZoom = false,
+				},
+				Right = AudioDisplay {
+					CtrlWZoom = false,
+				},
+				CurveReveal_Transparent = Background {
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = { Path = { Map = { ["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/" } }, },
+					Inputs = {
+						Width = Input { Value = 512, },
+						Height = Input { Value = 512, },
+						TopLeftAlpha = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1418.06, 1924.85 } },
+				},
+				CurveReveal_Output = Merge {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = { Path = { Map = { ["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/" } }, },
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "CurveReveal_Path",
+							Source = "Mask",
+						},
+						Background = Input {
+							SourceOp = "CurveReveal_Transparent",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "MediaIn7",
+							Source = "Output",
+						},
+						PerformDepthMerge = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1630.87, 1874.13 } },
+				}
+			},
+		}
+	},
+	ActiveTool = "curved_arrow"
+}

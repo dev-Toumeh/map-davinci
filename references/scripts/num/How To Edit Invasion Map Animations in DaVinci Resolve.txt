@@ -1,0 +1,1441 @@
+00:00 You know when you watching a Vox video
+00:02 
+
+00:02 or a Johnny Harris documentary and
+00:04 
+
+00:04 suddenly a beautiful map animation pops
+00:06 
+
+00:06 out right when he's explaining [music]
+00:07 
+
+00:07 something. Well, today I'm going to show
+00:09 
+
+00:09 you exactly how to build one in DaVinci
+00:11 
+
+00:11 Resolve. This is Russia and Ukraine
+00:12 
+
+00:12 invasion map animation. [music] And that
+00:14 
+
+00:14 ink invasion concept right there is one
+00:16 
+
+00:16 of the most widely used effect in this
+00:18 
+
+00:18 style of content. Once you master it,
+00:20 
+
+00:20 you'll find yourself using it
+00:21 
+
+00:21 everywhere. But before we touch a single
+00:23 
+
+00:23 node, let's take a moment to break down
+00:24 
+
+00:24 the animation so [music] we know exactly
+00:26 
+
+00:26 what we're dealing with. So, as you can
+00:28 
+
+00:28 see, the first thing we have is the base
+00:30 
+
+00:30 map with Russia and Ukraine highlighted,
+00:32 
+
+00:32 which is our foundation. [music]
+00:34 
+
+00:34 Then we have the ink reveal, which is
+00:36 
+
+00:36 our main effect, where the ink bleeds
+00:38 
+
+00:38 from Russia across the border into
+00:39 
+
+00:39 [music] Ukrainian territory. As the ink
+00:41 
+
+00:41 spreads, three tanks push in from the
+00:44 
+
+00:44 border and move into Ukraine in sync
+00:46 
+
+00:46 with the [music] ink. We also have two
+00:48 
+
+00:48 labels, Putin over Russia and Zelenskyy
+00:50 
+
+00:50 over Ukraine. Then there are cloud
+00:52 
+
+00:52 layers at a different depth to [music]
+00:54 
+
+00:54 give the scene atmosphere and make the
+00:56 
+
+00:56 camera movement feel three-dimensional.
+00:58 
+
+00:58 Then we have the animation of the
+00:60 
+
+00:60 [music] camera, the labels, and the rest
+01:02 
+
+01:02 of the elements. So, in total, we have
+01:04 
+
+01:04 the map, the ink, the labels, the tanks,
+01:07 
+
+01:07 [music] the clouds, and the animation.
+01:10 
+
+01:10 So, that's what we're working with, so
+01:11 
+
+01:11 let's get to start [music] building it
+01:13 
+
+01:13 piece by piece. You can download all the
+01:15 
+
+01:15 assets from the link in the description.
+01:17 
+
+01:17 So, let's get to it. The first thing
+01:19 
+
+01:19 we're going to start with is the map.
+01:21 
+
+01:21 All right, before we start, I'd like to
+01:22 
+
+01:22 work on a 4K 30 FPS timeline, [music]
+01:25 
+
+01:25 as you can see here. But 1920 by 1080
+01:27 
+
+01:27 work just fine. It doesn't really
+01:29 
+
+01:29 matter. Go to effects, grab a Fusion
+01:31 
+
+01:31 composition, and then make it about 10
+01:33 
+
+01:33 seconds long. [music] And jump into the
+01:34 
+
+01:34 Fusion page. Open the media pool and
+01:36 
+
+01:36 grab the map and bring it here.
+01:38 
+
+01:38 >> [music]
+01:38 
+
+01:38 >> View it and add a transform node. Scale
+01:41 
+
+01:41 it and position Russia and Ukraine in
+01:43 
+
+01:43 the center of the frame.
+01:44 
+
+01:44 >> [music]
+01:44 
+
+01:44 >> Hit command G to bring up the guides to
+01:46 
+
+01:46 help you align it. Something like this.
+01:49 
+
+01:49 Now, we're going to add the country
+01:50 
+
+01:50 highlight. To do so, there are two
+01:52 
+
+01:52 methods. First, [music] you can add a
+01:54 
+
+01:54 background node, merge it over the
+01:55 
+
+01:55 transform, make it red, and add a
+01:58 
+
+01:58 polygon node to mask out the [music]
+01:59 
+
+01:59 shape of Russia. Now, you can draw the
+02:01 
+
+02:01 polygon manually, and this will take a
+02:03 
+
+02:03 long time. But, the second method, and
+02:05 
+
+02:05 what I actually recommend, is using SVG
+02:08 
+
+02:08 shapes. You can go to our website like
+02:10 
+
+02:10 Vector [music] Maps, where you can
+02:12 
+
+02:12 search for Russia and download the SVG
+02:14 
+
+02:14 file. You can also download the Ukraine
+02:16 
+
+02:16 [music] and a bunch of countries. And to
+02:18 
+
+02:18 bring SVGs into Fusion, go to Fusion,
+02:21 
+
+02:21 import, then SVG. And it basically comes
+02:24 
+
+02:24 as a background with a couple of
+02:25 
+
+02:25 polygons that [music] define the country
+02:27 
+
+02:27 shape. I could have shown you how, but
+02:29 
+
+02:29 for the sake of time, unfortunately, we
+02:31 
+
+02:31 can't.
+02:31 
+
+02:31 >> [music]
+02:31 
+
+02:31 >> However, you will find the SVG file for
+02:34 
+
+02:34 both Russia and Ukraine in the assets
+02:36 
+
+02:36 folder anyway. I already have both
+02:38 
+
+02:38 ready, so [music] this is Russia and
+02:40 
+
+02:40 this is Ukraine. Merge Ukraine over
+02:42 
+
+02:42 Russia, plug it [music] in, and view it.
+02:45 
+
+02:45 It won't be perfectly centered straight
+02:46 
+
+02:46 away. So, add a transform node and size
+02:49 
+
+02:49 it down until [music] it sits correctly
+02:51 
+
+02:51 on the map.
+02:54 
+
+02:54 And there you go. Both countries [music]
+02:56 
+
+02:56 exactly where we need them to be. Now
+02:58 
+
+02:58 that the map is ready, it's time to
+02:60 
+
+02:60 build the ink reveal. This is the effect
+03:02 
+
+03:02 that carries the whole animation. Add a
+03:03 
+
+03:03 background node, merge it in, and make
+03:06 
+
+03:06 it red. Add a polygon node, view in the
+03:08 
+
+03:08 viewer like so, then remove the default
+03:11 
+
+03:11 keyframe,
+03:11 
+
+03:11 >> [music]
+03:11 
+
+03:11 >> and draw a rough shape like this.
+03:14 
+
+03:14 Select the points and hit shift S to
+03:16 
+
+03:16 smooth it out. After the polygon, add a
+03:18 
+
+03:18 displace node, then connect a fast noise
+03:21 
+
+03:21 into it. Start playing with the scale,
+03:24 
+
+03:24 detail, and contrast value, or you can
+03:26 
+
+03:26 just copy my settings. Just make sure
+03:29 
+
+03:29 that the shape gets a nice organic
+03:30 
+
+03:30 distortion on the edges. Something that
+03:33 
+
+03:33 translates like an ink bleeding. Then
+03:35 
+
+03:35 you can push the seed rate a little for
+03:36 
+
+03:36 more of that effect. This shape is going
+03:39 
+
+03:39 to be our mask for the invasion reveal.
+03:41 
+
+03:41 But, here's something I like to add on
+03:42 
+
+03:42 top. I like to add a second shape to
+03:44 
+
+03:44 give the ink more visual depth. Copy all
+03:46 
+
+03:46 of this with command C and paste it with
+03:49 
+
+03:49 command shift V. This creates an
+03:51 
+
+03:51 instance, which is just a linked copy,
+03:53 
+
+03:53 so when one moves, both moves at the
+03:55 
+
+03:55 same time. Merge [music] the instance
+03:57 
+
+03:57 over the original, then right click on
+03:59 
+
+03:59 the instance background and choose
+04:01 
+
+04:01 de-instance color group.
+04:03 
+
+04:03 Shift the color to something like light
+04:05 
+
+04:05 red, almost pinkish, then after so, add
+04:08 
+
+04:08 a transform node, size it down slightly,
+04:10 
+
+04:10 and right click on the merge, and then
+04:12 
+
+04:12 swap inputs.
+04:14 
+
+04:14 So, the instance sits behind the main
+04:16 
+
+04:16 shape. Select all of this, hit command G
+04:19 
+
+04:19 to group it, hit F to rename it, and
+04:22 
+
+04:22 let's call it ink. View it in the merge,
+04:24 
+
+04:24 and then go ahead and add a transform
+04:26 
+
+04:26 node. Size it down and rotate it so it
+04:29 
+
+04:29 sits over the border area. We also want
+04:32 
+
+04:32 it to be masked by the Ukraine shape.
+04:34 
+
+04:34 So, from the Ukraine background node,
+04:36 
+
+04:36 bring the output [music] and plug it
+04:38 
+
+04:38 into the blue input of the merge, and
+04:41 
+
+04:41 then copy the this transform here and
+04:43 
+
+04:43 connect it as well. Now, the ink is
+04:45 
+
+04:45 fully masked to Ukrainian territory.
+04:48 
+
+04:48 When we animate it coming in, [music] it
+04:49 
+
+04:49 will only bleed inside Ukraine's border
+04:52 
+
+04:52 coming from Russia, like an invasion
+04:54 
+
+04:54 spreading from Russia.
+04:58 
+
+04:58 Now, with the ink in place, it's time to
+05:00 
+
+05:00 add the labels, the Putin and Zelenskyy
+05:03 
+
+05:03 ones. Add a merge node, and this is
+05:05 
+
+05:05 where the Putin label will be. Add a
+05:06 
+
+05:06 background node, make it fully
+05:08 
+
+05:08 transparent, and plug it in.
+05:10 
+
+05:10 Add another merge node to the black
+05:12 
+
+05:12 background.
+05:16 
+
+05:16 Then add an ellipse mask and plug it to
+05:18 
+
+05:18 the merge. Uncheck solid so you can see
+05:20 
+
+05:20 the shape clearly, and push the border
+05:22 
+
+05:22 width to get a clean circle outline. Add
+05:25 
+
+05:25 another merge node with a red
+05:26 
+
+05:26 background.
+05:30 
+
+05:30 Copy the ellipse and plug it to the
+05:32 
+
+05:32 background. Check solid back on and make
+05:34 
+
+05:34 this one slightly smaller. Add a
+05:36 
+
+05:36 rectangle node, bring it to the center,
+05:39 
+
+05:39 and push the soft edge up so it fades
+05:41 
+
+05:41 out nicely. So, you can end up with a
+05:42 
+
+05:42 circular shape that looks like this. Add
+05:44 
+
+05:44 one more merge node and bring in the
+05:46 
+
+05:46 Putin image. Add a transform and
+05:49 
+
+05:49 position his face in the upper part of
+05:51 
+
+05:51 the label. We want his head slightly
+05:53 
+
+05:53 above the circle, like a foreground
+05:55 
+
+05:55 element. To do so, we must cut off the
+05:57 
+
+05:57 lower part cleanly. Add a polygon node
+06:00 
+
+06:00 and plug it into the merge. Place points
+06:02 
+
+06:02 along the bottom edge of the label and
+06:04 
+
+06:04 curve them with shift S on the handles.
+06:13 
+
+06:13 Play with it until you get a clean curve
+06:15 
+
+06:15 cut at the bottom. After the image, add
+06:17 
+
+06:17 a color corrector and give it a reddish
+06:19 
+
+06:19 tint
+06:20 
+
+06:20 >> [music]
+06:20 
+
+06:20 >> to tie it into the Russia palette. For
+06:22 
+
+06:22 the text, add a text plus node.
+06:26 
+
+06:26 Go to shading, enable element two, set
+06:28 
+
+06:28 the appearance to the third one, and the
+06:30 
+
+06:30 level to text and pick a black color
+06:32 
+
+06:32 here. On the fonts, I'm using
+06:34 
+
+06:34 Alexandria, my go-to font for this
+06:36 
+
+06:36 style. Right click here and then click
+06:38 
+
+06:38 on follower. Then go to modifiers. Once
+06:41 
+
+06:41 you're there, animate the shading
+06:42 
+
+06:42 opacity from frame zero to frame 15,
+06:45 
+
+06:45 going from zero to one. Then adjust the
+06:47 
+
+06:47 timing and delay until the text reveal
+06:50 
+
+06:50 character by character the way you want.
+06:52 
+
+06:52 Once you're happy with the Putin label,
+06:54 
+
+06:54 copy the entire setup and paste it here.
+06:57 
+
+06:57 Merge it on top. Now, swap everything
+06:59 
+
+06:59 for the Ukraine version. Blue
+07:00 
+
+07:00 background, blue tint, and change the
+07:03 
+
+07:03 text to Zelenskyy. Zelenskyy from the
+07:05 
+
+07:05 media pool, reposition him, group the
+07:08 
+
+07:08 Putin nodes with command G and name it
+07:11 
+
+07:11 Putin. Then do the same for Zelenskyy.
+07:13 
+
+07:13 Add a transform node on each one to
+07:15 
+
+07:15 position each label on the map, Putin
+07:17 
+
+07:17 over Russia and Zelenskyy over Ukraine.
+07:23 
+
+07:23 And now for the next, which are the
+07:25 
+
+07:25 tanks. And honestly, this is the
+07:27 
+
+07:27 quickest part of the whole build. Add a
+07:29 
+
+07:29 merge node, go to the media pool and
+07:31 
+
+07:31 bring in the tank image.
+07:34 
+
+07:34 Add a transform node, rotate it to face
+07:36 
+
+07:36 Ukraine, and place it right on the
+07:38 
+
+07:38 border. Copy the tank and transform and
+07:41 
+
+07:41 paste them here. Merge them in and
+07:43 
+
+07:43 rotate it slightly. Once you're happy
+07:45 
+
+07:45 with your results, do it one more time
+07:47 
+
+07:47 for the last one. Try to rotate it
+07:49 
+
+07:49 differently so they don't look
+07:50 
+
+07:50 identical.
+07:56 
+
+07:56 And make sure to spread them out along
+07:58 
+
+07:58 the border. After the last merge, add a
+07:60 
+
+07:60 shadow node, push the offsets a little,
+08:02 
+
+08:02 and increase the softness. As you can
+08:04 
+
+08:04 see, without the shadow, the tanks looks
+08:06 
+
+08:06 flat. This small detail makes a real
+08:08 
+
+08:08 difference. One last thing, go back to
+08:10 
+
+08:10 the ink instance and push the color to
+08:12 
+
+08:12 be a little more pinkish. Something like
+08:14 
+
+08:14 that reads slightly different from the
+08:16 
+
+08:16 main red shape. Now that all our 2D
+08:18 
+
+08:18 animations are done, it's time to move
+08:20 
+
+08:20 everything into 3D space and add the
+08:23 
+
+08:23 clouds. After the final merge, add an
+08:25 
+
+08:25 image plane 3D node. Unplug the merge
+08:27 
+
+08:27 into the green input of the image plane
+08:29 
+
+08:29 and view it [music] like this. Then go
+08:31 
+
+08:31 to the media pool, grab a cloud image,
+08:33 
+
+08:33 add another image plane 3D, plug the
+08:35 
+
+08:35 cloud into the green input, and merge it
+08:37 
+
+08:37 over the first image plane 3D. This will
+08:39 
+
+08:39 generate a merge 3D node, but now as you
+08:41 
+
+08:41 can see, both the main comp and the
+08:43 
+
+08:43 clouds are now on the same Z level. So,
+08:46 
+
+08:46 select the cloud image plane and pull it
+08:49 
+
+08:49 in [music] so it sits further from the
+08:50 
+
+08:50 camera. Open a second viewer, add a
+08:52 
+
+08:52 renderer 3D node, and [music] view it
+08:54 
+
+08:54 there. Add a camera 3D and plug it into
+08:57 
+
+08:57 the merge 3D. Pull the camera back on
+08:59 
+
+08:59 the Z translation until the full scene
+09:01 
+
+09:01 is in frame. Scale the cloud image plane
+09:03 
+
+09:03 down a little and shift [music] it to
+09:06 
+
+09:06 one side using the red handle. After
+09:08 
+
+09:08 that, add a duplicate 3D node. Pull the
+09:10 
+
+09:10 duplicate to the other side on the X
+09:12 
+
+09:12 translation and push the Z offset
+09:14 
+
+09:14 [music] slightly to create a depth
+09:16 
+
+09:16 separation between the two cloud layers.
+09:19 
+
+09:19 Just enough for a parallax view. Adjust
+09:21 
+
+09:21 the Y offset and scale until they look
+09:23 
+
+09:23 like two different cloud formations.
+09:25 
+
+09:25 >> [music]
+09:26 
+
+09:26 >> And lastly, add a transform 3D at the
+09:28 
+
+09:28 end. And just like this, now it's time
+09:31 
+
+09:31 to animate.
+09:33 
+
+09:33 Before anything, go to playback and set
+09:35 
+
+09:35 it to half so the preview stays smooth.
+09:37 
+
+09:37 On the camera, go to frame zero and add
+09:40 
+
+09:40 a keyframe on the Z translation.
+09:42 
+
+09:42 Go to frame 100 and push the camera in
+09:45 
+
+09:45 along Z until that it's focused on the
+09:48 
+
+09:48 border. Reposition the cloud if they're
+09:50 
+
+09:50 like blocking the shots and tweak the Z
+09:52 
+
+09:52 rotation slightly if needed. Select the
+09:54 
+
+09:54 transform 3D of the clouds, go to frame
+09:57 
+
+09:57 zero and add a keyframe on the X. Go to
+09:59 
+
+09:59 frame 150 and shift [music] the X so the
+10:01 
+
+10:01 clouds drift slowly across the frame. By
+10:03 
+
+10:03 frame 150, they should be cleared off
+10:06 
+
+10:06 the main subjects. On the camera again,
+10:08 
+
+10:08 on frame 100, add a keyframe on the X
+10:10 
+
+10:10 translation. Go back to frame zero and
+10:12 
+
+10:12 add another keyframe. And then adjust
+10:14 
+
+10:14 the X and the Y to properly center the
+10:16 
+
+10:16 scene as the camera pushes in.
+10:21 
+
+10:21 Now, once that's done, select the Russia
+10:24 
+
+10:24 mask where we're going to make a flicker
+10:26 
+
+10:26 reveal on the map shapes. So, go to
+10:28 
+
+10:28 frame 100 and add a keyframe on the
+10:30 
+
+10:30 level. Bring it down like this.
+10:31 
+
+10:31 >> [music]
+10:31 
+
+10:31 >> Then from the arrows of your keyboard,
+10:34 
+
+10:34 go two frames forward and bring it up.
+10:36 
+
+10:36 This will create a keyframe
+10:38 
+
+10:38 automatically. Then go two frames more
+10:40 
+
+10:40 and bring it down. Two frames more,
+10:42 
+
+10:42 bring it up. So, you get the idea. And
+10:45 
+
+10:45 just like this, we made the flicker
+10:46 
+
+10:46 reveal.
+10:48 
+
+10:48 Do the same for Ukraine, but this time
+10:50 
+
+10:50 starting at frame 103 so the two reveals
+10:52 
+
+10:52 are slightly offset to add more
+10:54 
+
+10:54 dynamics. So, just like we did, adjust
+10:56 
+
+10:56 the level each two frames. Once you
+10:59 
+
+10:59 finish, you'll get this flicker revealed
+11:01 
+
+11:01 like this as well.
+11:05 
+
+11:05 Now, on to the labels. I know this part
+11:07 
+
+11:07 of the video is so long so I want you to
+11:09 
+
+11:09 to focus with me more on this one. On
+11:11 
+
+11:11 the point label in this ellipse node, go
+11:13 
+
+11:13 to frame 120 and add a keyframe on
+11:16 
+
+11:16 length and bring it down like so. Go to
+11:18 
+
+11:18 frame 140 and bring the length up like
+11:20 
+
+11:20 this. On the merge keyframe, the level
+11:22 
+
+11:22 at frame 120, decreasing it like this.
+11:26 
+
+11:26 And at frame 140, increasing it like
+11:28 
+
+11:28 this. For the point image, keyframe the
+11:30 
+
+11:30 center at frame 120, go to frame 140 and
+11:34 
+
+11:34 adjust it like this so the image raises
+11:36 
+
+11:36 into frame. Here we made a mistake
+11:38 
+
+11:38 because it's going the wrong direction.
+11:41 
+
+11:41 So open the spline, select all and hit V
+11:44 
+
+11:44 to flip it.
+11:47 
+
+11:47 For the text, animate the blend from
+11:50 
+
+11:50 frame 120 to frame 130, going from 0 to
+11:54 
+
+11:54 1. And then open the keyframe panel and
+11:56 
+
+11:56 move the text keyframe to start around
+11:59 
+
+11:59 frame 130 so the text appears just after
+12:03 
+
+12:03 the label. Select the transform,
+12:04 
+
+12:04 ellipse, and shapes and open the spline,
+12:07 
+
+12:07 command A, and hit F to smooth out the
+12:10 
+
+12:10 curve.
+12:13 
+
+12:13 Once you finish, do the same for
+12:15 
+
+12:15 Zelenskyy one at the same timing as
+12:17 
+
+12:17 Putin since we'll change the timing
+12:19 
+
+12:19 later.
+12:24 
+
+12:24 Now around frame 140 for and frame 50,
+12:27 
+
+12:27 let's add a flicker on the tank merge.
+12:29 
+
+12:29 The same way we did on the map with
+12:32 
+
+12:32 increasing and decreasing the blend each
+12:34 
+
+12:34 two frames. Once fully revealed at frame
+12:36 
+
+12:36 160, keyframe the center position of
+12:38 
+
+12:38 each tank and animate them moving into
+12:40 
+
+12:40 Ukrainian territory on frame 220. I
+12:43 
+
+12:43 recommend using the controls from the
+12:45 
+
+12:45 viewer since they are much more easy and
+12:47 
+
+12:47 flexible.
+12:57 
+
+12:57 Once that's done, double-click the ink
+12:59 
+
+12:59 group on the polygon, go to frame 160
+13:03 
+
+13:03 and keyframe the [music] center of the
+13:04 
+
+13:04 mask. Go to frame 220 and add another
+13:07 
+
+13:07 keyframe and drag the center deep into
+13:09 
+
+13:09 Ukrainian territory. But before we do
+13:11 
+
+13:11 so, let's move these tanks a little bit
+13:14 
+
+13:14 behind so they start cleanly on the
+13:16 
+
+13:16 border. Then selecting the polygon,
+13:18 
+
+13:18 let's open the keyframe panel and let's
+13:20 
+
+13:20 tweak the timing and move the ink to
+13:22 
+
+13:22 start at frame 140. We want the ink
+13:25 
+
+13:25 moving just before the tank arrive so it
+13:27 
+
+13:27 looks like the tanks are pushing it
+13:29 
+
+13:29 forward. So, actually, we want the ink
+13:31 
+
+13:31 to stop around frame 220, roughly where
+13:34 
+
+13:34 the tank stops, so let's extend it like
+13:37 
+
+13:37 this. Now, after the ink merge, add
+13:39 
+
+13:39 [music] a new merge node and bring in a
+13:41 
+
+13:41 grunge texture. Set the blend mode to
+13:43 
+
+13:43 overlay, and it will probably be too
+13:45 
+
+13:45 small, so add a transform and scale it
+13:47 
+
+13:47 up to cover the full frame. Now, let's
+13:49 
+
+13:49 plug the render 3D into the media out
+13:51 
+
+13:51 and go to the edit page. Go to second
+13:54 
+
+13:54 four [music] and add an adjustment clip
+13:56 
+
+13:56 and make it roughly 1 second long.
+13:57 
+
+13:57 Select the adjustment clip and scale it
+13:59 
+
+13:59 up from the transform in the inspector,
+14:01 
+
+14:01 and also try to center it like this, so
+14:04 
+
+14:04 the point label is in the middle. Once
+14:06 
+
+14:06 you do that, duplicate the clip dragging
+14:08 
+
+14:08 it to the side while holding Alt. And
+14:11 
+
+14:11 this time, zoom into the Zelensky side.
+14:13 
+
+14:13 Then go ahead to the last of this
+14:14 
+
+14:14 adjustment clip of Putin, and where the
+14:17 
+
+14:17 Zelensky one starts, right click on the
+14:19 
+
+14:19 comp and open in the fusion page. Find
+14:21 
+
+14:21 the Zelensky label, double click and
+14:23 
+
+14:23 open [music] it. Select all the nodes
+14:25 
+
+14:25 that have keyframes and then open the
+14:27 
+
+14:27 keyframes panel. Select them and push
+14:29 
+
+14:29 them to start at frame 148. Also, select
+14:31 
+
+14:31 the merge of the tanks and open the
+14:33 
+
+14:33 keyframes panel and select the keyframes
+14:35 
+
+14:35 and push them to frame 174. Now, for the
+14:38 
+
+14:38 tanks, select the transforms of the
+14:40 
+
+14:40 tanks, the polygon of the ink, and push
+14:44 
+
+14:44 all of them to start around frame 180 to
+14:47 
+
+14:47 frame 185. View the render, and now the
+14:49 
+
+14:49 scene should be clean. [music] For the
+14:51 
+
+14:51 final camera pull back, go to frame 148
+14:54 
+
+14:54 to frame 150 on the camera, keyframe the
+14:57 
+
+14:57 Z, X, and Y translation. Go to the last
+14:60 
+
+14:60 frame and keyframe all of this again.
+15:02 
+
+15:02 Then pull the camera back, but as you
+15:04 
+
+15:04 can see, the clouds are blocking the
+15:06 
+
+15:06 view. So, for the clouds, go to frame
+15:08 
+
+15:08 160, keyframe [music] the image plane
+15:10 
+
+15:10 material opacity, go one frame forward
+15:13 
+
+15:13 and bring the opacity down. This fades
+15:15 
+
+15:15 the cloud out as the camera raises, so
+15:18 
+
+15:18 they don't block the final wide [music]
+15:20 
+
+15:20 shot. Now, go back to the camera and on
+15:22 
+
+15:22 the last frame, adjust the X and the Y
+15:25 
+
+15:25 to recenter. This gives you a slow,
+15:27 
+
+15:27 [music] clean pull back as everything
+15:29 
+
+15:29 finishes. Select the camera, open the
+15:31 
+
+15:31 spline, command [music] A, hit F, and
+15:34 
+
+15:34 smooth the curve.
+15:36 
+
+15:36 Finally, the sinking and the animations
+15:38 
+
+15:38 are done. And now let's add some final
+15:40 
+
+15:40 last touches to make the whole animation
+15:42 
+
+15:42 feel more polished. Move all of your
+15:44 
+
+15:44 clips to a second track and add an
+15:46 
+
+15:46 adjustment clip over everything. Name it
+15:48 
+
+15:48 post effects. Right click and open in
+15:50 
+
+15:50 the fusion page. Go to effects, open
+15:52 
+
+15:52 templates, search for chromatic
+15:54 
+
+15:54 aberration, and bring [music] it in.
+15:56 
+
+15:56 Keep it very subtle, just enough to add
+15:58 
+
+15:58 the cinematic feel without being
+15:59 
+
+15:59 distracting. Then add a grain node, drop
+16:02 
+
+16:02 the power, drop the blend, and adjust
+16:04 
+
+16:04 the grain size until it feels like a
+16:06 
+
+16:06 light natural texture. Nothing heavy.
+16:08 
+
+16:08 After that, add a Gaussian blur node
+16:11 
+
+16:11 with an ellipse mask covering only the
+16:13 
+
+16:13 outer edges of the frame.
+16:16 
+
+16:16 Check invert and push the soft edge up.
+16:18 
+
+16:18 This gives us a gentle vignette blur
+16:20 
+
+16:20 that will keep the center stay sharp.
+16:23 
+
+16:23 Now let's add the title text. Bring your
+16:24 
+
+16:24 playback at this point in the timeline
+16:27 
+
+16:27 where the [music] ink starts spreading
+16:28 
+
+16:28 and the tanks uh starts moving. And add
+16:30 
+
+16:30 a text plus node. Right click and then
+16:33 
+
+16:33 open in the fusion page. Select [music]
+16:34 
+
+16:34 the text node and write 2022, space, add
+16:38 
+
+16:38 a separator bar, space, [music] the
+16:40 
+
+16:40 Russian invasion of Ukraine. Size it
+16:42 
+
+16:42 down, go to shading, enable it, and do
+16:45 
+
+16:45 the usual setup. Appearance, [music]
+16:46 
+
+16:46 text level, color, and all that. Then
+16:48 
+
+16:48 the font Alexandria. Once you have
+16:50 
+
+16:50 something like this, right click [music]
+16:52 
+
+16:52 and on the text box, and choose
+16:53 
+
+16:53 character level styling. Go to the
+16:55 
+
+16:55 modifiers, select the separator bar from
+16:58 
+
+16:58 the viewer, and make it [music] red. And
+17:00 
+
+17:00 also center it on the transform a little
+17:02 
+
+17:02 bit. To animate it, go back to the tools
+17:04 
+
+17:04 tab. On the layout, go to frame zero,
+17:07 
+
+17:07 keyframe center above the frame, go to
+17:09 
+
+17:09 frame 30, and bring it down to its final
+17:12 
+
+17:12 position. Open the spline, select
+17:14 
+
+17:14 everything, hit F, and smooth the curve.
+17:16 
+
+17:16 Now the title slide in from above and
+17:19 
+
+17:19 settles into place.
+17:20 
+
+17:20 >> [music]
+17:20 
+
+17:20 >> Clean and simple. And that's it. The
+17:23 
+
+17:23 full Russian invasion of Ukraine
+17:24 
+
+17:24 documentary map animation built from
+17:26 
+
+17:26 scratch inside DaVinci Resolve Fusion.
+17:29 
+
+17:29 If this was useful, leave a like,
+17:31 
+
+17:31 comment, and subscribe. If you really
+17:33 
+
+17:33 want to see more of the documentary
+17:34 
+
+17:34 content, I recommend you to watch this
+17:37 
+
+17:37 one next.

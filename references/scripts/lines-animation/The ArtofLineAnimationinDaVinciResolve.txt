@@ -1,0 +1,970 @@
+00:00 hey what's going on guys in this video
+00:02 
+
+00:02 we're going to discuss specifically how
+00:04 
+
+00:04 to animate lines in daventries off so
+00:07 
+
+00:07 the first thing we're going to do is to
+00:08 
+
+00:08 take our Fusion composition clip here
+00:10 
+
+00:10 straight to the fusion page and let's
+00:12 
+
+00:12 bring a background note and change the
+00:13 
+
+00:13 color of the background note to a color
+00:16 
+
+00:16 that you like the next thing we're going
+00:18 
+
+00:18 to do is to bring a polygon masking node
+00:20 
+
+00:20 which is going to be used to primarily
+00:22 
+
+00:22 Drive Line creation so now let's go
+00:25 
+
+00:25 ahead and put down two dots on the
+00:27 
+
+00:27 screen but before we put down the second
+00:28 
+
+00:28 one a good practice here is to hold down
+00:30 
+
+00:30 the shift key this is going to ensure
+00:32 
+
+00:32 the line is straight so now all we need
+00:35 
+
+00:35 to do is to bring up the Border width
+00:37 
+
+00:37 just a little bit and as you can see we
+00:40 
+
+00:40 have a perfectly straight line so to
+00:42 
+
+00:42 animate the line there are a few things
+00:44 
+
+00:44 we can do so the first is to play with
+00:46 
+
+00:46 the length setting another one we can
+00:48 
+
+00:48 play with is the position setting but
+00:51 
+
+00:51 the thing to note about position
+00:52 
+
+00:52 shedding is that you have the ability to
+00:54 
+
+00:54 take it Beyond zero so now when we take
+00:57 
+
+00:57 it to
+00:58 
+
+00:58 -1 you can see the line is going to go
+00:60 
+
+00:60 all away from the left to the right
+01:02 
+
+01:02 another setting we can play with is
+01:04 
+
+01:04 shape animation which automatically
+01:07 
+
+01:07 keyframes for us so now the first thing
+01:09 
+
+01:09 we're going to do here is to change the
+01:12 
+
+01:12 line to modify only and then we're going
+01:14 
+
+01:14 to shorten this line while holding down
+01:16 
+
+01:16 the shift key then come to another part
+01:18 
+
+01:18 of the video then bring it out so this
+01:20 
+
+01:20 as you can see will automatically
+01:22 
+
+01:22 keyframe for us and if we replay this
+01:24 
+
+01:24 right now you will see that we have a a
+01:27 
+
+01:27 pretty basic line animation created we
+01:29 
+
+01:29 can also come to spline editor and
+01:31 
+
+01:31 adjust the interpolation between the two
+01:34 
+
+01:34 keyframes this will make the animation
+01:36 
+
+01:36 feel a little bit more refined another
+01:39 
+
+01:39 thing we can play with is line points so
+01:41 
+
+01:41 once again let's put down uh you know
+01:43 
+
+01:43 two dots on the screen then let's change
+01:46 
+
+01:46 it to modify only then let's select
+01:48 
+
+01:48 these two points right click and then in
+01:51 
+
+01:51 the menu let's go to uh polyline and
+01:54 
+
+01:54 then let's go to publish and then select
+01:56 
+
+01:56 uh publish points so now as you can see
+01:59 
+
+01:59 uh the location data for each point is
+02:02 
+
+02:02 now available to us but to know which
+02:04 
+
+02:04 point is which what we're going to do is
+02:06 
+
+02:06 to go back to that same menu and then
+02:08 
+
+02:08 instead let's activate uh publish points
+02:11 
+
+02:11 so now as you can see we can tell which
+02:13 
+
+02:13 is point zero and which is 0.1 and you
+02:16 
+
+02:16 can change uh the points themselves by
+02:18 
+
+02:18 changing the data now let's go ahead and
+02:22 
+
+02:22 copy the y-axis data of 0.01 and then
+02:25 
+
+02:25 paste it into y-axis of point zero this
+02:28 
+
+02:28 will ensure both points are on the same
+02:30 
+
+02:30 line and then let's do the same thing
+02:33 
+
+02:33 for Point access so now these points are
+02:35 
+
+02:35 sitting right on top of each other then
+02:37 
+
+02:37 let's change the border with just by
+02:40 
+
+02:40 bringing up just a little bit just a
+02:42 
+
+02:42 touch and then let's keyframe point zero
+02:46 
+
+02:46 at this part of this video now let's go
+02:48 
+
+02:48 to another part of the video and that's
+02:50 
+
+02:50 keyframe Again by bringing out this line
+02:54 
+
+02:54 and which is essentially changing the
+02:56 
+
+02:56 x-axis of point zero so now the beauty
+02:59 
+
+02:59 is that we have this location data
+03:01 
+
+03:01 available to us so let's go to shape and
+03:04 
+
+03:04 now we're going to bring our end gone
+03:06 
+
+03:06 and end render node we're going to
+03:08 
+
+03:08 create basically a triangle here so
+03:09 
+
+03:09 let's change sides to three now let's
+03:12 
+
+03:12 connect this render node to background
+03:14 
+
+03:14 as a foreground so we're going to do
+03:16 
+
+03:16 first of all is change the color of this
+03:19 
+
+03:19 triangle here to a the same color as the
+03:23 
+
+03:23 line now let's go to the merge node
+03:25 
+
+03:25 let's bring down the size setting so
+03:28 
+
+03:28 that the triangle itself is
+03:30 
+
+03:30 proportionate to the line itself and now
+03:32 
+
+03:32 let's go to the center setting in the
+03:34 
+
+03:34 merge node right click and then go to
+03:35 
+
+03:35 connect to and then let's connect to the
+03:37 
+
+03:37 path one Precision data so this will
+03:39 
+
+03:39 ensure that the position of the arrow is
+03:42 
+
+03:42 always always locked to the same
+03:45 
+
+03:45 position as a point zero on the line now
+03:49 
+
+03:49 just FYI if you go to uh the polygon
+03:51 
+
+03:51 masking note go to the modifiers tab
+03:53 
+
+03:53 this is where you can find out what's
+03:55 
+
+03:55 the path uh for uh point zero on the
+03:59 
+
+03:59 line all right guys so uh let's go back
+04:02 
+
+04:02 to merge node change angle to 180 this
+04:04 
+
+04:04 will make sure that the angle the arrow
+04:06 
+
+04:06 is pointing in the right direction now
+04:08 
+
+04:08 let's uh go ahead and bring a spline
+04:11 
+
+04:11 editor and we're going to change the
+04:13 
+
+04:13 interpolation for two keyframes 4.0 this
+04:15 
+
+04:15 is going to impact the arrow as well
+04:17 
+
+04:17 since they are all locked all right now
+04:20 
+
+04:20 let's go ahead and create another arrow
+04:22 
+
+04:22 another triangle so let's do that and
+04:24 
+
+04:24 then we're gonna go to the size setting
+04:27 
+
+04:27 in this new merch note bring down the
+04:29 
+
+04:29 sides so that the triangle is
+04:31 
+
+04:31 proportionate to the line then let's go
+04:34 
+
+04:34 ahead and the keyframe point one instead
+04:36 
+
+04:36 this time so let's do that and then once
+04:38 
+
+04:38 uh we have keyframe point one we're
+04:41 
+
+04:41 gonna do is to bring this line out to
+04:43 
+
+04:43 the other side of the screen so once
+04:45 
+
+04:45 that all that is done you can go back to
+04:47 
+
+04:47 the modifiers Tab and see that now it is
+04:49 
+
+04:49 past two 4.1 uh so uh in the emerge node
+04:53 
+
+04:53 if you go back and then go to the center
+04:55 
+
+04:55 setting under connect two we're going to
+04:57 
+
+04:57 connect to path to Precision data at
+04:59 
+
+04:59 this time so this will ensure the other
+05:01 
+
+05:01 arrow is locked to that same position as
+05:04 
+
+05:04 the 0.1 and if you change the
+05:06 
+
+05:06 interpolation again this is going to
+05:08 
+
+05:08 impact both the point as well as the
+05:10 
+
+05:10 arrow as well all right now let's switch
+05:13 
+
+05:13 gears a little and look at how to create
+05:15 
+
+05:15 a non-linear line animation so let's put
+05:17 
+
+05:17 down four points on the screen and we're
+05:20 
+
+05:20 going to select these points right click
+05:22 
+
+05:22 in the menu let's go to uh polyline and
+05:25 
+
+05:25 then go to create and then select a
+05:28 
+
+05:28 rectangle in the pop-up menu we're going
+05:30 
+
+05:30 to just select OK for now so this is
+05:32 
+
+05:32 going to give us a square so what we can
+05:35 
+
+05:35 do is to select the left two points and
+05:37 
+
+05:37 then just hold down the shift key drag
+05:39 
+
+05:39 it out this will give us a rectangle all
+05:42 
+
+05:42 right guys so now let's uncheck solid
+05:44 
+
+05:44 bring up the border with adjust the
+05:46 
+
+05:46 touch and what we can do is to play with
+05:49 
+
+05:49 the length as well as the position
+05:50 
+
+05:50 setting here so as you can see let's go
+05:52 
+
+05:52 ahead and first of all play with the
+05:56 
+
+05:56 length setting so let's uh keyframe a
+05:59 
+
+05:59 length setting here uh and then let's go
+06:02 
+
+06:02 to another part of the video Let's
+06:04 
+
+06:04 keyframe again let's go back to the
+06:06 
+
+06:06 previous Point bring down the length
+06:08 
+
+06:08 setting to zero so now as you can see we
+06:10 
+
+06:10 have a pretty basic non-linear line
+06:12 
+
+06:12 animation and then we can also play with
+06:16 
+
+06:16 the position setting as well uh you know
+06:19 
+
+06:19 to go along with the length setting but
+06:22 
+
+06:22 what if we want to add another element
+06:24 
+
+06:24 well let's once again put down four
+06:26 
+
+06:26 points on the screen and then let's
+06:29 
+
+06:29 select all these points and then let's
+06:31 
+
+06:31 right click in the menu uh let's once
+06:33 
+
+06:33 again go to polyline go to create and
+06:36 
+
+06:36 then let's select ellipse this time and
+06:38 
+
+06:38 that's just select OK and uncheck solid
+06:41 
+
+06:41 and then bring up water with just a
+06:43 
+
+06:43 little bit so what we're going to do
+06:44 
+
+06:44 right now is to play with the length
+06:47 
+
+06:47 setting uh what we want to do here
+06:49 
+
+06:49 basically is just to show one quarter of
+06:52 
+
+06:52 the line so let's do that let's keyframe
+06:55 
+
+06:55 and put down 0.25 and so this is going
+07:00 
+
+07:00 to be the finished line so let's
+07:03 
+
+07:03 keyframe that and then let's go to
+07:05 
+
+07:05 another part of this video Let's
+07:07 
+
+07:07 keyframe again let's go back to the
+07:09 
+
+07:09 previous point and then bring this down
+07:10 
+
+07:10 to zero all right so now we have a
+07:13 
+
+07:13 simple nonlinear line animation and then
+07:15 
+
+07:15 what we're going to do is to basically
+07:18 
+
+07:18 publish this line path so to do that
+07:21 
+
+07:21 let's right click shape animation here
+07:23 
+
+07:23 and then in the menu we're going to
+07:24 
+
+07:24 remove actually this line first and then
+07:27 
+
+07:27 let's right click once again and then
+07:29 
+
+07:29 let's publish this line path information
+07:31 
+
+07:31 and then let's go to modifiers tab
+07:33 
+
+07:33 you'll see that it's there available for
+07:36 
+
+07:36 us so let's go to shape and bring out
+07:39 
+
+07:39 and gun and render create a triangle
+07:42 
+
+07:42 here make sure it's three sides and then
+07:44 
+
+07:44 connect to the background as a
+07:45 
+
+07:45 foreground and change the color of the
+07:47 
+
+07:47 triangle of the arrow to the same color
+07:50 
+
+07:50 as the line and now let's go to the
+07:53 
+
+07:53 merge node a bring down the size of this
+07:54 
+
+07:54 Arrow so that it's fitting for this
+07:56 
+
+07:56 animation and now let's go to the center
+07:58 
+
+07:58 setting let's right click in the menu
+08:01 
+
+08:01 select a path this will initiate the
+08:03 
+
+08:03 path information for this Arrow under
+08:06 
+
+08:06 the modifiers Tab and now let's uh go to
+08:09 
+
+08:09 shape animation right click I want to
+08:11 
+
+08:11 connect to let's connect to the polygon
+08:13 
+
+08:13 path value this will ensure the arrow is
+08:15 
+
+08:15 sitting on the same path as the line and
+08:17 
+
+08:17 now let's go to path one a displacement
+08:20 
+
+08:20 setting now this is initially
+08:23 
+
+08:23 automatically keyframe for us but we can
+08:26 
+
+08:26 on keyframe it but essentially you will
+08:28 
+
+08:28 see that a changing displacement value
+08:30 
+
+08:30 is going to animate the arrow for us so
+08:33 
+
+08:33 with that said let's go to the beginning
+08:36 
+
+08:36 of the video here we're going to
+08:37 
+
+08:38 keyframe placement ourselves and then
+08:40 
+
+08:40 leave it at zero let's go to the end of
+08:42 
+
+08:42 the line animation and let's go and
+08:44 
+
+08:44 let's keyframe displacement Again by
+08:47 
+
+08:47 bringing up to the point where it's
+08:49 
+
+08:49 sitting at the end of the line so if you
+08:51 
+
+08:51 were to replace this right now you guys
+08:54 
+
+08:54 will see that uh this arrow is moving in
+08:56 
+
+08:56 the same speed as the line now as for
+08:59 
+
+08:59 the direction of the arrow here we're
+09:02 
+
+09:02 gonna go to the angle setting let's go
+09:04 
+
+09:05 to connect two and then let's connect to
+09:07 
+
+09:07 the path one header uh you know setting
+09:09 
+
+09:09 here this will ensure that the angle is
+09:12 
+
+09:12 pointing in the same direction as the
+09:14 
+
+09:14 line animation all right perfect so uh
+09:18 
+
+09:18 the next thing we're going to do here is
+09:19 
+
+09:19 to change the interpolation for the line
+09:21 
+
+09:21 but the key thing here is to remember
+09:23 
+
+09:23 when you animate this you need to make
+09:25 
+
+09:26 sure that you understand what's the
+09:28 
+
+09:28 value for easy and ease out because we
+09:30 
+
+09:30 need to make sure that the displacement
+09:33 
+
+09:33 setting uh when you change the
+09:36 
+
+09:36 interpolation for the 2 two keyframes
+09:39 
+
+09:39 it's going to be the same as the value
+09:42 
+
+09:42 for the others which is going to be 80
+09:43 
+
+09:43 in this case for using and ease out so
+09:45 
+
+09:45 as you see now when you do that this is
+09:48 
+
+09:48 going to ensure the arrow is moving in
+09:50 
+
+09:50 the same speed as the line so another
+09:53 
+
+09:53 thing we can do is to bring a text node
+09:56 
+
+09:56 now let's go to the layout tab and
+09:58 
+
+09:58 change the type to a path so this will
+10:01 
+
+10:01 allow us to draw a path on the screen so
+10:04 
+
+10:04 what we're going to do is to draw a very
+10:06 
+
+10:06 simple path on the screen but holding
+10:09 
+
+10:09 down the shift key so this will ensure
+10:10 
+
+10:10 that the lines are perfectly straight
+10:13 
+
+10:13 now let's go back to the text box we're
+10:15 
+
+10:15 going to type in a bunch of dashes and
+10:18 
+
+10:18 then so this will allow us to basically
+10:20 
+
+10:20 create a dashed line we can also go to
+10:23 
+
+10:23 the transform tab there then go change
+10:26 
+
+10:26 the spacing between each Dash we can
+10:29 
+
+10:29 also go to the shading Tab and then
+10:32 
+
+10:32 let's go to precision and let's go to
+10:35 
+
+10:35 offset this will change how the uh you
+10:37 
+
+10:37 know dashes are said where the dash is
+10:39 
+
+10:39 sitting compared to the line path itself
+10:42 
+
+10:42 then most importantly if we go back to
+10:44 
+
+10:44 the text tab the ride on setting is
+10:47 
+
+10:47 going to allow us to animate this line
+10:48 
+
+10:48 so with that said what we're going to do
+10:51 
+
+10:51 is to keyframe uh right on at this point
+10:54 
+
+10:54 of the video let's bring end all the way
+10:57 
+
+10:57 to a start and then let's go to another
+10:59 
+
+10:59 part of this video let's bring the Ant
+11:01 
+
+11:01 back up so now guys as you can see we
+11:05 
+
+11:05 have created a a pretty basic dash line
+11:09 
+
+11:09 animation now to add another element to
+11:11 
+
+11:11 this what we're going to do is to go
+11:13 
+
+11:13 back to the layout tab and then we're
+11:15 
+
+11:15 going to go to shape animation right
+11:18 
+
+11:18 click let's once again remove this path
+11:21 
+
+11:21 first and then let's right click again
+11:23 
+
+11:23 and then let's publish this path setting
+11:26 
+
+11:26 uh so now on the modifiers tab you have
+11:29 
+
+11:29 this information available and then
+11:30 
+
+11:30 let's go ahead and bring once again and
+11:33 
+
+11:33 gone and render create an arrow that's
+11:36 
+
+11:36 connected to the text tab as a
+11:38 
+
+11:38 foreground let's once again change the
+11:40 
+
+11:41 size so that it's fitting for this
+11:43 
+
+11:43 animation so two things we're gonna do
+11:46 
+
+11:46 one is let's first of all go through the
+11:49 
+
+11:49 settings tab right click and then let's
+11:51 
+
+11:51 go to connect to you will see that
+11:53 
+
+11:53 there's nothing there so we have to go
+11:54 
+
+11:54 to path publish the path first and then
+11:56 
+
+11:56 go to modifiers tab go to a shape
+11:59 
+
+11:59 animation right click and connect to uh
+12:01 
+
+12:01 this text path connect to the value so
+12:04 
+
+12:04 now this arrow is sitting on that same
+12:06 
+
+12:06 path and then let's go to path one let's
+12:09 
+
+12:09 once again uh use displacement to help
+12:12 
+
+12:12 us set the animation for this Arrow so
+12:16 
+
+12:16 what we're going to do is to just to
+12:18 
+
+12:18 bring this back to the point where this
+12:20 
+
+12:20 is at the end of the animation so it's
+12:22 
+
+12:23 going to be one in this case and now you
+12:26 
+
+12:26 will see that this arrow is moving in
+12:28 
+
+12:28 the same speed as the dashed line now
+12:30 
+
+12:30 let's go back to the angle setting here
+12:33 
+
+12:33 let's right click and then we're going
+12:34 
+
+12:34 to go to connect to and now let's make
+12:37 
+
+12:37 sure that we connect to the path one
+12:39 
+
+12:39 heading so this will ensure that the
+12:41 
+
+12:41 arrow is also pointing in that same
+12:42 
+
+12:42 direction alright guys so this is
+12:44 
+
+12:44 basically it a quick look at different
+12:47 
+
+12:47 ways to create line animation in DaVinci
+12:49 
+
+12:49 Resolve I hope this helps and as always
+12:51 
+
+12:51 I will see you next time
+12:53 
+
+12:53 [Music]

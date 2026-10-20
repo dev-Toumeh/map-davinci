@@ -1,0 +1,51 @@
+{
+  "schema_version": 3,
+  "name": "Map video",
+  "assets_metadata": "json/metadata.json",
+  "output": {
+    "width": 2160,
+    "height": 3840,
+    "fps": 24,
+    "duration_frames": 720
+  },
+  "commentary": {
+    "clips": []
+  },
+  "keyframes": [
+    {
+      "frame": 0,
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "view_width": 0.31640625,
+      "easing": "linear"
+    },
+    {
+      "frame": 96,
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "view_width": 0.158203125,
+      "easing": "smooth"
+    }
+  ],
+  "connections": [],
+  "region_groups": [
+    {
+      "iso3": "QAT",
+      "start_frame": null,
+      "end_frame": null,
+      "children": [
+        {
+          "id": "country-qat",
+          "name": "Entire country",
+          "category": "country",
+          "start_frame": null,
+          "end_frame": null
+        }
+      ]
+    }
+  ]
+}

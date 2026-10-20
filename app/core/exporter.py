@@ -718,7 +718,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
                             center/zoom and is used by the browser UI
       orientation  "landscape" (3840x2160) | "vertical" (2160x3840)
       wide_factor  float, default 2.0
-      source       key in SOURCES, default google_satellite
+      source       key in SOURCES, default esri_world_imagery
     """
     t0 = time.time()
     name = "".join(c if (c.isalnum() or c in "-_") else "_" for c in str(config.get("name", "shot"))) or "shot"
@@ -739,7 +739,7 @@ def run_export(config: dict, progress: ProgressFn) -> dict:
     wide_factor = float(config.get("wide_factor", 2.0))
     if wide_factor <= 1.0:
         raise ValueError("wide_factor must be > 1")
-    source_key = config.get("source", "google_satellite")
+    source_key = config.get("source", "esri_world_imagery")
     if source_key not in SOURCES:
         raise ValueError(f"unknown imagery source: {source_key}")
     source = SOURCES[source_key]

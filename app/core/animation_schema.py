@@ -114,7 +114,7 @@ def _region_groups(value: Any, metadata: dict, duration: int) -> list[dict]:
             geometry_file = child.get("geometry_file")
             if geometry_file:
                 geometry_file = str(geometry_file)
-                if not __import__("re").fullmatch(r"regions/geometry_[A-Za-z0-9_.-]+\.geojson", geometry_file):
+                if not __import__("re").fullmatch(r"(?:data/)?regions/geometry_[A-Za-z0-9_.-]+\.geojson", geometry_file):
                     raise ValueError("sub-territory geometry file must be package-local")
                 normalized["geometry_file"] = geometry_file
             children.append(normalized)

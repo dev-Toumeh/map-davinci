@@ -1,0 +1,159 @@
+{
+	Tools = ordered() {
+		MultiMerge1 = MultiMerge {
+			EnabledRegion = TimeRegion { { Start = 0, End = 837.9999, FrameLength = 1 } },
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { {
+							[0] = 1,
+							8,
+							3,
+							4,
+							2,
+							5
+						} }, },
+				Background = Input {
+					SourceOp = "Left_Stack2_Main_Placement",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "Background1",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "right-path", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "MultiMerge3",
+					Source = "Output",
+				},
+				["Layer2.Center"] = Input { Value = { -0.0393222481283449, 1.44947021225342 }, },
+				["Layer2.Size"] = Input { Value = 3.22, },
+				LayerName2 = Input { Value = "v3", },
+				["Layer3.Foreground"] = Input {
+					SourceOp = "object_1_right",
+					Source = "Output",
+				},
+				["Layer3.Center"] = Input {
+					SourceOp = "object1_right",
+					Source = "Position",
+				},
+				["Layer3.Size"] = Input { Value = 3.22, },
+				LayerName3 = Input { Value = "opject_1_right", },
+				["Layer4.Foreground"] = Input {
+					SourceOp = "object_1_left",
+					Source = "Output",
+				},
+				["Layer4.Center"] = Input {
+					SourceOp = "object1_left",
+					Source = "Position",
+				},
+				["Layer4.Size"] = Input { Value = 3.22, },
+				LayerName4 = Input { Value = "object_1_left", },
+				["Layer5.Foreground"] = Input {
+					SourceOp = "MultiMerge2",
+					Source = "Output",
+				},
+				["Layer5.Center"] = Input { Value = { -0.0393220481283451, 1.44947061493798 }, },
+				["Layer5.Size"] = Input { Value = 3.22, },
+				LayerName5 = Input { Value = "v4", },
+				LayerName6 = Input { Value = "MultiMerge2_1 Layer", },
+				LayerName7 = Input { Value = "MultiMerge2_3 Layer", },
+				["Layer8.Foreground"] = Input {
+					SourceOp = "Background1_1",
+					Source = "Output",
+				},
+				["Layer8.Center"] = Input {
+					SourceOp = "left_path",
+					Source = "Value",
+				},
+				LayerName8 = Input { Value = "left-path", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 715, 362.697 } },
+		},
+		object1_right = PolyPath {
+			DrawMode = "InsertAndModify",
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { 0.341070726915521, 1.58698601398601 }, },
+				Size = Input { Value = 4.056, },
+				Displacement = Input {
+					SourceOp = "Path1Displacement",
+					Source = "Value",
+				},
+				PolyLine = Input {
+					SourceOp = "right_path",
+					Source = "Value",
+				}
+			},
+		},
+		Path1Displacement = BezierSpline {
+			SplineColor = { Red = 255, Green = 0, Blue = 255 },
+			NameSet = true,
+			KeyFrames = {
+				[0] = { -0.25, RH = { 3.33333333333333, -0.166666666666667 }, Flags = { Linear = true } },
+				[10] = { 0, LH = { 6.66666666666667, -0.0833333333333333 }, RH = { 31.3333333333333, 0 }, Flags = { Linear = true } },
+				[74] = { 0, LH = { 52.6666666666667, 0 }, RH = { 77.3333333333333, 0.0833333333333333 }, Flags = { Linear = true } },
+				[84] = { 0.25, LH = { 80.6666666666667, 0.166666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		right_path = PublishPolyLine {
+			NameSet = true,
+			Inputs = {
+				Value = Input {
+					Value = Polyline {
+						Closed = true,
+						Points = {
+							{ Linear = true, X = 0.100935828877005, Y = -0.267220902612827, LX = 8.45442188872723e-18, LY = 0.122729944406843, RX = -8.45442188872723e-18, RY = -0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.489443124835049, LX = -0.0690355937288492, LY = 2.25451250366059e-17, RX = 0.0690355937288492, RY = -2.25451250366059e-17 },
+							{ Linear = true, X = 0.350935828877005, Y = -0.267220902612827, LX = -1.69088437774545e-17, LY = -0.122729944406843, RX = 1.69088437774545e-17, RY = 0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.0449986803906044, LX = 0.0690355937288492, LY = -3.75752083943432e-17, RX = -0.0690355937288492, RY = 3.75752083943432e-17 }
+						}
+					},
+				}
+			},
+		},
+		object1_left = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { -1.173033, 1.583609 }, },
+				Size = Input { Value = 4.055, },
+				Displacement = Input {
+					SourceOp = "object1_leftDisplacement",
+					Source = "Value",
+				},
+				PolyLine = Input {
+					SourceOp = "Publish1",
+					Source = "Value",
+				}
+			},
+		},
+		object1_leftDisplacement = BezierSpline {
+			SplineColor = { Red = 255, Green = 0, Blue = 255 },
+			NameSet = true,
+			KeyFrames = {
+				[0] = { 0.25, RH = { 3.33333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+				[10] = { 0.5, LH = { 6.66666666666667, 0.416666666666667 }, RH = { 31.3333333333333, 0.5 }, Flags = { Linear = true } },
+				[74] = { 0.5, LH = { 52.6666666666667, 0.5 }, RH = { 77.3333333333333, 0.583333333333333 }, Flags = { Linear = true } },
+				[84] = { 0.75, LH = { 80.6666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		Publish1 = PublishPolyLine {
+			Inputs = {
+				Value = Input {
+					Value = Polyline {
+						Closed = true,
+						Points = {
+							{ Linear = true, X = 0.100935828877005, Y = -0.267220902612827, LX = 8.45442188872723e-18, LY = 0.122729944406843, RX = -8.45442188872723e-18, RY = -0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.489443124835049, LX = -0.0690355937288492, LY = 2.25451250366059e-17, RX = 0.0690355937288492, RY = -2.25451250366059e-17 },
+							{ Linear = true, X = 0.350935828877005, Y = -0.267220902612827, LX = -1.69088437774545e-17, LY = -0.122729944406843, RX = 1.69088437774545e-17, RY = 0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.0449986803906044, LX = 0.0690355937288492, LY = -3.75752083943432e-17, RX = -0.0690355937288492, RY = 3.75752083943432e-17 }
+						}
+					},
+				}
+			},
+		},
+		left_path = PublishPoint {
+			NameSet = true,
+		}
+	}
+}

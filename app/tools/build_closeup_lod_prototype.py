@@ -129,7 +129,7 @@ def build(package: Path, composition: Path, target_frame: int,
     center_lon, center_lat = exporter.merc_to_ll((minx + maxx) / 2, (miny + maxy) / 2)
     target_mpp = (maxx - minx) / int(output_config["width"])
     ground_mpp = target_mpp * math.cos(math.radians(center_lat))
-    source_key = metadata.get("imagery", {}).get("source", "google_satellite")
+    source_key = metadata.get("imagery", {}).get("source", "esri_world_imagery")
     source = exporter.SOURCES[source_key]
     zoom, _ = exporter.choose_tile_zoom(ground_mpp, center_lat, source["max_zoom"])
     image_dir = output.parent.parent / "images"

@@ -1,0 +1,910 @@
+Composition {
+	CurrentTime = 0,
+	RenderRange = { 0, 119 },
+	GlobalRange = { 0, 119 },
+	CurrentID = 35,
+	PlaybackUpdateMode = 0,
+	StereoMode = false,
+	Version = "DaVinci Resolve 21.1.0.0015",
+	SavedOutputs = 0,
+	HeldTools = 0,
+	DisabledTools = 0,
+	LockedTools = 0,
+	AudioOffset = 0,
+	Resumable = true,
+	OutputClips = {
+	},
+	Tools = {
+		TB_Original = MediaIn {
+			CustomData = {
+				MediaProps = {
+					MEDIA_FORMAT_TYPE = "PNG",
+					MEDIA_HEIGHT = 2160,
+					MEDIA_ID = "b96afcea-32db-4d55-ab92-49887e94b204",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "satellite_detail.png",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/experement/texture_blend/images/satellite_detail.png",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 3840
+				},
+				MEDIA_ID = "b96afcea-32db-4d55-ab92-49887e94b204",
+			},
+			Inputs = {
+				GlobalOut = Input { Value = 119, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "b96afcea-32db-4d55-ab92-49887e94b204", },
+				AudioTrack = Input { Value = FuID { }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 0, 0 } },
+			Version = 1
+		},
+		TB_Base_ColourLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Base_ColourLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Base_ColourLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Base_ColourLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Relief_BlendLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Relief_BlendLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Relief_BlendLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Relief_BlendLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Paper_BlendLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Paper_BlendLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Paper_BlendLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Paper_BlendLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Final_StyleLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Final_StyleLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Final_StyleLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Final_StyleLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		TB_Attribution = TextPlus {
+			Inputs = {
+				GlobalOut = Input { Value = 119, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				Center = Input { Value = { 0.32, 0.025 }, },
+				Red1 = Input { Value = 0.18, },
+				Green1 = Input { Value = 0.13, },
+				Blue1 = Input { Value = 0.08, },
+				StyledText = Input { Value = "Imagery: Esri, Maxar, Earthstar Geographics | Relief: Esri and contributors", },
+				Font = Input { Value = "Arial", },
+				Style = Input { Value = "Regular", },
+				Size = Input { Value = 0.008, },
+				VerticalJustificationNew = Input { Value = 3, },
+				HorizontalJustificationNew = Input { Value = 3, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 460, 140 } },
+			Version = 1
+		},
+		TB_Credited_Map = Merge {
+			Inputs = {
+				Background = Input {
+					SourceOp = "TB_Final_Style",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "TB_Attribution",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 480, 0 } },
+		},
+		TB_Rendered_Image = Custom {
+			Inputs = {
+				LUTIn1 = Input {
+					SourceOp = "TB_Rendered_ImageLUTIn1",
+					Source = "Value",
+				},
+				LUTIn2 = Input {
+					SourceOp = "TB_Rendered_ImageLUTIn2",
+					Source = "Value",
+				},
+				LUTIn3 = Input {
+					SourceOp = "TB_Rendered_ImageLUTIn3",
+					Source = "Value",
+				},
+				LUTIn4 = Input {
+					SourceOp = "TB_Rendered_ImageLUTIn4",
+					Source = "Value",
+				},
+				Image1 = Input {
+					SourceOp = "TB_Credited_Map",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 720, 0 } },
+		},
+		TB_Rendered_ImageLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		TB_Rendered_ImageLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		TB_Rendered_ImageLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		TB_Rendered_ImageLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		MediaOut1 = MediaOut {
+			CtrlWZoom = false,
+			Inputs = {
+				Index = Input { Value = "0", },
+				Input = Input {
+					SourceOp = "TB_Rendered_Image",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 960, 0 } },
+		},
+		Texture_Blend = GroupOperator {
+			Inputs = ordered() {
+				Control7 = InstanceInput {
+					SourceOp = "TB_Final_Style",
+					Source = "NumberIn1",
+					Name = "Edge shading",
+				},
+				Control6 = InstanceInput {
+					SourceOp = "TB_Paper_Blend",
+					Source = "NumberIn2",
+					Name = "Paper mode: 0 Multiply / 1 Soft Light",
+				},
+				Control5 = InstanceInput {
+					SourceOp = "TB_Paper_Blend",
+					Source = "NumberIn1",
+					Name = "Paper strength",
+				},
+				MainInput1 = InstanceInput {
+					SourceOp = "TB_Base_Colour",
+					Source = "Image1",
+				},
+				Control1 = InstanceInput {
+					SourceOp = "TB_Base_Colour",
+					Source = "NumberIn2",
+					Name = "Warmth",
+				},
+				Control2 = InstanceInput {
+					SourceOp = "TB_Relief_Blend",
+					Source = "NumberIn1",
+					Name = "Relief strength",
+				},
+				Control3 = InstanceInput {
+					SourceOp = "TB_Relief_Blend",
+					Source = "NumberIn2",
+					Name = "Relief mode: 0 Multiply / 1 Soft Light",
+				},
+				Control4 = InstanceInput {
+					SourceOp = "TB_Relief_Blend",
+					Source = "NumberIn3",
+					Name = "Relief shadow depth",
+				},
+				Control0 = InstanceInput {
+					SourceOp = "TB_Base_Colour",
+					Source = "NumberIn1",
+					Name = "Base contrast",
+				}
+			},
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "TB_Final_Style",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo {
+				Pos = { 240, 0 },
+				Flags = {
+					AllowPan = false,
+					AutoSnap = true,
+					RemoveRouters = true
+				},
+				Size = { 846, 426.364, 423, 24.2424 },
+				Direction = "Horizontal",
+				PipeStyle = "Direct",
+				Scale = 1,
+				Offset = { 0, 0 }
+			},
+			Tools = ordered() {
+				TB_Hillshade = Loader {
+					Clips = {
+						Clip {
+							ID = "Clip1",
+							Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/experement/texture_blend/images/esri_hillshade.png",
+							FormatID = "PNGFormat",
+							StartFrame = -1,
+							LengthSetManually = true,
+							TrimIn = 0,
+							TrimOut = 0,
+							ExtendFirst = 0,
+							ExtendLast = 0,
+							Loop = 1,
+							AspectMode = 0,
+							Depth = 0,
+							TimeCode = 0,
+							GlobalStart = 0,
+							GlobalEnd = 1000000
+						}
+					},
+					CtrlWShown = false,
+					ViewInfo = OperatorInfo { Pos = { -360, 188.758 } },
+				},
+				TB_Paper = Loader {
+					Clips = {
+						Clip {
+							ID = "Clip1",
+							Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/experement/texture_blend/images/paper_texture.png",
+							FormatID = "PNGFormat",
+							StartFrame = -1,
+							LengthSetManually = true,
+							TrimIn = 0,
+							TrimOut = 0,
+							ExtendFirst = 0,
+							ExtendLast = 0,
+							Loop = 1,
+							AspectMode = 0,
+							Depth = 0,
+							TimeCode = 0,
+							GlobalStart = 0,
+							GlobalEnd = 1000000
+						}
+					},
+					CtrlWShown = false,
+					ViewInfo = OperatorInfo { Pos = { -120, 8.75757 } },
+				},
+				TB_Paper_Canvas = Background {
+					CtrlWShown = false,
+					Inputs = {
+						GlobalOut = Input { Value = 119, },
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						TopLeftAlpha = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { -360, 8.75757 } },
+				},
+				TB_Paper_Fit = Merge {
+					CtrlWShown = false,
+					Inputs = {
+						Background = Input {
+							SourceOp = "TB_Paper_Canvas",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "TB_Paper",
+							Source = "Output",
+						},
+						Size = Input { Value = 3.0622009569378, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 100, 8.75757 } },
+				},
+				TB_Base_Colour = Custom {
+					CtrlWShown = false,
+					Inputs = {
+						NumberIn1 = Input { Value = 1.06, },
+						NumberIn2 = Input { Value = 0.018, },
+						LUTIn1 = Input {
+							SourceOp = "TB_Base_ColourLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "TB_Base_ColourLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "TB_Base_ColourLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "TB_Base_ColourLUTIn4",
+							Source = "Value",
+						},
+						RedExpression = Input { Value = "min(1,max(0,(r1-.5)*n1+.5+n2*1))", },
+						GreenExpression = Input { Value = "min(1,max(0,(g1-.5)*n1+.5+n2*0.2))", },
+						BlueExpression = Input { Value = "min(1,max(0,(b1-.5)*n1+.5+n2*-0.55))", },
+						Image1 = Input {
+							SourceOp = "TB_Original",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { -360, 368.758 } },
+				},
+				TB_Relief_Blend = Custom {
+					CtrlWShown = false,
+					Inputs = {
+						NumberIn1 = Input { Value = 0.65, },
+						NumberIn3 = Input { Value = 4, },
+						LUTIn1 = Input {
+							SourceOp = "TB_Relief_BlendLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "TB_Relief_BlendLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "TB_Relief_BlendLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "TB_Relief_BlendLUTIn4",
+							Source = "Value",
+						},
+						Intermediate1 = Input { Value = "min(1,max(0,(r2+g2+b2)/3))", },
+						Intermediate2 = Input { Value = "min(1,max(0,((r2+g2+b2)/3-.97)*4+.5))", },
+						RedExpression = Input { Value = "r1*(1-n1)+n1*if(n2<.5,r1*(i1^n3),if(i2<.5,r1-(1-2*i2)*r1*(1-r1),r1+(2*i2-1)*(sqrt(max(r1,0))-r1)))", },
+						GreenExpression = Input { Value = "g1*(1-n1)+n1*if(n2<.5,g1*(i1^n3),if(i2<.5,g1-(1-2*i2)*g1*(1-g1),g1+(2*i2-1)*(sqrt(max(g1,0))-g1)))", },
+						BlueExpression = Input { Value = "b1*(1-n1)+n1*if(n2<.5,b1*(i1^n3),if(i2<.5,b1-(1-2*i2)*b1*(1-b1),b1+(2*i2-1)*(sqrt(max(b1,0))-b1)))", },
+						Image1 = Input {
+							SourceOp = "TB_Base_Colour",
+							Source = "Output",
+						},
+						Image2 = Input {
+							SourceOp = "TB_Hillshade",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { -120, 368.758 } },
+				},
+				TB_Paper_Blend = Custom {
+					CtrlWShown = false,
+					Inputs = {
+						NumberIn1 = Input { Value = 0.28, },
+						NumberIn2 = Input { Value = 1, },
+						LUTIn1 = Input {
+							SourceOp = "TB_Paper_BlendLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "TB_Paper_BlendLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "TB_Paper_BlendLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "TB_Paper_BlendLUTIn4",
+							Source = "Value",
+						},
+						Intermediate1 = Input { Value = "min(1,max(0,((r2+g2+b2)/3-.9)*7+.5))", },
+						RedExpression = Input { Value = "r1*(1-n1)+n1*if(n2<.5,r1*((r2+g2+b2)/3),if(i1<.5,r1-(1-2*i1)*r1*(1-r1),r1+(2*i1-1)*(sqrt(max(r1,0))-r1)))", },
+						GreenExpression = Input { Value = "g1*(1-n1)+n1*if(n2<.5,g1*((r2+g2+b2)/3),if(i1<.5,g1-(1-2*i1)*g1*(1-g1),g1+(2*i1-1)*(sqrt(max(g1,0))-g1)))", },
+						BlueExpression = Input { Value = "b1*(1-n1)+n1*if(n2<.5,b1*((r2+g2+b2)/3),if(i1<.5,b1-(1-2*i1)*b1*(1-b1),b1+(2*i1-1)*(sqrt(max(b1,0))-b1)))", },
+						Image1 = Input {
+							SourceOp = "TB_Relief_Blend",
+							Source = "Output",
+						},
+						Image2 = Input {
+							SourceOp = "TB_Paper_Fit",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 120, 368.758 } },
+				},
+				TB_Final_Style = Custom {
+					CtrlWShown = false,
+					Inputs = {
+						NumberIn1 = Input { Value = 0.13, },
+						LUTIn1 = Input {
+							SourceOp = "TB_Final_StyleLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "TB_Final_StyleLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "TB_Final_StyleLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "TB_Final_StyleLUTIn4",
+							Source = "Value",
+						},
+						Intermediate1 = Input { Value = "min(1,((x-.5)*(x-.5)+(y-.5)*(y-.5))*2)", },
+						RedExpression = Input { Value = "r1*(1-n1*i1)", },
+						GreenExpression = Input { Value = "g1*(1-n1*i1)", },
+						BlueExpression = Input { Value = "b1*(1-n1*i1)", },
+						Image1 = Input {
+							SourceOp = "TB_Paper_Blend",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 360, 368.758 } },
+				}
+			},
+		}
+	},
+	Frames = {
+		{
+			FrameTypeID = "ChildFrame",
+			Mode = 3,
+			LayoutPreset = 0,
+			PresetName = "Default",
+			Left = 0,
+			Top = 0,
+			Width = 1920,
+			Height = 959,
+			ZoneInfo = {
+				AuxRight = { Expanded = true },
+				Right = { Expanded = true, },
+				Left = { Expanded = false, },
+				AuxLeft = { Expanded = true },
+				["!Left"] = {
+				},
+				["!Right"] = {
+				}
+			},
+			ViewInfo = {
+				Keyframes = { Show = false, },
+				LayoutStrip = { Show = true, },
+				Inspector = { Show = true, Adjust = false, RatioX = 100, RatioY = 1, MRU = 4 },
+				Effects = { Show = true, Adjust = false, RatioX = 1, RatioY = 99.835255354201, MRU = 3 },
+				Viewer2 = { Show = true, RatioX = 0.947368421052632, RatioY = 0.01, },
+				Comments = { Show = false },
+				Clips = { Show = false, },
+				ActionStrip = { Show = true, RatioX = 100, },
+				Time = { Show = true, RatioX = 100, },
+				MediaPool = { Show = false, Adjust = true, RatioX = 1, RatioY = 100.164744645799, MRU = 0 },
+				Nodes = { Show = true, RatioX = 1, RatioY = 100, },
+				Metadata = { Show = false, },
+				Viewer1 = { Show = true, Adjust = false, RatioX = 1.05263157894737, RatioY = 0.01, MRU = 5 },
+				Spline = { Show = false, },
+				OuterColumns = {
+					RatioX = 100,
+					RatioY = 1,
+				},
+				OuterLeft = {
+				},
+				CenterSplit = {
+					RatioX = 1,
+					RatioY = 100,
+				},
+				OuterRight = {
+					PixelX = 420,
+					RatioY = 100,
+				},
+				InnerColumns = {
+					RatioX = 100,
+					RatioY = 2.01639344262295,
+				},
+				MainSplit = {
+					RatioX = 100,
+					RatioY = 0.983606557377049,
+				},
+				InnerLeft = {
+					PixelX = 420,
+					RatioY = 100,
+				},
+				InnerRight = {
+				},
+				ViewerSplit = {
+					RatioX = 100,
+					RatioY = 1,
+				}
+			},
+			Views = ordered() {
+				MediaPool = "MediaPoolView",
+				Effects = MultiView {
+					Active = "EffectView",
+					ViewList = ordered() {
+						EffectView = "EffectView"
+					},
+				},
+				Nodes = MultiView {
+					Active = "FlowView",
+					ViewList = ordered() {
+						FlowView = "FlowView"
+					},
+					FlowView = FlowView {
+						Flags = {
+							Navigator = true,
+							AutoHideNavigator = true,
+							AutoSnap = true,
+							RemoveRouters = true
+						},
+						NavigatorSize = { 200, 140 },
+						Direction = "Horizontal",
+						PipeStyle = "Direct",
+						RootScale = 0.705852,
+						RootOffset = { -192.195, 158.179 }
+					}
+				},
+				Keyframes = MultiView {
+					Active = "TimelineView",
+					ViewList = ordered() {
+						TimelineView = "TimelineView"
+					},
+					TimelineView = TimelineView {
+						TreeControlState = {
+						},
+						DisplayMode = "All Tools",
+						ShowCurrentTimeTools = false,
+						Filter = "Show All",
+						ShowSelectedTools = false,
+						ShowAnimatedToolsOnly = false,
+						ShowEditBoxes = false,
+						KeyFrameView = {
+							Position = { Left = 232, Bottom = 323 },
+							ScaleX = 2.69031007751938,
+							OffsetX = -64.5674418604651,
+							OffsetY = 0,
+							AutoScaling = "scroll",
+							AutoSnapTo = "frame",
+							AutoSnapToGuidelines = false,
+							GuidelinesGrabEnabled = true,
+							GuidelinesSnapTo = "none"
+						},
+						Spreadsheet = { LeftPos = 232, Visible = false }
+					}
+				},
+				Spline = MultiView {
+					Active = "SplineView",
+					ViewList = ordered() {
+						SplineView = "SplineEditorView"
+					},
+					SplineView = SplineEditorView {
+						LeftPos = 264,
+						ScaleX = 0.2,
+						ScaleY = 0.00335570469798658,
+						OffsetX = -3.4,
+						OffsetY = 0,
+						AutoScaling = "scroll",
+						AutoSnapTo = "frame",
+						AutoSnapToGuidelines = false,
+						GuidelinesSnapTo = "frame",
+						ShowKeyMarkers = false,
+						IndependentHandles = false,
+						ShowNonSplineModifiers = false,
+						GuidelinesGrabEnabled = true,
+						ShowOneToolOnly = false,
+						ShowSelectedTools = false,
+						ShowAllInputs = false,
+						Filter = "Show All"
+					}
+				},
+				Inspector = MultiView {
+					Active = "Tools",
+					ViewList = ordered() {
+						Tools = "ControlView",
+						Modifiers = "ModifierView"
+					},
+				},
+				Viewer1 = MultiView {
+					Active = "LeftView",
+					ViewList = ordered() {
+						LeftView = "PreviewContainer"
+					},
+				},
+				Viewer2 = MultiView {
+					Active = "RightView",
+					ViewList = ordered() {
+						RightView = "PreviewContainer"
+					},
+				},
+				Time = "TimeView",
+				ActionStrip = "ActionStripView",
+				LayoutStrip = "LayoutStripView",
+				Clips = "ClipsView",
+				Metadata = "MetadataView"
+			},
+			Layout = {
+				{ ID = "LayoutStrip", FixedY = 36, Resolve = false, Flat = true },
+				{
+					{
+						{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+						{ ID = "Effects", RatioX = 1 },
+						Zone = "Left",
+						Rows = 2,
+						PaneID = "OuterLeft",
+						PixelX = 420
+					},
+					{
+						{
+							{
+								{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+								{ ID = "Effects", RatioX = 1 },
+								PaneID = "InnerLeft",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Left"
+							},
+							{
+								{
+									{ ID = "Viewer1", RatioY = 0.01, RatioX = 1 },
+									{ ID = "Viewer2", RatioX = 1 },
+									RatioY = 1,
+									Columns = 2,
+									PaneID = "ViewerSplit"
+								},
+								{ ID = "Time", FixedY = 83, Photo = false, Flat = true },
+								RatioX = 1,
+								Rows = 2
+							},
+							{
+								{ ID = "Inspector", RatioY = 1 },
+								{ ID = "Metadata", RatioY = 1, Fusion = false },
+								PaneID = "InnerRight",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Right"
+							},
+							RatioY = 2,
+							Columns = 3,
+							PaneID = "InnerColumns"
+						},
+						{ ID = "ActionStrip", FixedY = 50, Flat = true },
+						{
+							{ ID = "Nodes", RatioX = 1 },
+							{ ID = "Spline", Photo = false, RatioX = 1 },
+							{ ID = "Keyframes", Photo = false, RatioX = 1 },
+							RatioY = 1,
+							Columns = 3,
+							PaneID = "MainSplit"
+						},
+						{ Fusion = false, ID = "Clips", LARGE_FixedY = 160, MEDIUM_FixedY = 138, SMALL_FixedY = 110 },
+						RatioX = 1,
+						Rows = 4,
+						PaneID = "CenterSplit"
+					},
+					{
+						{ ID = "Inspector", RatioY = 1 },
+						{ ID = "Metadata", RatioY = 1, Fusion = false },
+						Zone = "Right",
+						Rows = 2,
+						PaneID = "OuterRight",
+						PixelX = 420
+					},
+					RatioY = 1,
+					Columns = 3,
+					PaneID = "OuterColumns"
+				},
+				RatioX = 1,
+				Rows = 2,
+				RatioY = 1
+			},
+			TopBar = {
+				Left = { "Left", "MediaPool", "Effects", "Clips", "Nodes", "Console" },
+				Right = { "Spline", "Keyframes", "Metadata", "Inspector", "Right" }
+			}
+		}
+	},
+	Prefs = {
+		Comp = {
+			Interactive = {
+				Proxy = {
+					Scale = 1,
+				},
+			},
+			Views = {
+				RightView = {
+					Viewer = {
+						Layer = ":Default",
+					},
+				},
+				LeftView = {
+				},
+			},
+			Paths = {
+				Map = {
+					["ResolveCaches:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/CacheClip/91373488-f9b6-4308-8d48-ad248928a7f7/9b8706fb-797c-4fc3-a327-0916b4fda9d8/8c71e31c-333e-48cd-86d5-9e7056ae83c8/Fusion",
+				},
+			},
+			FrameFormat = {
+				Width = 3840,
+				Height = 2160,
+				Rate = 24,
+				DepthFull = 3,
+				DepthPreview = 3,
+				DepthInteractive = 3,
+			},
+			Unsorted = {
+				GlobalEnd = 119
+			},
+			SpellCheck = {
+			},
+		}
+	},
+}
+

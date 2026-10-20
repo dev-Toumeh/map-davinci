@@ -1,0 +1,516 @@
+{
+	Tools = ordered() {
+		MacroTool1 = MacroOperator {
+			CtrlWZoom = false,
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "MultiMerge3",
+					Source = "Output",
+				},
+				MainOutput2 = InstanceOutput {
+					SourceOp = "GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415f_1_3",
+					Source = "MainOutput1",
+				},
+				MainOutput3 = InstanceOutput {
+					SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415f_1_1 = GroupOperator {
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = {
+						Path = {
+							Map = {
+								["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/"
+							}
+						},
+					},
+					Inputs = ordered() {
+						Speed = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1",
+							Source = "Speed",
+							Page = "Controls",
+						},
+						TimelineFPS = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1",
+							Source = "TimelineFPS",
+							Page = "Controls",
+						},
+						Offset = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1",
+							Source = "Offset",
+							Page = "Controls",
+						}
+					},
+					Outputs = {
+						MainOutput1 = InstanceOutput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1",
+							Source = "Output",
+						}
+					},
+					ViewInfo = GroupInfo { Pos = { 1390.39, -142.107 } },
+					Tools = ordered() {
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1_1 = Loader {
+							Clips = {
+								Clip {
+									ID = "Clip1",
+									Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/Frames/frame_0000.png",
+									FormatID = "PNGFormat",
+									Length = 2,
+									LengthSetManually = true,
+									TrimIn = 0,
+									TrimOut = 1,
+									ExtendFirst = 0,
+									ExtendLast = 0,
+									Loop = 1,
+									AspectMode = 0,
+									Depth = 0,
+									TimeCode = 0,
+									GlobalStart = 0,
+									GlobalEnd = 1000000
+								}
+							},
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }
+							},
+							ViewInfo = OperatorInfo { Pos = { -110, 8.75758 } },
+						},
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1 = TimeStretcher {
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								SourceTime = Input {
+									Value = 0,
+									Expression = "iif((((time-comp.RenderStart)*1000/GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1.TimelineFPS*GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1.Speed+GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1.Offset*1000)%100)<50,0,1)",
+								},
+								Input = Input {
+									SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1_1",
+									Source = "Output",
+								}
+							},
+							ViewInfo = OperatorInfo { Pos = { 110, 8.75758 } },
+							UserControls = ordered() { Speed = { INP_MaxAllowed = 100, INPID_InputControl = "SliderControl", INP_MaxScale = 4, INP_Default = 1, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Speed" }, TimelineFPS = { INP_MaxAllowed = 240, INPID_InputControl = "SliderControl", INP_MaxScale = 60, INP_Default = 24, INP_MinScale = 1, INP_MinAllowed = 1, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Timeline FPS" }, Offset = { INP_MaxAllowed = 100000, INPID_InputControl = "SliderControl", INP_MaxScale = 0.1, INP_Default = 0, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Offset (seconds)" } }
+						}
+					},
+				},
+				GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415f_1 = GroupOperator {
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = {
+						Path = {
+							Map = {
+								["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/"
+							}
+						},
+					},
+					Inputs = ordered() {
+						Speed = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1",
+							Source = "Speed",
+							Page = "Controls",
+						},
+						TimelineFPS = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1",
+							Source = "TimelineFPS",
+							Page = "Controls",
+						},
+						Offset = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1",
+							Source = "Offset",
+							Page = "Controls",
+						}
+					},
+					Outputs = {
+						MainOutput1 = InstanceOutput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1",
+							Source = "Output",
+						}
+					},
+					ViewInfo = GroupInfo { Pos = { 1381.06, -248.216 } },
+					Tools = ordered() {
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1 = Loader {
+							Clips = {
+								Clip {
+									ID = "Clip1",
+									Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/Frames/frame_0000.png",
+									FormatID = "PNGFormat",
+									Length = 2,
+									LengthSetManually = true,
+									TrimIn = 0,
+									TrimOut = 1,
+									ExtendFirst = 0,
+									ExtendLast = 0,
+									Loop = 1,
+									AspectMode = 0,
+									Depth = 0,
+									TimeCode = 0,
+									GlobalStart = 0,
+									GlobalEnd = 1000000
+								}
+							},
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }
+							},
+							ViewInfo = OperatorInfo { Pos = { -110, 8.75758 } },
+						},
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1 = TimeStretcher {
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								SourceTime = Input {
+									Value = 0,
+									Expression = "iif((((time-comp.RenderStart)*1000/GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1.TimelineFPS*GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1.Speed+GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1.Offset*1000)%100)<50,0,1)",
+								},
+								Input = Input {
+									SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1",
+									Source = "Output",
+								}
+							},
+							ViewInfo = OperatorInfo { Pos = { 110, 8.75758 } },
+							UserControls = ordered() { Speed = { INP_MaxAllowed = 100, INPID_InputControl = "SliderControl", INP_MaxScale = 4, INP_Default = 1, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Speed" }, TimelineFPS = { INP_MaxAllowed = 240, INPID_InputControl = "SliderControl", INP_MaxScale = 60, INP_Default = 24, INP_MinScale = 1, INP_MinAllowed = 1, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Timeline FPS" }, Offset = { INP_MaxAllowed = 100000, INPID_InputControl = "SliderControl", INP_MaxScale = 0.1, INP_Default = 0, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Offset (seconds)" } }
+						}
+					},
+				},
+				GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415f_1_2 = GroupOperator {
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = {
+						Path = {
+							Map = {
+								["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/"
+							}
+						},
+					},
+					Inputs = ordered() {
+						Speed = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2",
+							Source = "Speed",
+							Page = "Controls",
+						},
+						TimelineFPS = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2",
+							Source = "TimelineFPS",
+							Page = "Controls",
+						},
+						Offset = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2",
+							Source = "Offset",
+							Page = "Controls",
+						}
+					},
+					Outputs = {
+						MainOutput1 = InstanceOutput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2",
+							Source = "Output",
+						}
+					},
+					ViewInfo = GroupInfo { Pos = { 1388.06, -344.775 } },
+					Tools = ordered() {
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1_2 = Loader {
+							Clips = {
+								Clip {
+									ID = "Clip1",
+									Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/Frames/frame_0000.png",
+									FormatID = "PNGFormat",
+									Length = 2,
+									LengthSetManually = true,
+									TrimIn = 0,
+									TrimOut = 1,
+									ExtendFirst = 0,
+									ExtendLast = 0,
+									Loop = 1,
+									AspectMode = 0,
+									Depth = 0,
+									TimeCode = 0,
+									GlobalStart = 0,
+									GlobalEnd = 1000000
+								}
+							},
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }
+							},
+							ViewInfo = OperatorInfo { Pos = { -110, 8.75758 } },
+						},
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2 = TimeStretcher {
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								SourceTime = Input {
+									Value = 0,
+									Expression = "iif((((time-comp.RenderStart)*1000/GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2.TimelineFPS*GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2.Speed+GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2.Offset*1000)%100)<50,0,1)",
+								},
+								Input = Input {
+									SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1_2",
+									Source = "Output",
+								}
+							},
+							ViewInfo = OperatorInfo { Pos = { 110, 8.75758 } },
+							UserControls = ordered() { Speed = { INP_MaxAllowed = 100, INPID_InputControl = "SliderControl", INP_MaxScale = 4, INP_Default = 1, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Speed" }, TimelineFPS = { INP_MaxAllowed = 240, INPID_InputControl = "SliderControl", INP_MaxScale = 60, INP_Default = 24, INP_MinScale = 1, INP_MinAllowed = 1, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Timeline FPS" }, Offset = { INP_MaxAllowed = 100000, INPID_InputControl = "SliderControl", INP_MaxScale = 0.1, INP_Default = 0, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Offset (seconds)" } }
+						}
+					},
+				},
+				MultiMerge3 = MultiMerge {
+					CtrlWShown = false,
+					Inputs = {
+						LayerEnabled5 = Input {
+							SourceOp = "MultiMerge3LayerEnabled5",
+							Source = "Value",
+						},
+						LayerOrder = Input {
+							SourceOp = "MultiMerge3LayerOrder",
+							Source = "Value",
+						},
+						Background = Input {
+							SourceOp = "Background14",
+							Source = "Output",
+						},
+						["Layer1.Foreground"] = Input {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_1",
+							Source = "Output",
+						},
+						["Layer1.Center"] = Input { Value = { 0.904, 0.309 }, },
+						["Layer1.Size"] = Input { Value = 2.14, },
+						["Layer1.Angle"] = Input { Value = -24.6, },
+						["Layer1.Blend"] = Input {
+							SourceOp = "MultiMerge3indeaLayer1Blend",
+							Source = "Value",
+						},
+						LayerName1 = Input { Value = "indea", },
+						LayerEnabled1 = Input {
+							SourceOp = "MultiMerge3LayerEnabled1",
+							Source = "Value",
+						},
+						["Layer2.Foreground"] = Input {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1",
+							Source = "Output",
+						},
+						["Layer2.Center"] = Input { Value = { 0.567, 0.757 }, },
+						["Layer2.Size"] = Input { Value = 1.57, },
+						["Layer2.Angle"] = Input { Value = -10.4, },
+						["Layer2.FlipHoriz"] = Input { Value = 1, },
+						["Layer2.Blend"] = Input {
+							SourceOp = "MultiMerge3afghanistanLayer2Blend",
+							Source = "Value",
+						},
+						LayerName2 = Input { Value = "afghanistan", },
+						LayerEnabled2 = Input {
+							SourceOp = "MultiMerge3LayerEnabled2",
+							Source = "Value",
+						},
+						["Layer3.Foreground"] = Input {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_2",
+							Source = "Output",
+						},
+						["Layer3.Center"] = Input { Value = { 0.356, 0.441 }, },
+						["Layer3.Size"] = Input { Value = 1.847, },
+						["Layer3.FlipHoriz"] = Input { Value = 1, },
+						["Layer3.Blend"] = Input {
+							SourceOp = "MultiMerge3iranLayer3Blend",
+							Source = "Value",
+						},
+						LayerName3 = Input { Value = "iran", },
+						LayerEnabled3 = Input {
+							SourceOp = "MultiMerge3LayerEnabled3",
+							Source = "Value",
+						},
+						LayerEnabled4 = Input {
+							SourceOp = "MultiMerge3LayerEnabled4",
+							Source = "Value",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1684.53, -187.734 } },
+				},
+				MultiMerge3LayerOrder = BezierSpline {
+					SplineColor = { Red = 155, Green = 64, Blue = 239 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[0] = { 0, RH = { 148.666666666667, 0.333333333333333 }, Flags = { Linear = true, LockedY = true }, Value = ScriptVal { {
+									[0] = 1,
+									2,
+									3
+								} } },
+						[446] = { 1, LH = { 297.333333333333, 0.666666666666667 }, Flags = { Linear = true, LockedY = true }, Value = ScriptVal { {
+									[0] = 1,
+									2,
+									3
+								} } }
+					}
+				},
+				MultiMerge3indeaLayer1Blend = BezierSpline {
+					SplineColor = { Red = 229, Green = 207, Blue = 19 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[345] = { 0, RH = { 351.333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+						[364] = { 1, LH = { 357.666666666667, 0.666666666666667 }, RH = { 375.666666666667, 1 }, Flags = { Linear = true } },
+						[399] = { 1, LH = { 387.333333333333, 1 }, RH = { 406.333333333333, 0.666666666666667 }, Flags = { Linear = true } },
+						[421] = { 0, LH = { 413.666666666667, 0.333333333333333 }, Flags = { Linear = true } }
+					}
+				},
+				MultiMerge3LayerEnabled1 = BezierSpline {
+					SplineColor = { Red = 198, Green = 82, Blue = 232 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[0] = { 0, RH = { 115.333333333333, 0 }, Flags = { StepIn = true } },
+						[346] = { 1, LH = { 346, 0.666666666666667 }, RH = { 379, 1 }, Flags = { StepIn = true } },
+						[446] = { 0, LH = { 446, 0 }, Flags = { StepIn = true } }
+					}
+				},
+				MultiMerge3afghanistanLayer2Blend = BezierSpline {
+					SplineColor = { Red = 229, Green = 207, Blue = 19 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[345] = { 0, RH = { 351.333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+						[364] = { 1, LH = { 357.666666666667, 0.666666666666667 }, RH = { 375.666666666667, 1 }, Flags = { Linear = true } },
+						[399] = { 1, LH = { 387.333333333333, 1 }, RH = { 406.333333333333, 0.666666666666667 }, Flags = { Linear = true } },
+						[421] = { 0, LH = { 413.666666666667, 0.333333333333333 }, Flags = { Linear = true } }
+					}
+				},
+				MultiMerge3LayerEnabled2 = BezierSpline {
+					SplineColor = { Red = 232, Green = 82, Blue = 214 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[0] = { 0, RH = { 115.333333333333, 0 }, Flags = { StepIn = true } },
+						[346] = { 1, LH = { 346, 0.666666666666667 }, RH = { 379, 1 }, Flags = { StepIn = true } },
+						[446] = { 0, LH = { 446, 0 }, Flags = { StepIn = true } }
+					}
+				},
+				MultiMerge3iranLayer3Blend = BezierSpline {
+					SplineColor = { Red = 229, Green = 207, Blue = 19 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[345] = { 0, RH = { 351.333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+						[364] = { 1, LH = { 357.666666666667, 0.666666666666667 }, RH = { 375.666666666667, 1 }, Flags = { Linear = true } },
+						[399] = { 1, LH = { 387.333333333333, 1 }, RH = { 406.333333333333, 0.666666666666667 }, Flags = { Linear = true } },
+						[421] = { 0, LH = { 413.666666666667, 0.333333333333333 }, Flags = { Linear = true } }
+					}
+				},
+				MultiMerge3LayerEnabled3 = BezierSpline {
+					SplineColor = { Red = 232, Green = 82, Blue = 125 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[0] = { 0, RH = { 115.333333333333, 0 }, Flags = { StepIn = true } },
+						[346] = { 1, LH = { 346, 0.666666666666667 }, RH = { 379, 1 }, Flags = { StepIn = true } },
+						[446] = { 0, LH = { 446, 0 }, Flags = { StepIn = true } }
+					}
+				},
+				MultiMerge3LayerEnabled4 = BezierSpline {
+					SplineColor = { Red = 232, Green = 82, Blue = 44 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[0] = { 1, RH = { 148.666666666667, 1 }, Flags = { StepIn = true } },
+						[446] = { 1, LH = { 446, 1 }, Flags = { StepIn = true } }
+					}
+				},
+				MultiMerge3LayerEnabled5 = BezierSpline {
+					SplineColor = { Red = 232, Green = 145, Blue = 44 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[0] = { 1, RH = { 148.666666666667, 1 }, Flags = { StepIn = true } },
+						[446] = { 1, LH = { 446, 1 }, Flags = { StepIn = true } }
+					}
+				},
+				Background14 = Background {
+					CtrlWShown = false,
+					Inputs = {
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						TopLeftAlpha = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1735.88, -284.293 } },
+				},
+				GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415f_1_3 = GroupOperator {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					NameSet = true,
+					CustomData = {
+						Path = {
+							Map = {
+								["Setting:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/"
+							}
+						},
+					},
+					Inputs = ordered() {
+						Speed = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3",
+							Source = "Speed",
+							Page = "Controls",
+						},
+						TimelineFPS = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3",
+							Source = "TimelineFPS",
+							Page = "Controls",
+						},
+						Offset = InstanceInput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3",
+							Source = "Offset",
+							Page = "Controls",
+						}
+					},
+					Outputs = {
+						MainOutput1 = InstanceOutput {
+							SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3",
+							Source = "Output",
+						}
+					},
+					ViewInfo = GroupInfo { Pos = { 1388.06, -443.455 } },
+					Tools = ordered() {
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1_3 = Loader {
+							Clips = {
+								Clip {
+									ID = "Clip1",
+									Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/gif-loops/GIF_Angry______________Sticker_by_LINE_FRIENDS_42c7415fa9ea4001b57a1b197f6e7eef/Frames/frame_0000.png",
+									FormatID = "PNGFormat",
+									Length = 2,
+									LengthSetManually = true,
+									TrimIn = 0,
+									TrimOut = 1,
+									ExtendFirst = 0,
+									ExtendLast = 0,
+									Loop = 1,
+									AspectMode = 0,
+									Depth = 0,
+									TimeCode = 0,
+									GlobalStart = 0,
+									GlobalEnd = 1000000
+								}
+							},
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }
+							},
+							ViewInfo = OperatorInfo { Pos = { -110, 8.75758 } },
+						},
+						GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3 = TimeStretcher {
+							CtrlWShown = false,
+							NameSet = true,
+							Inputs = {
+								SourceTime = Input {
+									Value = 0,
+									Expression = "iif((((time-comp.RenderStart)*1000/GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3.TimelineFPS*GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3.Speed+GIF_42c7415fa9ea4001b57a1b197f6e7eef_Timing_1_3.Offset*1000)%100)<50,0,1)",
+								},
+								Input = Input {
+									SourceOp = "GIF_42c7415fa9ea4001b57a1b197f6e7eef_Frames_1_3",
+									Source = "Output",
+								}
+							},
+							ViewInfo = OperatorInfo { Pos = { 110, 8.75758 } },
+							UserControls = ordered() { Speed = { INP_MaxAllowed = 100, INPID_InputControl = "SliderControl", INP_MaxScale = 4, INP_Default = 1, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Speed" }, TimelineFPS = { INP_MaxAllowed = 240, INPID_InputControl = "SliderControl", INP_MaxScale = 60, INP_Default = 24, INP_MinScale = 1, INP_MinAllowed = 1, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Timeline FPS" }, Offset = { INP_MaxAllowed = 100000, INPID_InputControl = "SliderControl", INP_MaxScale = 0.1, INP_Default = 0, INP_MinScale = 0, INP_MinAllowed = 0, LINKID_DataType = "Number", ICS_ControlPage = "Controls", LINKS_Name = "Offset (seconds)" } }
+						}
+					},
+				}
+			},
+		}
+	},
+	ActiveTool = "MacroTool1"
+}

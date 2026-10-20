@@ -1,0 +1,23 @@
+local r=resolve or fu:GetResolve()
+local pm=assert(r:GetProjectManager())
+local p=assert(pm:GetCurrentProject())
+assert(p:GetName()=='china sv usa','Wrong project')
+local item=assert(p:GetTimelineByIndex(1):GetItemListInTrack('video',2)[14])
+assert(item:GetName()=='china-wrong-1-child-old','Clip changed')
+local c=assert(item:GetFusionCompByIndex(1))
+local real=assert(c:FindTool('object1_left'))
+local duplicate=assert(c:FindTool('Left_Blur_Depth_Path'))
+local base='/Users/naseemtoumeh/edit-projects/davinvi-resolve/experement/ArchiveCarousel_type_2/backups/live_20261019_223905/'
+assert(item:ExportFusionComp(base..'before_quarter_path_offset.comp',1),'Backup failed')
+c:StartUndo('Blurred left copy - quarter-path separation')
+duplicate.Displacement:SetExpression('object1_left.Displacement + 0.25')
+c:EndUndo(true)
+for _,frame in ipairs({0,5,10,36,74,84}) do
+ local a=real:GetInput('Displacement',frame)
+ local b=duplicate:GetInput('Displacement',frame)
+ assert(math.abs(b-a-0.25)<0.00001,'Path offset verification failed at '..frame)
+ print('QUARTER_PATH_CHECK',frame,'real',a,'blurred',b)
+end
+assert(pm:SaveProject(),'Save failed')
+assert(item:ExportFusionComp(base..'after_quarter_path_offset.comp',1),'Verification export failed')
+print('QUARTER_PATH_OFFSET_SAVED')

@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "app/static/animation.html"
+        ],
+        "createdAt": "2026-10-20T11:08:19.794Z",
+        "reason": "Agent: remaining findings are only the full-bleed previewwrap and frame-aligned audio-track, not text containers. draw()/targetLayout() and audioFrameAt() use their viewport bounds. Functional labels have explicit 8px insets; list/control padding was fixed."
+      },
+      {
+        "rule": "clipped-overflow-container",
+        "value": "*",
+        "files": [
+          "app/static/animation.html"
+        ],
+        "createdAt": "2026-10-20T11:08:19.808Z",
+        "reason": "Agent: the remaining positioned children are waveform, audio clip and playhead inside the audio timeline, not menus or tooltips. Timeline clipping and its inactive hidden state are intentional."
+      }
+    ]
+  }
+}

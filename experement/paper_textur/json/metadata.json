@@ -1,0 +1,140 @@
+{
+  "app": "map-asset-app 0.1",
+  "package_layout": {
+    "version": 2,
+    "directories": {
+      "images": "images",
+      "json": "json",
+      "data": "data",
+      "sounds": "sounds",
+      "fusion": "fusion",
+      "videos": "videos"
+    },
+    "files": {
+      "metadata": "json/metadata.json",
+      "animation": "json/animation.json"
+    }
+  },
+  "assets": {
+    "satellite_detail": "images/satellite_detail.png",
+    "satellite_wide": "images/satellite_wide.png",
+    "alignment_check": "images/alignment_check.jpg"
+  },
+  "generated_at": "2026-10-08T00:44:47+0200",
+  "crs": "EPSG:3857",
+  "output": {
+    "width": 3840,
+    "height": 2160,
+    "orientation": "landscape",
+    "resolution": "4k",
+    "wide_factor": 2.0
+  },
+  "center": {
+    "lat": 27.999246397287827,
+    "lng": 52.582598002884225
+  },
+  "zoom_requested": 6.6000000000000005,
+  "detail": {
+    "bbox_mercator": {
+      "minx": 4658577.133019739,
+      "miny": 2576752.645970212,
+      "maxx": 7048358.935517214,
+      "maxy": 3921004.9098750413
+    },
+    "meters_per_pixel": 622.3390110670509,
+    "ground_meters_per_pixel_at_center": 549.4965745902535,
+    "tile_zoom": 8,
+    "tile_zoom_upscaled": false,
+    "pixel_transform": {
+      "origin_top_left_mercator": [
+        4658577.133019739,
+        3921004.9098750413
+      ],
+      "meters_per_pixel_x": 622.3390110670509,
+      "meters_per_pixel_y": 622.3390110670509,
+      "formula": "px = (merc_x - x0) / mpp ; py = (y0 - merc_y) / mpp"
+    },
+    "corner_latlng": {
+      "top_left": [
+        41.84871040841332,
+        33.19341582719992
+      ],
+      "bottom_right": [
+        63.31648559735514,
+        22.54223391441972
+      ]
+    }
+  },
+  "wide": {
+    "bbox_mercator": {
+      "minx": 3463686.2317710007,
+      "miny": 1904626.514017797,
+      "maxx": 8243249.8367659515,
+      "maxy": 4593131.041827456
+    },
+    "meters_per_pixel": 1244.6780221341019,
+    "ground_meters_per_pixel_at_center": 1098.993149180507,
+    "tile_zoom": 7,
+    "tile_zoom_upscaled": false,
+    "covers_factor": 2.0,
+    "same_center_as_detail": true
+  },
+  "fusion_notes": {
+    "detail_plane_scale": 1.0,
+    "wide_plane_scale": 2.0,
+    "wide_plane_z_offset_suggestion": -0.001,
+    "note": "If the detail ImagePlane3D is placed at scale 1, the wide plane should be scaled by wide_factor so both cover the correct geographic area; keep its center aligned."
+  },
+  "countries": [
+    {
+      "iso3": "QAT",
+      "color": "#8d1b3d",
+      "border_color": "#FFFFFF",
+      "file": "images/mask_QAT.png",
+      "svg_file": "images/mask_QAT.svg",
+      "geometry_file": "data/geometry_QAT.geojson",
+      "bounds_px": {
+        "x0": 1592,
+        "y0": 1450,
+        "x1": 1747,
+        "y1": 1766
+      }
+    }
+  ],
+  "imagery": {
+    "source": "esri_world_imagery",
+    "attribution": "Esri, Maxar, Earthstar Geographics",
+    "note": "Max zoom varies by area; tiles may be missing in remote regions."
+  },
+  "boundaries": {
+    "dataset": "Natural Earth 10m Admin 0 - Countries",
+    "url": "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson",
+    "license": "public domain (Natural Earth)"
+  },
+  "files": {
+    "images/satellite_detail.png": {
+      "sha256": "3d2bea77ba5ea3768ca8c0216eace278d501620cef98d51ca9b6f7ca430d3927",
+      "bytes": 10911662
+    },
+    "images/satellite_wide.png": {
+      "sha256": "0045fa3ead09a4ade391834cac5b7ff04b134ace6e18a0e5f66bbc78063d9748",
+      "bytes": 12471596
+    },
+    "images/alignment_check.jpg": {
+      "sha256": "a694e92c1fcda8433326b7b98a4f30ec37817b91da7edff635065f97fdca1a76",
+      "bytes": 1825036
+    },
+    "images/mask_QAT.png": {
+      "sha256": "0bd307ec0f711afe42d07c29ade5bc97ddb6341b322725ae4dcf25ccbb9eaeb3",
+      "bytes": 46962
+    },
+    "images/mask_QAT.svg": {
+      "sha256": "4a00f21c7ddd70fcab6bccd020da982546eccede322ee137bbf26bac5158f00c",
+      "bytes": 4556
+    },
+    "data/geometry_QAT.geojson": {
+      "sha256": "b37a3662b4bba0cfa90b84eafe34ea974442f455e414d1dfce4f6d25f885f89c",
+      "bytes": 15072
+    }
+  }
+}

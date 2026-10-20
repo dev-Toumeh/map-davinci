@@ -1,0 +1,20 @@
+{
+  "name": "Experiment 02 - Texture Blend",
+  "base_package": "../paper_textur",
+  "resolution": [
+    3840,
+    2160
+  ],
+  "motion": false,
+  "native_render_verified": true,
+  "relief": "Esri World Hillshade; identical geographic extent to the Esri satellite map",
+  "paper": "Separate AI-created blank paper texture, reused from the first experiment",
+  "fusion_layers": "Original satellite \u2192 Base Colour \u2192 Hillshade Multiply \u2192 Paper Soft Light \u2192 Edge Shading \u2192 Attribution \u2192 MediaOut",
+  "controls": {
+    "relief_strength": 0.65,
+    "relief_shadow_depth": 4,
+    "paper_strength": 0.28,
+    "edge_shading": 0.13
+  },
+  "status": "Visual experiment; not approved for app integration"
+}

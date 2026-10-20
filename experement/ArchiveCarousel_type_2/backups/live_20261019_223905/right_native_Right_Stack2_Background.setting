@@ -1,0 +1,15 @@
+{
+ Tools = ordered() {
+		Right_Stack2_Background = Background {
+			Inputs = {
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				TopLeftAlpha = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 751.256, -16.4251 } },
+		},
+ },
+}

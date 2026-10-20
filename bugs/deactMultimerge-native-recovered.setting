@@ -1,0 +1,199 @@
+{
+	Tools = ordered() {
+		PAK_Local_Elements_MultiMerge_Recovered = MultiMerge {
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				Background = Input { },
+				["Layer1.Foreground"] = Input { },
+				["Layer2.Foreground"] = Input { },
+				["Layer3.Foreground"] = Input { },
+				["Layer4.Foreground"] = Input { },
+				["Layer5.Foreground"] = Input { },
+				["Layer6.Foreground"] = Input { },
+				["Layer7.Foreground"] = Input { },
+				["Layer8.Foreground"] = Input { },
+				LayerEnabled8 = Input { Value = 0, },
+				LayerOrder = Input { Value = ScriptVal { { [0] = 2, 3, 1, 5, 4, 7, 6 } }, },
+				["Layer1.Center"] = Input {
+					SourceOp = "Path2_1_Recovered",
+					Source = "Position",
+				},
+				["Layer1.Size"] = Input { Value = 0.67, },
+				["Layer1.Angle"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeMediaIn3tankpngLayerLayer1Angle_Recovered",
+					Source = "Value",
+				},
+				["Layer1.Blend"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeMediaIn3tankpngLayerLayer1Blend_Recovered",
+					Source = "Value",
+				},
+				LayerName1 = Input { Value = "MediaIn3: tank.png Layer", },
+				["Layer2.Blend"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeBackground7LayerLayer2Blend_Recovered",
+					Source = "Value",
+				},
+				LayerName2 = Input { Value = "Background7 Layer", },
+				["Layer3.Center"] = Input {
+					SourceOp = "Path1_52_Recovered",
+					Source = "Position",
+				},
+				["Layer3.Size"] = Input { Value = 0.67, },
+				["Layer3.Angle"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeMediaIn3_1tankpngLayerLayer3Angle_Recovered",
+					Source = "Value",
+				},
+				["Layer3.Blend"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeMediaIn3_1tankpngLayerLayer3Blend_Recovered",
+					Source = "Value",
+				},
+				LayerName3 = Input { Value = "MediaIn3_1: tank.png Layer", },
+				["Layer4.Center"] = Input { Value = { 0.524, 0.5 }, },
+				["Layer4.Size"] = Input { Value = 0.808, },
+				["Layer4.Angle"] = Input { Value = 47, },
+				["Layer4.Blend"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeMediaIn5angeryeye2pngLayerLayer4Blend_Recovered",
+					Source = "Value",
+				},
+				LayerName4 = Input { Value = "MediaIn5: angery-eye2.png Layer", },
+				["Layer5.Blend"] = Input {
+					SourceOp = "PAK_Local_Elements_MultiMergeMerge1LayerLayer5Blend_Recovered",
+					Source = "Value",
+				},
+				LayerName5 = Input { Value = "Merge1 Layer", },
+				["Layer6.Center"] = Input { Value = { 0.429, 0.235 }, },
+				["Layer6.Size"] = Input { Value = 0.3, },
+				LayerName6 = Input { Value = "Text2 Layer", },
+				["Layer7.Center"] = Input { Value = { 0.396245059288538, 0.1212 }, },
+				["Layer7.Size"] = Input { Value = 0.024, },
+				LayerName7 = Input { Value = "Polygon2 Layer", },
+				["Layer8.Center"] = Input { Value = { 0.268, -0.093 }, },
+				["Layer8.Angle"] = Input { Value = 13, },
+				LayerName8 = Input { Value = "MultiMerge3_1_1 Layer", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 0, 0 } },
+		},
+		Path2_1_Recovered = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			Inputs = {
+				Displacement = Input {
+					SourceOp = "Path2_1Displacement_Recovered",
+					Source = "Value",
+				},
+				PolyLine = Input {
+					Value = Polyline {
+						Points = {
+							{ Linear = true, LockY = true, X = 0.304787234042553, Y = 0.0328171745152354, RX = -0.0132978723404256, RY = 0.00461680517082182 },
+							{ Linear = true, LockY = true, X = 0.264893617021276, Y = 0.0466675900277008, LX = 0.0132978723404256, LY = -0.00461680517082182, RX = -0.0146665390070921, RY = 0.0186668033240997 },
+							{ Linear = true, LockY = true, X = 0.220894, Y = 0.102668, LX = 0.0146665390070921, LY = -0.0186668033240997, RX = -0.0736313333333333, RY = -0.0342226666666667 },
+							{ Linear = true, LockY = true, X = 0, Y = 0, LX = 0.0736313333333333, LY = 0.0342226666666667 }
+						}
+					},
+				}
+			},
+		},
+		Path2_1Displacement_Recovered = BezierSpline {
+			SplineColor = { Red = 255, Green = 0, Blue = 178 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[249] = { 0, RH = { 258, 0.0394261374590181 }, Flags = { LockedY = true } },
+				[276] = { 0.118278412377054, LH = { 267, 0.0788522749180362 }, RH = { 291.666666666667, 0.184768659705495 }, Flags = { Linear = true, LockedY = true } },
+				[323] = { 0.317749154362376, LH = { 307.333333333333, 0.251258907033935 }, RH = { 585.333333333333, 0.545166102908251 }, Flags = { Linear = true, LockedY = true } },
+				[1110] = { 1, LH = { 847.666666666667, 0.772583051454125 }, Flags = { Linear = true, LockedY = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeMediaIn3tankpngLayerLayer1Angle_Recovered = BezierSpline {
+			SplineColor = { Red = 232, Green = 81, Blue = 217 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[249] = { 41.7, RH = { 258, 46.0333333333333 }, Flags = { Linear = true } },
+				[276] = { 54.7, LH = { 267, 50.3666666666667 }, RH = { 291.666666666667, 48.6 }, Flags = { Linear = true } },
+				[323] = { 36.4, LH = { 307.333333333333, 42.5 }, Flags = { Linear = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeMediaIn3tankpngLayerLayer1Blend_Recovered = BezierSpline {
+			SplineColor = { Red = 229, Green = 94, Blue = 98 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[233] = { 0, RH = { 262.333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+				[321] = { 1, LH = { 291.666666666667, 0.666666666666667 }, RH = { 329.666666666667, 0.666666666666667 }, Flags = { Linear = true } },
+				[347] = { 0, LH = { 338.333333333333, 0.333333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeBackground7LayerLayer2Blend_Recovered = BezierSpline {
+			SplineColor = { Red = 229, Green = 94, Blue = 19 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[321] = { 1, RH = { 329.666666666667, 0.666666666666667 }, Flags = { Linear = true } },
+				[347] = { 0, LH = { 338.333333333333, 0.333333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		Path1_52_Recovered = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			Inputs = {
+				Displacement = Input {
+					SourceOp = "Path1_52Displacement_Recovered",
+					Source = "Value",
+				},
+				PolyLine = Input {
+					Value = Polyline {
+						Points = {
+							{ Linear = true, LockY = true, X = 0.203, Y = -0.124, RX = -0.0343333333333333, RY = 0.0406666666666667 },
+							{ Linear = true, LockY = true, X = 0.1, Y = -0.002, LX = 0.0343333333333333, LY = -0.0406666666666667, RX = -0.0333333333333333, RY = 0.000666666666666667 },
+							{ Linear = true, LockY = true, X = 0, Y = 0, LX = 0.0333333333333333, LY = -0.000666666666666667 }
+						}
+					},
+				}
+			},
+		},
+		Path1_52Displacement_Recovered = BezierSpline {
+			SplineColor = { Red = 255, Green = 0, Blue = 255 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[249] = { 0, RH = { 273.666666666667, 0.204947156617686 }, Flags = { Linear = true, LockedY = true } },
+				[323] = { 0.614841469853057, LH = { 298.333333333333, 0.409894313235372 }, RH = { 585.333333333333, 0.743227646568705 }, Flags = { Linear = true, LockedY = true } },
+				[1110] = { 1, LH = { 847.666666666667, 0.871613823284352 }, Flags = { Linear = true, LockedY = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeMediaIn3_1tankpngLayerLayer3Angle_Recovered = BezierSpline {
+			SplineColor = { Red = 195, Green = 81, Blue = 232 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[249] = { 57.4, RH = { 258, 50.4333333333333 }, Flags = { Linear = true } },
+				[276] = { 36.5, LH = { 267, 43.4666666666667 }, RH = { 291.666666666667, 34.7666666666667 }, Flags = { Linear = true } },
+				[323] = { 31.3, LH = { 307.333333333333, 33.0333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeMediaIn3_1tankpngLayerLayer3Blend_Recovered = BezierSpline {
+			SplineColor = { Red = 229, Green = 94, Blue = 98 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[233] = { 0, RH = { 262.333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+				[321] = { 1, LH = { 291.666666666667, 0.666666666666667 }, RH = { 329.666666666667, 0.666666666666667 }, Flags = { Linear = true } },
+				[347] = { 0, LH = { 338.333333333333, 0.333333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeMediaIn5angeryeye2pngLayerLayer4Blend_Recovered = BezierSpline {
+			SplineColor = { Red = 33, Green = 229, Blue = 104 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[430] = { 0, RH = { 436, 0.333333333333333 }, Flags = { Linear = true } },
+				[448] = { 1, LH = { 442, 0.666666666666667 }, RH = { 466.333333333333, 1 }, Flags = { Linear = true } },
+				[503] = { 1, LH = { 484.666666666667, 1 }, RH = { 507.666666666667, 0.666666666666667 }, Flags = { Linear = true } },
+				[517] = { 0, LH = { 512.333333333333, 0.333333333333333 }, Flags = { Linear = true } }
+			}
+		},
+		PAK_Local_Elements_MultiMergeMerge1LayerLayer5Blend_Recovered = BezierSpline {
+			SplineColor = { Red = 114, Green = 229, Blue = 19 },
+			CtrlWZoom = false,
+			KeyFrames = {
+				[896] = { 0, RH = { 905.333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+				[924] = { 1, LH = { 914.666666666667, 0.666666666666667 }, RH = { 951, 0.666666666666667 }, Flags = { Linear = true } },
+				[1005] = { 0, LH = { 978, 0.333333333333333 }, Flags = { Linear = true } }
+			}
+		}
+	},
+	ActiveTool = "PAK_Local_Elements_MultiMerge_Recovered"
+}

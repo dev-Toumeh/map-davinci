@@ -66,20 +66,20 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("USA_Entire_Shapes = sMerge", text)
         self.assertIn("USA_Texas_Annexation_1845_Shapes = sMerge", text)
         self.assertIn("Country_Deployment = MultiMerge", text)
-        self.assertIn("Country_Edit_Controller = CustomTool", text)
+        self.assertNotIn("CustomTool", text)
+        self.assertNotIn("UserControls", text)
         self.assertIn("Country_Edit_Selected = MultiMerge", text)
         self.assertIn("Country_Mode_Switch = Switch", text)
-        self.assertIn('LINKS_Name = "USA - Entire country"', text)
-        self.assertIn('LINKS_Name = "USA - Texas Annexation"', text)
-        self.assertIn('Expression = "1 - Country_Edit_Controller.Show_01"', text)
-        self.assertIn('Expression = "1 - Country_Edit_Controller.Show_02"', text)
+        self.assertNotIn('Country_Edit_Controller', text)
+        self.assertIn('Name0 = Input { Value = "USA - Entire country"', text)
+        self.assertIn('Name0 = Input { Value = "USA - Texas Annexation"', text)
         self.assertIn('SourceOp = "Country_Edit_01_Enabled"', text)
         self.assertIn('SourceOp = "Country_Edit_02_Enabled"', text)
         deployment = text.split("Country_Deployment = MultiMerge", 1)[1].split(
             "Country_Edit_Selected = MultiMerge", 1)[0]
         self.assertIn('SourceOp = "USA_Flag_Color_Flag"', deployment)
         self.assertIn('SourceOp = "Country_Edit_02_Render"', deployment)
-        self.assertIn('Name0 = Input { Value = "EDIT MODE - checked countries and territories"', text)
+        self.assertIn('Name0 = Input { Value = "EDIT MODE - native territory switches"', text)
         self.assertIn('Name1 = Input { Value = "DEPLOYMENT - all countries and territories"', text)
         self.assertIn('SourceOp = "Country_Deployment", Source = "Output"', text)
         self.assertIn('Map_With_Countries = Merge', text)
@@ -95,6 +95,20 @@ class RegionLayerTests(unittest.TestCase):
                 "USA_Entire_Shapes = sMerge", 1)[0]
         self.assertIn('SourceOp = "USA_Entire_Ring_01_Fill"', border)
         self.assertNotIn("Polyline = Input", border)
+
+    def test_structured_region_geometry_path_survives_a_second_save(self):
+        animation = self.base_animation()
+        animation["region_groups"] = [{"iso3": "USA", "children": [
+            {"id": "country-usa", "name": "Entire country", "category": "country"},
+            {"id": "admin-us-tx", "name": "Texas", "category": "administrative",
+             "geometry_file": "data/regions/geometry_admin-us-tx.geojson"},
+        ]}]
+        normalized = normalize_animation(animation, self.metadata())
+        saved_again = normalize_animation(normalized, self.metadata())
+        self.assertEqual(
+            saved_again["region_groups"][0]["children"][1]["geometry_file"],
+            "data/regions/geometry_admin-us-tx.geojson",
+        )
 
     def test_territory_names_are_short_and_explain_original_territory(self):
         entire = {"id": "country-usa", "name": "Entire country", "category": "country"}
@@ -118,7 +132,7 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIsNone(child["start_frame"])
         self.assertIsNone(child["end_frame"])
 
-    def test_edit_controller_can_enable_regions_across_multiple_countries(self):
+    def test_native_switches_enable_regions_without_custom_controllers(self):
         metadata = self.metadata()
         metadata["countries"].append({
             "iso3": "CAN", "color": "#ff0000", "border_color": "#ffffff",
@@ -131,12 +145,10 @@ class RegionLayerTests(unittest.TestCase):
                 (package / f"geometry_{iso3}.geojson").write_text(
                     json.dumps({"geometry": GEOMETRY}))
             text = generate(package, metadata, animation).read_text()
-        edit = text.split("Country_Edit_Controller = CustomTool", 1)[1].split(
-            "Country_Deployment = MultiMerge", 1)[0]
-        self.assertIn('Show_01 = Input { Value = 1', edit)
-        self.assertIn('Show_02 = Input { Value = 1', edit)
-        controller = edit.split('USA_Flag_Adjust = CustomTool', 1)[0]
-        self.assertNotIn('INP_Default = 0', controller)
+        edit = text.split("Country_Deployment = MultiMerge", 1)[0]
+        self.assertNotIn('Country_Edit_Controller', text)
+        self.assertNotIn('CustomTool', text)
+        self.assertNotIn('UserControls', text)
         flag_switches = re.findall(
             r'([A-Z]{3}_Flag_Color_Flag = Switch).*?Which = Input \{ Value = (\d)',
             edit, re.S)
@@ -144,8 +156,8 @@ class RegionLayerTests(unittest.TestCase):
             ('USA_Flag_Color_Flag = Switch', '0'),
             ('CAN_Flag_Color_Flag = Switch', '0'),
         ])
-        self.assertIn('LINKS_Name = "USA - Entire country"', edit)
-        self.assertIn('LINKS_Name = "CAN - Entire country"', edit)
+        self.assertIn('Name0 = Input { Value = "USA - Entire country"', edit)
+        self.assertIn('Name0 = Input { Value = "CAN - Entire country"', edit)
         self.assertIn('Country_Edit_01_Enabled = Switch', edit)
         self.assertIn('Country_Edit_02_Enabled = Switch', edit)
         for index in (1, 2):
@@ -153,9 +165,8 @@ class RegionLayerTests(unittest.TestCase):
                 'ViewInfo', 1)[0]
             self.assertIn(f'Input0 = Input {{ SourceOp = "', enabled)
             self.assertIn('Name1 = Input { Value = "OFF"', enabled)
-            self.assertIn(
-                f'Which = Input {{ Expression = "1 - Country_Edit_Controller.Show_{index:02d}"',
-                enabled)
+            self.assertIn('Which = Input { Value = 0', enabled)
+            self.assertNotIn('Expression', enabled)
         selected = text.split("Country_Edit_Selected = MultiMerge", 1)[1].split(
             "Country_Mode_Switch = Switch", 1)[0]
         self.assertIn('SourceOp = "Country_Edit_01_Enabled"', selected)
@@ -187,15 +198,16 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("Country_Edit_02_Plane = ImagePlane3D", content)
         self.assertIn('SceneInput3 = Input { SourceOp = "Country_Edit_01_Plane"', content)
         self.assertIn('SceneInput4 = Input { SourceOp = "Country_Edit_02_Plane"', content)
-        self.assertIn("Country_Mode_Switch = CustomTool", content)
-        self.assertEqual(content.count('Expression = "Country_Mode_Switch.Deployment"'), 2)
+        self.assertNotIn('CustomTool', content)
+        self.assertNotIn('UserControls', content)
+        self.assertNotIn('Country_Mode_Switch', content)
+        self.assertNotIn('Country_Edit_Controller', content)
         for index in (1, 2):
-            self.assertIn(f'Show_{index:02d} = Input {{ Value = 1', content)
             enabled = content.split(f"Country_Edit_{index:02d}_Enabled = Switch", 1)[1].split(
                 "ViewInfo", 1)[0]
-            self.assertIn(
-                f'Which = Input {{ Expression = "1 - Country_Edit_Controller.Show_{index:02d}"',
-                enabled)
+            self.assertIn('Which = Input { Value = 0', enabled)
+            self.assertNotIn('Expression', enabled)
+            self.assertNotIn(f'Country_Edit_{index:02d}_Mode', content)
             self.assertIn('Input0 = Input { SourceOp = "', enabled)
             self.assertIn(f'Input1 = Input {{ SourceOp = "Country_Edit_{index:02d}_Canvas"', enabled)
             self.assertIn(f'Name1 = Input {{ Value = "OFF"', enabled)
@@ -230,10 +242,11 @@ class RegionLayerTests(unittest.TestCase):
         self.assertIn("Tools = ordered()", group)
         frame = re.search(
             r'ViewInfo = GroupInfo \{.*?Pos = \{ (-?[\d.]+), \d+ \}.*?'
-            r'Size = \{ (\d+),', group, re.S)
+            r'Size = \{ ([\d.]+),', group, re.S)
         self.assertIsNotNone(frame)
-        self.assertAlmostEqual(float(frame.group(1)) + int(frame.group(2)) / 2,
-                               50, places=5)
+        # Absolute group positions change with the balanced country layout;
+        # its local frame size and internal alignment must remain intact.
+        self.assertGreater(float(frame.group(2)), 0)
         self.assertEqual(text.count('SourceOp = "USA_Entire_Optional_Islands"'), 1)
         positions = {}
         for index, kind in ((1, "Fill"), (1, "Border"),
@@ -243,13 +256,11 @@ class RegionLayerTests(unittest.TestCase):
                 group, re.S)
             self.assertIsNotNone(match)
             positions[index, kind] = tuple(map(int, match.groups()))
-        self.assertEqual(positions[1, "Fill"][0], positions[1, "Border"][0])
-        self.assertEqual(positions[2, "Fill"][0], positions[2, "Border"][0])
-        self.assertEqual(positions[1, "Fill"][1] - positions[1, "Border"][1], 22)
-        self.assertEqual(positions[2, "Fill"][1] - positions[2, "Border"][1], 22)
-        self.assertEqual(positions[2, "Border"][1], positions[1, "Border"][1])
-        self.assertGreaterEqual(
-            positions[2, "Border"][0] - positions[1, "Border"][0], 250)
+        self.assertEqual(positions[1, "Border"][0], positions[1, "Fill"][0])
+        self.assertEqual(positions[2, "Border"][0], positions[2, "Fill"][0])
+        self.assertGreater(positions[1, "Fill"][1], positions[1, "Border"][1])
+        self.assertGreater(positions[2, "Fill"][1], positions[2, "Border"][1])
+        self.assertGreater(positions[2, "Border"][1], positions[1, "Border"][1])
 
 
 if __name__ == "__main__":

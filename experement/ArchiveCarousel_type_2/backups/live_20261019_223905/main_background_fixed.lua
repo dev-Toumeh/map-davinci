@@ -1,0 +1,83 @@
+return bmd.readstring([====[
+{
+	Tools = ordered() {
+		MultiMerge1 = MultiMerge {
+			EnabledRegion = TimeRegion { { Start = 0, End = 837.9999, FrameLength = 1 } },
+			Inputs = {
+                ["Layer9.Foreground"] = Input { SourceOp = "Left_Blur_Depth_Placement", Source = "Output", },
+                LayerName9 = Input { Value = "Left stack 1 blur", },
+                ["Layer10.Foreground"] = Input { SourceOp = "Left_Stack2_Blur_Placement", Source = "Output", },
+                LayerName10 = Input { Value = "Left stack 2 blur", },
+                ["Layer11.Foreground"] = Input { SourceOp = "Left_Stack2_Main_Placement", Source = "Output", },
+                LayerName11 = Input { Value = "Left stack 2 main", },
+				LayerOrder = Input { Value = ScriptVal { {
+							[0] = 9,
+                            10,
+                            11,
+                            1,
+							8,
+							3,
+							4,
+							2,
+							5
+						} }, },
+				Background = Input {
+					SourceOp = "Main_Transparent_Background",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "Background1",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "right-path", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "MultiMerge3",
+					Source = "Output",
+				},
+				["Layer2.Center"] = Input { Value = { -0.0393222481283449, 1.44947021225342 }, },
+				["Layer2.Size"] = Input { Value = 3.22, },
+				LayerName2 = Input { Value = "v3", },
+				["Layer3.Foreground"] = Input {
+					SourceOp = "object_1_right",
+					Source = "Output",
+				},
+				["Layer3.Center"] = Input {
+					SourceOp = "object1_right",
+					Source = "Position",
+				},
+				["Layer3.Size"] = Input { Value = 3.22, },
+				LayerName3 = Input { Value = "opject_1_right", },
+				["Layer4.Foreground"] = Input {
+					SourceOp = "object_1_left",
+					Source = "Output",
+				},
+				["Layer4.Center"] = Input {
+					SourceOp = "object1_left",
+					Source = "Position",
+				},
+				["Layer4.Size"] = Input { Value = 3.22, },
+				LayerName4 = Input { Value = "object_1_left", },
+				["Layer5.Foreground"] = Input {
+					SourceOp = "MultiMerge2",
+					Source = "Output",
+				},
+				["Layer5.Center"] = Input { Value = { -0.0393220481283451, 1.44947061493798 }, },
+				["Layer5.Size"] = Input { Value = 3.22, },
+				LayerName5 = Input { Value = "v4", },
+				LayerName6 = Input { Value = "MultiMerge2_1 Layer", },
+				LayerName7 = Input { Value = "MultiMerge2_3 Layer", },
+				["Layer8.Foreground"] = Input {
+					SourceOp = "Background1_1",
+					Source = "Output",
+				},
+				["Layer8.Center"] = Input {
+					SourceOp = "left_path",
+					Source = "Value",
+				},
+				LayerName8 = Input { Value = "left-path", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 715, 362.697 } },
+		},
+	},
+}
+]====])

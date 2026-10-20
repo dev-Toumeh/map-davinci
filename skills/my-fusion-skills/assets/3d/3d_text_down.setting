@@ -1,0 +1,303 @@
+{
+	Tools = ordered() {
+		MacroTool1 = MacroOperator {
+			CtrlWZoom = false,
+			Outputs = {
+				Output1 = InstanceOutput {
+					SourceOp = "Path4",
+					Source = "Heading",
+				},
+				MainOutput1 = InstanceOutput {
+					SourceOp = "ImagePlane3D2",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				Instance_Rectangle1 = RectangleMask {
+					CtrlWShown = false,
+					SourceOp = "Rectangle1",
+					Inputs = {
+						EffectMask = Input {
+						},
+						SettingsNest = Input {
+						},
+						LayersNest = Input {
+						},
+						CommentsNest = Input {
+						},
+						FrameRenderScriptNest = Input {
+						},
+						StartRenderScripts = Input {
+						},
+						EndRenderScripts = Input {
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1274.46, -472.168 } },
+				},
+				Instance_Text3 = TextPlus {
+					CtrlWShown = false,
+					SourceOp = "Text3",
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "Instance_Rectangle1",
+							Source = "Mask",
+						},
+						SettingsNest = Input {
+						},
+						LayersNest = Input {
+						},
+						ImageNest = Input {
+						},
+						["Gamut.ColorSpaceNest"] = Input {
+						},
+						["Gamut.GammaSpaceNest"] = Input {
+						},
+						Layout = Input {
+						},
+						LayoutRotation = Input {
+							Value = 1,
+						},
+						Background = Input {
+						},
+						TransformTransform = Input {
+						},
+						TransformRotation = Input {
+							Value = 1,
+						},
+						TransformPivot = Input {
+						},
+						TransformShear = Input {
+						},
+						TransformSize = Input {
+						},
+						Properties1 = Input {
+						},
+						Softness1 = Input {
+							Value = 1,
+						},
+						Position1 = Input {
+						},
+						Rotation1 = Input {
+						},
+						PivotNest1 = Input {
+						},
+						Shear1 = Input {
+						},
+						Size1 = Input {
+						},
+						TextText = Input {
+						},
+						TabSpacing = Input {
+						},
+						AdvancedFontControls = Input {
+						},
+						ClearSelectedKerning = Input {
+						},
+						ClearAllKerning = Input {
+						},
+						ClearSelectedPlacement = Input {
+						},
+						ClearAllPlacement = Input {
+						},
+						Internal = Input {
+						},
+						CommentsNest = Input {
+						},
+						FrameRenderScriptNest = Input {
+						},
+						StartRenderScripts = Input {
+						},
+						EndRenderScripts = Input {
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1276.36, -428.017 } },
+					Version = 1
+				},
+				Path4 = PolyPath {
+					DrawMode = "InsertAndModify",
+					CtrlWZoom = false,
+					Inputs = {
+						Displacement = Input {
+							SourceOp = "Path4Displacement",
+							Source = "Value",
+						},
+						PolyLine = Input {
+							Value = Polyline {
+								Points = {
+									{ Linear = true, LockY = true, X = -0.531, Y = -0.215, RX = 0, RY = -0.0903333333333333 },
+									{ Linear = true, LockY = true, X = -0.531, Y = -0.486, LX = 0, LY = 0.0903333333333333, RX = 0, RY = -1.85037170770859e-17 },
+									{ Linear = true, LockY = true, X = -0.531, Y = -0.486, LX = 0, LY = 1.85037170770859e-17, RX = 0, RY = -0.150333333333333 },
+									{ Linear = true, LockY = true, X = -0.531, Y = -0.937, LX = 0, LY = 0.150333333333333 }
+								}
+							},
+						}
+					},
+				},
+				Path4Displacement = BezierSpline {
+					SplineColor = { Red = 255, Green = 0, Blue = 255 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[1075] = { 0, RH = { 1084.33333333333, 0 }, Flags = { LockedY = true } },
+						[1103] = { 0.375346260387812, LH = { 1093.66760015488, 0.293883902659653 }, RH = { 1107.99930945911, 0.418985146666882 }, Flags = { LockedY = true } },
+						[1118] = { 0.375346260387812, LH = { 1113.00096097536, 0.30746216427457 }, RH = { 1128.33229982853, 0.515652993576621 }, Flags = { LockedY = true } },
+						[1149] = { 1, LH = { 1138.66666666667, 1 }, Flags = { LockedY = true } }
+					}
+				},
+				Instance_Background15 = Background {
+					CtrlWShown = false,
+					SourceOp = "Background15",
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "Instance_Text3",
+							Source = "Output",
+						},
+						SettingsNest = Input {
+						},
+						LayersNest = Input {
+						},
+						ImageNest = Input {
+						},
+						["Gamut.ColorSpaceNest"] = Input {
+						},
+						["Gamut.GammaSpaceNest"] = Input {
+						},
+						BackgroundNest = Input {
+						},
+						TopLeftAlpha = Input {
+						},
+						CommentsNest = Input {
+						},
+						FrameRenderScriptNest = Input {
+						},
+						StartRenderScripts = Input {
+						},
+						EndRenderScripts = Input {
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1277.12, -388.811 } },
+				},
+				Blur1 = Blur {
+					CtrlWShown = false,
+					Inputs = {
+						Filter = Input { Value = FuID { "Fast Gaussian" }, },
+						XBlurSize = Input { Value = 15.7, },
+						Input = Input {
+							SourceOp = "Instance_Background15",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 1275.45, -349.236 } },
+				},
+				Background15 = Background {
+					CtrlWShown = false,
+					Inputs = {
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						TopLeftAlpha = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1267.71, -305.73 } },
+				},
+				Text3 = TextPlus {
+					CtrlWShown = false,
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "Rectangle1",
+							Source = "Mask",
+						},
+						Width = Input { Value = 1920, },
+						Height = Input { Value = 1080, },
+						UseFrameFormatSettings = Input { Value = 1, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						Wrap = Input { Value = 1, },
+						Center = Input { Value = { 0.528673, 0.477795 }, },
+						LayoutRotation = Input { Value = 1, },
+						CharacterOffset = Input {
+							SourceOp = "Path4",
+							Source = "Position",
+						},
+						TransformRotation = Input { Value = 1, },
+						Softness1 = Input { Value = 1, },
+						StyledText = Input { Value = "60%", },
+						Font = Input { Value = "Poppins", },
+						Style = Input { Value = "Bold", },
+						Size = Input { Value = 0.5, },
+						VerticalJustificationNew = Input { Value = 3, },
+						HorizontalJustificationNew = Input { Value = 3, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1416.45, -427.767 } },
+					Version = 1
+				},
+				MultiMerge4 = MultiMerge {
+					CtrlWShown = false,
+					Inputs = {
+						LayerOrder = Input { Value = ScriptVal { { [0] = 2, 1 } }, },
+						Background = Input {
+							SourceOp = "Background15",
+							Source = "Output",
+						},
+						["Layer1.Foreground"] = Input {
+							SourceOp = "Text3",
+							Source = "Output",
+						},
+						["Layer1.Center"] = Input { Value = { 0.5, 0.499 }, },
+						LayerName1 = Input { Value = "Text3 Layer", },
+						["Layer2.Foreground"] = Input {
+							SourceOp = "Blur1",
+							Source = "Output",
+						},
+						["Layer2.Center"] = Input { Value = { 0.5, 0.356 }, },
+						["Layer2.Gain"] = Input { Value = 0.819, },
+						["Layer2.Blend"] = Input { Value = 0.598, },
+						LayerName2 = Input { Value = "Blur1 Layer", }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1411.81, -305.684 } },
+				},
+				Rectangle1 = RectangleMask {
+					CtrlWShown = false,
+					Inputs = {
+						Filter = Input { Value = FuID { "Fast Gaussian" }, },
+						MaskWidth = Input { Value = 1920, },
+						MaskHeight = Input { Value = 1080, },
+						PixelAspect = Input { Value = { 1, 1 }, },
+						UseFrameFormatSettings = Input { Value = 1, },
+						ClippingMode = Input { Value = FuID { "None" }, },
+						Center = Input { Value = { 0.483620555814314, 0.448950921364714 }, },
+						Width = Input { Value = 1.48767795912435, },
+						Height = Input { Value = 0.252301020057177, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1410.12, -469.265 } },
+				},
+				ImagePlane3D2 = ImagePlane3D {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					Inputs = {
+						["Transform3DOp.Translate.X"] = Input { Value = -0.128, },
+						["Transform3DOp.Translate.Y"] = Input { Value = 0.152, },
+						["Transform3DOp.Translate.Z"] = Input { Value = 0.02, },
+						["Transform3DOp.Rotate.Z"] = Input {
+							SourceOp = "ImagePlane3D2ZRotation",
+							Source = "Value",
+						},
+						["SurfacePlaneInputs.ObjectID.ObjectID"] = Input { Value = 11, },
+						MaterialInput = Input {
+							SourceOp = "MultiMerge4",
+							Source = "Output",
+						},
+						["MtlStdInputs.MaterialID"] = Input { Value = 11, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 1406.45, -261.799 } },
+				},
+				ImagePlane3D2ZRotation = BezierSpline {
+					SplineColor = { Red = 128, Green = 128, Blue = 255 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[1104] = { 0, Flags = { Linear = true } }
+					}
+				}
+			},
+		}
+	},
+	ActiveTool = "MacroTool1"
+}

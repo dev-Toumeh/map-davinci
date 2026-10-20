@@ -1,0 +1,2256 @@
+Composition {
+	CurrentTime = 81,
+	RenderRange = { 1, 837 },
+	GlobalRange = { -46, 837 },
+	CurrentID = 185,
+	HiQ = true,
+	PlaybackUpdateMode = 0,
+	StereoMode = false,
+	Version = "DaVinci Resolve 21.1.1.0010",
+	SavedOutputs = 1,
+	HeldTools = 0,
+	DisabledTools = 0,
+	LockedTools = 0,
+	AudioOffset = 0,
+	Resumable = true,
+	OutputClips = {
+	},
+	CustomData = { TEMPLATE_ID = "Fusion Generator", BackgroundFixStage = "complete verified", BackgroundFixReaders = {
+			readfile = "nil",
+			readstring = "nil",
+			bmdreadfile = "nil",
+			bmdreadstring = "function"
+		}, BackgroundFixOrderType = "table", BackgroundFixOrder = {
+			[0] = 1,
+			8,
+			3,
+			4,
+			2,
+			5
+		}, BlurDiagnostics = {
+			MultiMerge1 = {
+				["Layer6.Nest"] = 1,
+				["Layer6.Center"] = {
+					0.5,
+					0.5,
+					0
+				},
+				["Layer6.BurnIn"] = 0,
+				["Layer6.FlipVert"] = 0,
+				["Layer6.Blend"] = 1,
+				["Layer6.Delete"] = 0,
+				["Layer6.ApplyBlank1"] = 0,
+				["Layer6.ClampCoverage"] = 1,
+				["Layer6.Operator"] = "Over",
+				["Layer6.ApplyBlank2"] = 0,
+				["Layer6.Edges"] = 0,
+				["Layer6.InvertTransform"] = 0,
+				["Layer6.FilterMethod"] = 2,
+				["Layer6.WindowMethod"] = 0,
+				["Layer6.SubtractiveAdditive"] = 1,
+				["Layer6.FlipHoriz"] = 0,
+				["Layer6.Reset"] = 0,
+				["Layer6.Gain"] = 1,
+				["Layer6.Size"] = 1,
+				["Layer6.Foreground_LayerSelect"] = ":Auto",
+				["Layer6.ApplyMode"] = "Normal",
+				LayerOrder = {
+					[0] = 6,
+					1,
+					8,
+					3,
+					4,
+					2,
+					5
+				},
+				["Layer6.Angle"] = 0
+			},
+			Left_Stack2_Main_Placement = {
+				ApplyBlank2 = 0,
+				Edges = 0,
+				ProcessWhenBlendIs00 = 0,
+				ProcessRed = 1,
+				FilterMethod = 2,
+				ProcessGreen = 1,
+				ProcessBlue = 1,
+				ProcessAlpha = 1,
+				Blank1 = 0,
+				ApplyMaskInverted = 0,
+				WindowMethod = 0,
+				FitMask = "Crop",
+				InvertTransform = 0,
+				Size = 3.22,
+				FlattenTransform = 0,
+				Channels = 1,
+				Blank2 = 0,
+				PerformDepthMerge = 0,
+				MaskChannel = 3,
+				ForegroundZOffset = 0,
+				Angle = 0,
+				MaskLow = 0,
+				BackgroundSubtractiveAdditive = 1,
+				ReferenceSize = 0,
+				Width = 1,
+				FlipHoriz = 0,
+				UseGPU = 1,
+				Comments = "",
+				FlipVert = 0,
+				FrameRenderScript = "",
+				ApplyBlank1 = 0,
+				StartRenderScripts = 0,
+				ApplyMode = "Normal",
+				StartRenderScript = "",
+				EndRenderScripts = 0,
+				MaskClipWhite = 1,
+				EndRenderScript = "",
+				Blank4 = 0,
+				UseObject = 0,
+				UseMaterial = 0,
+				Blend = 1,
+				ObjectID = 0,
+				ProcessLayers = ":Default",
+				MaterialID = 0,
+				Blank5 = 0,
+				MotionBlur = 0,
+				Quality = 2,
+				ProcessLayersCustom = {
+					":Default"
+				},
+				ShutterAngle = 180,
+				CenterBias = 0,
+				Operator = "Over",
+				SampleSpread = 1,
+				Blank6 = 0,
+				Foreground_LayerSelect = ":Auto",
+				EffectMask_LayerSelect = ":Auto",
+				Merge = 1,
+				SubtractiveAdditive = 1,
+				Center = {
+					-0.256863213903746,
+					1.4011393510161,
+					0
+				},
+				Gain = 1,
+				BurnIn = 0,
+				BlendClone = 1,
+				ClampCoverage = 1,
+				FrameRenderScriptNest = 1,
+				CommentsNest = 1,
+				UseFrameFormatSettings = 0,
+				Height = 1,
+				HideInputs = 0,
+				CorrectEdges = 0,
+				MaskClipBlack = 1,
+				SettingsNest = 1,
+				MaskHigh = 1,
+				LayerSpacer = 0,
+				Background_LayerSelect = ":Auto",
+				LayersNest = 1,
+				MultiplyByMask = 0
+			},
+			Left_Stack2_Blur_Placement = {
+				ApplyBlank2 = 0,
+				Edges = 0,
+				ProcessWhenBlendIs00 = 0,
+				ProcessRed = 1,
+				FilterMethod = 2,
+				ProcessGreen = 1,
+				ProcessBlue = 1,
+				ProcessAlpha = 1,
+				Blank1 = 0,
+				ApplyMaskInverted = 0,
+				WindowMethod = 0,
+				FitMask = "Crop",
+				InvertTransform = 0,
+				Size = 2.898,
+				FlattenTransform = 0,
+				Channels = 1,
+				Blank2 = 0,
+				PerformDepthMerge = 0,
+				MaskChannel = 3,
+				ForegroundZOffset = 0,
+				Angle = 0,
+				MaskLow = 0,
+				BackgroundSubtractiveAdditive = 1,
+				ReferenceSize = 0,
+				Width = 1,
+				FlipHoriz = 0,
+				UseGPU = 1,
+				Comments = "",
+				FlipVert = 0,
+				FrameRenderScript = "",
+				ApplyBlank1 = 0,
+				StartRenderScripts = 0,
+				ApplyMode = "Normal",
+				StartRenderScript = "",
+				EndRenderScripts = 0,
+				MaskClipWhite = 1,
+				EndRenderScript = "",
+				Blank4 = 0,
+				UseObject = 0,
+				UseMaterial = 0,
+				Blend = 0.6,
+				ObjectID = 0,
+				ProcessLayers = ":Default",
+				MaterialID = 0,
+				Blank5 = 0,
+				MotionBlur = 0,
+				Quality = 2,
+				ProcessLayersCustom = {
+					":Default"
+				},
+				ShutterAngle = 180,
+				CenterBias = 0,
+				Operator = "Over",
+				SampleSpread = 1,
+				Blank6 = 0,
+				Foreground_LayerSelect = ":Auto",
+				EffectMask_LayerSelect = ":Auto",
+				Merge = 1,
+				SubtractiveAdditive = 1,
+				Center = {
+					-0.763738213903745,
+					0.500028239904987,
+					0
+				},
+				Gain = 1,
+				BurnIn = 0,
+				BlendClone = 0.6,
+				ClampCoverage = 1,
+				FrameRenderScriptNest = 1,
+				CommentsNest = 1,
+				UseFrameFormatSettings = 0,
+				Height = 1,
+				HideInputs = 0,
+				CorrectEdges = 0,
+				MaskClipBlack = 1,
+				SettingsNest = 1,
+				MaskHigh = 1,
+				LayerSpacer = 0,
+				Background_LayerSelect = ":Auto",
+				LayersNest = 1,
+				MultiplyByMask = 0
+			},
+			Left_Blur_Depth_Placement = {
+				ApplyBlank2 = 0,
+				Edges = 0,
+				ProcessWhenBlendIs00 = 0,
+				ProcessRed = 1,
+				FilterMethod = 2,
+				ProcessGreen = 1,
+				ProcessBlue = 1,
+				ProcessAlpha = 1,
+				Blank1 = 0,
+				ApplyMaskInverted = 0,
+				WindowMethod = 0,
+				FitMask = "Crop",
+				InvertTransform = 0,
+				Size = 2.898,
+				FlattenTransform = 0,
+				Channels = 1,
+				Blank2 = 0,
+				PerformDepthMerge = 0,
+				MaskChannel = 3,
+				ForegroundZOffset = 0,
+				Angle = 0,
+				MaskLow = 0,
+				BackgroundSubtractiveAdditive = 1,
+				ReferenceSize = 0,
+				Width = 1,
+				FlipHoriz = 0,
+				UseGPU = 1,
+				Comments = "",
+				FlipVert = 0,
+				FrameRenderScript = "",
+				ApplyBlank1 = 0,
+				StartRenderScripts = 0,
+				ApplyMode = "Normal",
+				StartRenderScript = "",
+				EndRenderScripts = 0,
+				MaskClipWhite = 1,
+				EndRenderScript = "",
+				Blank4 = 0,
+				UseObject = 0,
+				UseMaterial = 0,
+				Blend = 1,
+				ObjectID = 0,
+				ProcessLayers = ":Default",
+				MaterialID = 0,
+				Blank5 = 0,
+				MotionBlur = 0,
+				Quality = 2,
+				ProcessLayersCustom = {
+					":Default"
+				},
+				ShutterAngle = 180,
+				CenterBias = 0,
+				Operator = "Over",
+				SampleSpread = 1,
+				Blank6 = 0,
+				Foreground_LayerSelect = ":Auto",
+				EffectMask_LayerSelect = ":Auto",
+				Merge = 1,
+				SubtractiveAdditive = 1,
+				Center = {
+					0.250011786096255,
+					0.500028239904989,
+					0
+				},
+				Gain = 1,
+				BurnIn = 0,
+				BlendClone = 1,
+				ClampCoverage = 1,
+				FrameRenderScriptNest = 1,
+				CommentsNest = 1,
+				UseFrameFormatSettings = 0,
+				Height = 1,
+				HideInputs = 0,
+				CorrectEdges = 0,
+				MaskClipBlack = 1,
+				SettingsNest = 1,
+				MaskHigh = 1,
+				LayerSpacer = 0,
+				Background_LayerSelect = ":Auto",
+				LayersNest = 1,
+				MultiplyByMask = 0
+			}
+		}, LivePathValuesBefore = {
+			object1_left = 0.25
+		}, LivePathValuesAfter = {
+			Left_Stack2_Blur_Path = 0,
+			object1_left = 0.25,
+			Left_Blur_Depth_Path = 0.5,
+			object2_left = -0.25
+		}, BlurBindingVerification = {
+			["36"] = {
+				Left_Blur_Depth_Path = 0.75,
+				object2_left = 0,
+				Left_Stack2_Blur_Path = 0.25,
+				main = 0.5
+			},
+			["84"] = {
+				Left_Blur_Depth_Path = 1,
+				object2_left = 0.25,
+				Left_Stack2_Blur_Path = 0.5,
+				main = 0.75
+			},
+			["0"] = {
+				Left_Blur_Depth_Path = 0.5,
+				object2_left = -0.25,
+				Left_Stack2_Blur_Path = 0,
+				main = 0.25
+			},
+			["74"] = {
+				Left_Blur_Depth_Path = 0.75,
+				object2_left = 0,
+				Left_Stack2_Blur_Path = 0.25,
+				main = 0.5
+			},
+			["5"] = {
+				Left_Blur_Depth_Path = 0.625,
+				object2_left = -0.125,
+				Left_Stack2_Blur_Path = 0.125,
+				main = 0.375
+			},
+			["10"] = {
+				Left_Blur_Depth_Path = 0.75,
+				object2_left = 0,
+				Left_Stack2_Blur_Path = 0.25,
+				main = 0.5
+			}
+		}, SecondObjectInspection = {
+			MultiMerge1 = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = true,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = true,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = false,
+					TOOLS_RegID = "MultiMerge",
+					TOOLI_ID = 89,
+					TOOLN_LastFrameTime = 0.00109700000029989,
+					TOOLI_Number_o_Inputs = 10,
+					TOOLI_ImageWidth = 3840,
+					TOOLI_ImageHeight = 2160,
+					TOOLI_ImageField = -1,
+					TOOLI_ImageDepth = 8,
+					TOOLN_ImageAspectX = 1,
+					TOOLN_ImageAspectY = 1,
+					TOOLNT_EnabledRegion_Start = {
+						0
+					},
+					TOOLNT_EnabledRegion_End = {
+						837.9999
+					},
+					TOOLNT_Region_Start = {
+						-46
+					},
+					TOOLNT_Region_End = {
+						837.9999
+					},
+					TOOLS_Name = "MultiMerge1",
+					TOOLB_NameSet = false
+				},
+				Blend = 1,
+				["Layer6.Size"] = 1,
+				["Layer6.Blend"] = 1,
+				LayerOrder = {
+					[0] = 6,
+					1,
+					8,
+					3,
+					4,
+					2,
+					5
+				},
+				exists = true
+			},
+			frame = 84,
+			Media_file2 = {
+				attrs = {
+					TOOLS_Clip_Path = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/1neSxMQ8q2A5GCqER-YCnUOo1LwYny8YjEXTCXDWo6Tc_HJ3t0BGy510q30mG7T6GChFrjpP-jpWkGuyqyS8EB0Od1rJLWN_1aF6WfOfD8HHuUrohFuCfzZZkmjPKYVf2EwLDzPZqyJ66wpYvMnPJ4AVm8cZQPjiU2fx96gCdTuQ8_527kzP_j-IrOzP8vb8.jpeg",
+					TOOLS_Clip_MediaID = "f4d15345-3ab0-4b34-abd3-13c63db99841",
+					TOOLB_NameSet = true,
+					TOOLS_Clip_Layer = "",
+					TOOLI_Clip_StartFrame = 0,
+					TOOLI_Clip_Length = 1,
+					TOOLI_Clip_TrimIn = 0,
+					TOOLI_Clip_TrimOut = 0,
+					TOOLS_Clip_FormatName = "JPEG",
+					TOOLI_Clip_ExtendFirst = 0,
+					TOOLI_Clip_ExtendLast = 0,
+					TOOLB_Clip_Reverse = false,
+					TOOLB_Clip_Loop = true,
+					TOOLS_Clip_Name = "image3",
+					TOOLB_Visible = true,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = true,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = false,
+					TOOLS_RegID = "MediaIn",
+					TOOLN_Clip_Start = -46,
+					TOOLI_ID = 135,
+					TOOLN_LastFrameTime = 4.59999973827507e-05,
+					TOOLN_Clip_End = 837,
+					TOOLI_Number_o_Inputs = 0,
+					TOOLI_ImageWidth = 400,
+					TOOLI_ImageHeight = 580,
+					TOOLI_ImageField = -1,
+					TOOLI_ImageDepth = 8,
+					TOOLN_ImageAspectX = 1,
+					TOOLN_ImageAspectY = 1,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-46
+					},
+					TOOLNT_Region_End = {
+						837.9999
+					},
+					TOOLS_Name = "Media_file2",
+					TOOLI_Clip_Height = 580,
+					TOOLI_Clip_Aspect = 1,
+					TOOLI_Clip_Width = 400,
+					TOOLB_ShowControls = false
+				},
+				MediaID = "f4d15345-3ab0-4b34-abd3-13c63db99841",
+				exists = true
+			},
+			Media_file2_Frame = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = true,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = true,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = false,
+					TOOLS_RegID = "ofx.com.blackmagicdesign.resolvefx.Transform",
+					TOOLI_ID = 136,
+					TOOLN_LastFrameTime = 0.000235000003158348,
+					TOOLI_Number_o_Inputs = 2,
+					TOOLI_ImageWidth = 400,
+					TOOLI_ImageHeight = 580,
+					TOOLI_ImageField = -1,
+					TOOLI_ImageDepth = 8,
+					TOOLN_ImageAspectX = 1,
+					TOOLN_ImageAspectY = 1,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-46
+					},
+					TOOLNT_Region_End = {
+						837.9999
+					},
+					TOOLS_Name = "Media_file2_Frame",
+					TOOLB_NameSet = true
+				},
+				Blend = 1,
+				exists = true
+			},
+			object_2_left = {
+				attrs = {
+					TOOLB_ShowControls = true,
+					TOOLB_Visible = true,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = false,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = true,
+					TOOLS_RegID = "MultiMerge",
+					TOOLI_ID = 134,
+					TOOLN_LastFrameTime = 0.000191999999515247,
+					TOOLI_Number_o_Inputs = 5,
+					TOOLI_ImageWidth = 3840,
+					TOOLI_ImageHeight = 2160,
+					TOOLI_ImageField = -1,
+					TOOLI_ImageDepth = 8,
+					TOOLN_ImageAspectX = 1,
+					TOOLN_ImageAspectY = 1,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-1000000000
+					},
+					TOOLNT_Region_End = {
+						-1000000000
+					},
+					TOOLS_Name = "object_2_left",
+					TOOLB_NameSet = true
+				},
+				LayerOrder = {
+					[0] = 1,
+					3,
+					2
+				},
+				Blend = 1,
+				exists = true
+			},
+			Left_Stack2_Main_Placement = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = true,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = true,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = false,
+					TOOLS_RegID = "Merge",
+					TOOLI_ID = 139,
+					TOOLN_LastFrameTime = 7.60000002628658e-05,
+					TOOLI_Number_o_Inputs = 2,
+					TOOLI_ImageWidth = 3840,
+					TOOLI_ImageHeight = 2160,
+					TOOLI_ImageField = -1,
+					TOOLI_ImageDepth = 8,
+					TOOLN_ImageAspectX = 1,
+					TOOLN_ImageAspectY = 1,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-46
+					},
+					TOOLNT_Region_End = {
+						837.9999
+					},
+					TOOLS_Name = "Left_Stack2_Main_Placement",
+					TOOLB_NameSet = true
+				},
+				Blend = 1,
+				Size = 3.22,
+				Center = {
+					-0.763738213903745,
+					0.500028239904987,
+					0
+				},
+				exists = true
+			},
+			Left_Stack2_Blur_Path = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = false,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = false,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = true,
+					TOOLS_RegID = "PolyPath",
+					TOOLI_ID = 142,
+					TOOLN_LastFrameTime = 5.40000000910368e-05,
+					TOOLI_Number_o_Inputs = 0,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-1000000000
+					},
+					TOOLNT_Region_End = {
+						1000000000
+					},
+					TOOLS_Name = "Left_Stack2_Blur_Path",
+					TOOLB_NameSet = true
+				},
+				Displacement = 0.283,
+				Size = 4.055,
+				Center = {
+					-1.173033,
+					1.583609,
+					0
+				},
+				exists = true
+			},
+			Left_Blur_Depth_Path = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = false,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = false,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = true,
+					TOOLS_RegID = "PolyPath",
+					TOOLI_ID = 132,
+					TOOLN_LastFrameTime = 5.2999999752501e-05,
+					TOOLI_Number_o_Inputs = 0,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-1000000000
+					},
+					TOOLNT_Region_End = {
+						1000000000
+					},
+					TOOLS_Name = "Left_Blur_Depth_Path",
+					TOOLB_NameSet = true
+				},
+				Displacement = 1,
+				Size = 4.055,
+				Center = {
+					-1.173033,
+					1.583609,
+					0
+				},
+				exists = true
+			},
+			object1_left = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = false,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = false,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = true,
+					TOOLS_RegID = "PolyPath",
+					TOOLI_ID = 180,
+					TOOLN_LastFrameTime = 9.0000030468218e-06,
+					TOOLI_Number_o_Inputs = 0,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-1000000000
+					},
+					TOOLNT_Region_End = {
+						1000000000
+					},
+					TOOLS_Name = "object1_left",
+					TOOLB_NameSet = true
+				},
+				Displacement = 0.75,
+				Size = 4.055,
+				Center = {
+					-1.173033,
+					1.583609,
+					0
+				},
+				exists = true
+			},
+			object2_left = {
+				attrs = {
+					TOOLB_ShowControls = false,
+					TOOLB_Visible = false,
+					TOOLB_Locked = false,
+					TOOLB_PassThrough = false,
+					TOOLB_HoldOutput = false,
+					TOOLB_CtrlWZoom = false,
+					TOOLB_CacheToDisk = false,
+					TOOLB_Selected = true,
+					TOOLS_RegID = "PolyPath",
+					TOOLI_ID = 140,
+					TOOLN_LastFrameTime = 6.1999999161344e-05,
+					TOOLI_Number_o_Inputs = 0,
+					TOOLNT_EnabledRegion_Start = {
+						-1000000000
+					},
+					TOOLNT_EnabledRegion_End = {
+						1000000000
+					},
+					TOOLNT_Region_Start = {
+						-1000000000
+					},
+					TOOLNT_Region_End = {
+						1000000000
+					},
+					TOOLS_Name = "object2_left",
+					TOOLB_NameSet = true
+				},
+				Displacement = 0,
+				Size = 4.055,
+				Center = {
+					-1.173033,
+					1.583609,
+					0
+				},
+				exists = true
+			}
+		} },
+	Tools = {
+		Main_Transparent_Background = Background {
+			NameSet = true,
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				TopLeftAlpha = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 586.008, 436.151 } },
+		},
+		p_right = PolylineMask {
+			DrawMode = "InsertAndModify",
+			DrawMode2 = "InsertAndModify",
+			NameSet = true,
+			Inputs = {
+				Filter = Input { Value = FuID { "Fast Gaussian" }, },
+				Solid = Input { Value = 0, },
+				JoinStyle = Input { Value = 0, },
+				WritePosition = Input { Value = 1.286, },
+				WriteLength = Input {
+					SourceOp = "p_leftLength",
+					Source = "Value",
+				},
+				MaskWidth = Input { Value = 3840, },
+				MaskHeight = Input { Value = 2160, },
+				PixelAspect = Input { Value = { 1, 1 }, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				ClippingMode = Input { Value = FuID { "None" }, },
+				Center = Input { Value = { 0.256201464566929, 1.8329858624842 }, },
+				Size = Input { Value = 4.921, },
+				Polyline = Input {
+					Value = Polyline {
+						Closed = true,
+						Points = {
+							{ Linear = true, X = 0.100935828877005, Y = -0.267220902612827, LX = 8.45442188872723e-18, LY = 0.122729944406843, RX = -8.45442188872723e-18, RY = -0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.489443124835049, LX = -0.0690355937288492, LY = 2.25451250366059e-17, RX = 0.0690355937288492, RY = -2.25451250366059e-17 },
+							{ Linear = true, X = 0.350935828877005, Y = -0.267220902612827, LX = -1.69088437774545e-17, LY = -0.122729944406843, RX = 1.69088437774545e-17, RY = 0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.0449986803906044, LX = 0.0690355937288492, LY = -3.75752083943432e-17, RX = -0.0690355937288492, RY = 3.75752083943432e-17 }
+						}
+					},
+				},
+				Polyline2 = Input {
+					Value = Polyline {
+					},
+					Disabled = true,
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 1256.94, 278.72 } },
+		},
+		p_leftLength = BezierSpline {
+			SplineColor = { Red = 249, Green = 211, Blue = 49 },
+			NameSet = true,
+			KeyFrames = {
+				[2] = { 0.425, RH = { 8, 0.425 } },
+				[20] = { 0, LH = { 14, 0 } }
+			}
+		},
+		Background1 = Background {
+			Inputs = {
+				EffectMask = Input {
+					SourceOp = "p_right",
+					Source = "Mask",
+				},
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 1045, 280.197 } },
+		},
+		MultiMerge3 = MultiMerge {
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { { [0] = 1, 2 } }, },
+				Background = Input {
+					SourceOp = "Background2",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "t3 Layer", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "MediaIn1",
+					Source = "Output",
+				},
+				["Layer2.Size"] = Input { Value = 0.6336785, },
+				["Layer2.Blend"] = Input { Value = 0.37, },
+				LayerName2 = Input { Value = "MediaIn1: Vintage 8mm Film.png Layer", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 1045, 148.197 } },
+		},
+		MediaIn3 = Loader {
+			CustomData = {
+				MediaProps = {
+					MEDIA_FORMAT_TYPE = "JPEG",
+					MEDIA_HEIGHT = 480,
+					MEDIA_ID = "333b6114-8723-4efd-bcd5-e720d5a92dcb",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "08gCDFkrEzib6bFvY-y-cRTlXYCf__SCGTYR8VF9rxxGM2Co_z339DMrsopCEIl8cPOg4-CY5vQQ2Ob6WM08eNElsbZxQbreRo0mdXfYR7F4Guo91PdwaTFjFFaGYztP4lQGUB_tracfZGjD_w07tDep0IBTaoR6LUFMH4ROvWBU3vEXj1KywBsIiBEfKDeV.jpeg",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/08gCDFkrEzib6bFvY-y-cRTlXYCf__SCGTYR8VF9rxxGM2Co_z339DMrsopCEIl8cPOg4-CY5vQQ2Ob6WM08eNElsbZxQbreRo0mdXfYR7F4Guo91PdwaTFjFFaGYztP4lQGUB_tracfZGjD_w07tDep0IBTaoR6LUFMH4ROvWBU3vEXj1KywBsIiBEfKDeV.jpeg",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 328,
+					__Queried = true
+				},
+				MEDIA_ID = "333b6114-8723-4efd-bcd5-e720d5a92dcb",
+			},
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "333b6114-8723-4efd-bcd5-e720d5a92dcb", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 1375, 16.197 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/08gCDFkrEzib6bFvY-y-cRTlXYCf__SCGTYR8VF9rxxGM2Co_z339DMrsopCEIl8cPOg4-CY5vQQ2Ob6WM08eNElsbZxQbreRo0mdXfYR7F4Guo91PdwaTFjFFaGYztP4lQGUB_tracfZGjD_w07tDep0IBTaoR6LUFMH4ROvWBU3vEXj1KywBsIiBEfKDeV.jpeg",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		Left = AudioDisplay {
+		},
+		Right = AudioDisplay {
+			CtrlWZoom = false,
+		},
+		t1_right = ofx.com.blackmagicdesign.resolvefx.Transform {
+			NameSet = true,
+			Inputs = {
+				Source = Input {
+					SourceOp = "MediaIn3",
+					Source = "Output",
+				},
+				controlMode = Input { Value = FuID { "TransformControlsSliders" }, },
+				controlReset = Input { Value = 0, },
+				controlGroup = Input { Value = 1, },
+				controlVisibility = Input { Value = FuID { "Show" }, },
+				posX = Input { Value = 0, },
+				posY = Input { Value = 0, },
+				zoom = Input { Value = 1, },
+				rotate = Input { Value = 0, },
+				scaleX = Input { Value = 1, },
+				scaleY = Input { Value = 1, },
+				pitch = Input { Value = 0, },
+				yaw = Input { Value = 0, },
+				flipH = Input { Value = 0, },
+				flipV = Input { Value = 0, },
+				adjustGroup = Input { Value = 1, },
+				isCrop = Input { Value = 0, },
+				cropL = Input { Value = 0, },
+				cropR = Input { Value = 0, },
+				cropT = Input { Value = 0, },
+				cropB = Input { Value = 0, },
+				edgeSoftness = Input { Value = 0.874, },
+				edgeRounding = Input { Value = 0.291, },
+				animationGroup = Input { Value = 0, },
+				serializedWarpable = Input { Value = "", },
+				serializedPinnable = Input { Value = "", },
+				motionBlur = Input { Value = 0, },
+				advancedGroup = Input { Value = 0, },
+				edgeBehaviour = Input { Value = FuID { "Constant" }, },
+				CompositeType = Input { Value = FuID { "COMPOSITE_NORMAL" }, },
+				olayAntiAlias = Input { Value = 1, },
+				previewAlpha = Input { Value = 0, },
+				isLegacyCrop = Input { Value = 0, },
+				isLegacyAlphaHandling = Input { Value = 0, },
+				isEnforceBlanking = Input { Value = 0, },
+				blendGroup = Input { Value = 0, },
+				blendIn = Input { Value = 1, },
+				blend = Input { Value = 0, },
+				ignoreContentShape = Input { Value = 0, },
+				legacyIsProcessRGBOnly = Input { Value = 0, },
+				IsNoTemporalFramesReqd = Input { Value = 0, },
+				srcProcessingAlphaMode = Input { Value = -1, },
+				dstProcessingAlphaMode = Input { Value = -1, },
+				resolvefxVersion = Input { Value = "1.4", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 1210, 16.197 } },
+		},
+		object_1_right = MultiMerge {
+			NameSet = true,
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { { [0] = 1, 2 } }, },
+				Background = Input {
+					SourceOp = "Background2",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "t1_right",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "t1 Layer", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "MediaIn1",
+					Source = "Output",
+				},
+				["Layer2.Size"] = Input { Value = 0.63, },
+				["Layer2.Blend"] = Input { Value = 0.37, },
+				LayerName2 = Input { Value = "MediaIn1: Vintage 8mm Film.png Layer", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 1045, 16.197 } },
+		},
+		Background2 = Background {
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				TopLeftAlpha = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 751.256, -16.4251 } },
+		},
+		MediaIn1 = Loader {
+			CustomData = { MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MediaProps = { __Queried = true, MEDIA_NUM_LAYERS = 0, MEDIA_FORMAT_TYPE = "PNG", MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png", MEDIA_START_FRAME = 0, MEDIA_LAYER_DESC = {
+					}, MEDIA_NAME = "Vintage 8mm Film.png", MEDIA_HEIGHT = 1086, MEDIA_SRC_FRAME_RATE = 24, MEDIA_IS_SOURCE_RES = true, MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MEDIA_MARK_OUT = 0, MEDIA_WIDTH = 1448, MEDIA_NUM_FRAMES = 1, MEDIA_MARK_IN = 0, MEDIA_PAR = 1 }, },
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "85583b41-424d-4433-9be0-3060e9420f5d", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 1726.49, 78.1753 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		Left = AudioDisplay {
+		},
+		Right = AudioDisplay {
+			CtrlWZoom = false,
+		},
+		MultiMerge2 = MultiMerge {
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { { [0] = 1, 2 } }, },
+				Background = Input {
+					SourceOp = "Background2",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "t4 Layer", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "MediaIn1",
+					Source = "Output",
+				},
+				["Layer2.Center"] = Input { Value = { 0.5, 0.501 }, },
+				["Layer2.Size"] = Input { Value = 0.6300312, },
+				["Layer2.Blend"] = Input { Value = 0.37, },
+				LayerName2 = Input { Value = "frame", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 1265, 148.197 } },
+		},
+		Left_Stack1_Background = Background {
+			NameSet = true,
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				TopLeftAlpha = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 55, -33.303 } },
+		},
+		MediaIn4 = Loader {
+			CustomData = {
+				MediaProps = {
+					MEDIA_FORMAT_TYPE = "JPEG",
+					MEDIA_HEIGHT = 580,
+					MEDIA_ID = "06847495-feb1-47cf-86a5-88eee515f898",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "4rhi7hFN9cx15MnRwO96ZtATSXDhoWtbaTpQeXvjQ6c4CKejDaeAwa5gDMN1rfl_KquYNXzue2yWc-o_XL2kztOdimh9EB7QQMLMzLDtUZNsQXtFq0YSOgaJ6crFVX8dqYRajHhXukc-VK_BqCOWlnphv39sbgbMwLTXjVD1_l6JmWcUf9Rg2yAw7rD5DWT0.jpeg",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/4rhi7hFN9cx15MnRwO96ZtATSXDhoWtbaTpQeXvjQ6c4CKejDaeAwa5gDMN1rfl_KquYNXzue2yWc-o_XL2kztOdimh9EB7QQMLMzLDtUZNsQXtFq0YSOgaJ6crFVX8dqYRajHhXukc-VK_BqCOWlnphv39sbgbMwLTXjVD1_l6JmWcUf9Rg2yAw7rD5DWT0.jpeg",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 401,
+					__Queried = true
+				},
+				MEDIA_ID = "06847495-feb1-47cf-86a5-88eee515f898",
+			},
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "06847495-feb1-47cf-86a5-88eee515f898", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 55, 16.197 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/4rhi7hFN9cx15MnRwO96ZtATSXDhoWtbaTpQeXvjQ6c4CKejDaeAwa5gDMN1rfl_KquYNXzue2yWc-o_XL2kztOdimh9EB7QQMLMzLDtUZNsQXtFq0YSOgaJ6crFVX8dqYRajHhXukc-VK_BqCOWlnphv39sbgbMwLTXjVD1_l6JmWcUf9Rg2yAw7rD5DWT0.jpeg",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		Left = AudioDisplay {
+		},
+		Right = AudioDisplay {
+			CtrlWZoom = false,
+		},
+		t1_left = ofx.com.blackmagicdesign.resolvefx.Transform {
+			NameSet = true,
+			Inputs = {
+				Source = Input {
+					SourceOp = "MediaIn4",
+					Source = "Output",
+				},
+				controlMode = Input { Value = FuID { "TransformControlsSliders" }, },
+				controlReset = Input { Value = 0, },
+				controlGroup = Input { Value = 1, },
+				controlVisibility = Input { Value = FuID { "Show" }, },
+				posX = Input { Value = 0, },
+				posY = Input { Value = 0, },
+				zoom = Input { Value = 1, },
+				rotate = Input { Value = 0, },
+				scaleX = Input { Value = 1, },
+				scaleY = Input { Value = 1, },
+				pitch = Input { Value = 0, },
+				yaw = Input { Value = 0, },
+				flipH = Input { Value = 0, },
+				flipV = Input { Value = 0, },
+				adjustGroup = Input { Value = 1, },
+				isCrop = Input { Value = 0, },
+				cropL = Input { Value = 0, },
+				cropR = Input { Value = 0, },
+				cropT = Input { Value = 0, },
+				cropB = Input { Value = 0, },
+				edgeSoftness = Input { Value = 0.874, },
+				edgeRounding = Input { Value = 0.291, },
+				animationGroup = Input { Value = 0, },
+				serializedWarpable = Input { Value = "", },
+				serializedPinnable = Input { Value = "", },
+				motionBlur = Input { Value = 0, },
+				advancedGroup = Input { Value = 0, },
+				edgeBehaviour = Input { Value = FuID { "Constant" }, },
+				CompositeType = Input { Value = FuID { "COMPOSITE_NORMAL" }, },
+				olayAntiAlias = Input { Value = 1, },
+				previewAlpha = Input { Value = 0, },
+				isLegacyCrop = Input { Value = 0, },
+				isLegacyAlphaHandling = Input { Value = 0, },
+				isEnforceBlanking = Input { Value = 0, },
+				blendGroup = Input { Value = 0, },
+				blendIn = Input { Value = 1, },
+				blend = Input { Value = 0, },
+				ignoreContentShape = Input { Value = 0, },
+				legacyIsProcessRGBOnly = Input { Value = 0, },
+				IsNoTemporalFramesReqd = Input { Value = 0, },
+				srcProcessingAlphaMode = Input { Value = -1, },
+				dstProcessingAlphaMode = Input { Value = -1, },
+				resolvefxVersion = Input { Value = "1.4", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 220, 16.197 } },
+		},
+		Left_Stack1_Vintage8mm = Loader {
+			NameSet = true,
+			CustomData = { MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MediaProps = { MEDIA_PAR = 1, MEDIA_NUM_LAYERS = 0, MEDIA_FORMAT_TYPE = "PNG", MEDIA_START_FRAME = 0, MEDIA_HEIGHT = 1086, MEDIA_LAYER_DESC = {
+					}, MEDIA_NAME = "Vintage 8mm Film.png", MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png", MEDIA_SRC_FRAME_RATE = 24, MEDIA_IS_SOURCE_RES = true, MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MEDIA_MARK_OUT = 0, MEDIA_WIDTH = 1448, MEDIA_NUM_FRAMES = 1, MEDIA_MARK_IN = 0, __Queried = true }, },
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "85583b41-424d-4433-9be0-3060e9420f5d", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 220, -33.303 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		object_1_left = MultiMerge {
+			NameSet = true,
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { {
+							[0] = 1,
+							3,
+							2
+						} }, },
+				Background = Input {
+					SourceOp = "Left_Stack1_Background",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "t1_left",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "t1_left", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "Left_Stack1_Vintage8mm",
+					Source = "Output",
+				},
+				["Layer2.Size"] = Input { Value = 0.6308958, },
+				["Layer2.Blend"] = Input { Value = 0.37, },
+				LayerName2 = Input { Value = "MediaIn1: Vintage 8mm Film.png Layer", },
+				["Layer3.Center"] = Input { Value = { 0.405015037593985, 0.810280279503105 }, },
+				LayerName3 = Input { Value = "t1_left_blur", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 385, 16.197 } },
+		},
+		Left_Blur_Depth = Blur {
+			NameSet = true,
+			Inputs = {
+				Filter = Input { Value = FuID { "Fast Gaussian" }, },
+				XBlurSize = Input { Value = 10.2, },
+				Input = Input {
+					SourceOp = "object_1_left",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 552.635, 16.197 } },
+		},
+		Left_Blur_Depth_Placement = Merge {
+			NameSet = true,
+			Inputs = {
+				Background = Input {
+					SourceOp = "Left_Stack1_Background",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "Left_Blur_Depth",
+					Source = "Output",
+				},
+				Center = Input {
+					SourceOp = "Left_Blur_Depth_Path",
+					Source = "Position",
+				},
+				Size = Input { Value = 2.898, },
+				PerformDepthMerge = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 551.467, 90.2739 } },
+		},
+		Left_Blur_Depth_Path = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { -1.173033, 1.583609 }, },
+				Size = Input { Value = 4.055, },
+				Displacement = Input {
+					Value = 1,
+					Expression = "object1_left.Displacement + 0.25",
+				},
+				PolyLine = Input {
+					SourceOp = "Publish1",
+					Source = "Value",
+				}
+			},
+		},
+		Publish1 = PublishPolyLine {
+			Inputs = {
+				Value = Input {
+					Value = Polyline {
+						Closed = true,
+						Points = {
+							{ Linear = true, X = 0.100935828877005, Y = -0.267220902612827, LX = 8.45442188872723e-18, LY = 0.122729944406843, RX = -8.45442188872723e-18, RY = -0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.489443124835049, LX = -0.0690355937288492, LY = 2.25451250366059e-17, RX = 0.0690355937288492, RY = -2.25451250366059e-17 },
+							{ Linear = true, X = 0.350935828877005, Y = -0.267220902612827, LX = -1.69088437774545e-17, LY = -0.122729944406843, RX = 1.69088437774545e-17, RY = 0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.0449986803906044, LX = 0.0690355937288492, LY = -3.75752083943432e-17, RX = -0.0690355937288492, RY = 3.75752083943432e-17 }
+						}
+					},
+				}
+			},
+		},
+		Left_Stack2_Blur = Blur {
+			NameSet = true,
+			Inputs = {
+				Filter = Input { Value = FuID { "Fast Gaussian" }, },
+				XBlurSize = Input { Value = 12, },
+				Input = Input {
+					SourceOp = "object_2_left",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 380.498, 130.897 } },
+		},
+		Left_Stack2_Blur_Placement = Merge {
+			NameSet = true,
+			Inputs = {
+				Blend = Input { Value = 0.6, },
+				Background = Input {
+					SourceOp = "Left_Blur_Depth_Placement",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "Left_Stack2_Blur",
+					Source = "Output",
+				},
+				Center = Input {
+					SourceOp = "Left_Stack2_Blur_Path",
+					Source = "Position",
+				},
+				Size = Input { Value = 2.898, },
+				PerformDepthMerge = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 551.756, 236.286 } },
+		},
+		Left_Stack2_Blur_Path = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { -1.173033, 1.583609 }, },
+				Size = Input { Value = 4.055, },
+				Displacement = Input { Value = 0.283, },
+				PolyLine = Input {
+					SourceOp = "Publish1",
+					Source = "Value",
+				}
+			},
+		},
+		Left_Stack2_Background = Background {
+			NameSet = true,
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				TopLeftAlpha = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 55, 131.697 } },
+		},
+		Media_file2 = Loader {
+			NameSet = true,
+			CustomData = {
+				MEDIA_ID = "f4d15345-3ab0-4b34-abd3-13c63db99841",
+				MediaProps = {
+					MEDIA_FORMAT_TYPE = "JPEG",
+					MEDIA_HEIGHT = 580,
+					MEDIA_ID = "f4d15345-3ab0-4b34-abd3-13c63db99841",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "image3",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/1neSxMQ8q2A5GCqER-YCnUOo1LwYny8YjEXTCXDWo6Tc_HJ3t0BGy510q30mG7T6GChFrjpP-jpWkGuyqyS8EB0Od1rJLWN_1aF6WfOfD8HHuUrohFuCfzZZkmjPKYVf2EwLDzPZqyJ66wpYvMnPJ4AVm8cZQPjiU2fx96gCdTuQ8_527kzP_j-IrOzP8vb8.jpeg",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 400
+				},
+			},
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "f4d15345-3ab0-4b34-abd3-13c63db99841", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 55, 181.197 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/project2/Aj+/images/1neSxMQ8q2A5GCqER-YCnUOo1LwYny8YjEXTCXDWo6Tc_HJ3t0BGy510q30mG7T6GChFrjpP-jpWkGuyqyS8EB0Od1rJLWN_1aF6WfOfD8HHuUrohFuCfzZZkmjPKYVf2EwLDzPZqyJ66wpYvMnPJ4AVm8cZQPjiU2fx96gCdTuQ8_527kzP_j-IrOzP8vb8.jpeg",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		Media_file2_Frame = ofx.com.blackmagicdesign.resolvefx.Transform {
+			NameSet = true,
+			Inputs = {
+				Source = Input {
+					SourceOp = "Media_file2",
+					Source = "Output",
+				},
+				controlMode = Input { Value = FuID { "TransformControlsSliders" }, },
+				controlReset = Input { Value = 0, },
+				controlGroup = Input { Value = 1, },
+				controlVisibility = Input { Value = FuID { "Show" }, },
+				posX = Input { Value = 0, },
+				posY = Input { Value = 0, },
+				zoom = Input { Value = 1, },
+				rotate = Input { Value = 0, },
+				scaleX = Input { Value = 1, },
+				scaleY = Input { Value = 1, },
+				pitch = Input { Value = 0, },
+				yaw = Input { Value = 0, },
+				flipH = Input { Value = 0, },
+				flipV = Input { Value = 0, },
+				adjustGroup = Input { Value = 1, },
+				isCrop = Input { Value = 0, },
+				cropL = Input { Value = 0, },
+				cropR = Input { Value = 0, },
+				cropT = Input { Value = 0, },
+				cropB = Input { Value = 0, },
+				edgeSoftness = Input { Value = 0.874, },
+				edgeRounding = Input { Value = 0.291, },
+				animationGroup = Input { Value = 0, },
+				serializedWarpable = Input { Value = "", },
+				serializedPinnable = Input { Value = "", },
+				motionBlur = Input { Value = 0, },
+				advancedGroup = Input { Value = 0, },
+				edgeBehaviour = Input { Value = FuID { "Constant" }, },
+				CompositeType = Input { Value = FuID { "COMPOSITE_NORMAL" }, },
+				olayAntiAlias = Input { Value = 1, },
+				previewAlpha = Input { Value = 0, },
+				isLegacyCrop = Input { Value = 0, },
+				isLegacyAlphaHandling = Input { Value = 0, },
+				isEnforceBlanking = Input { Value = 0, },
+				blendGroup = Input { Value = 0, },
+				blendIn = Input { Value = 1, },
+				blend = Input { Value = 0, },
+				ignoreContentShape = Input { Value = 0, },
+				legacyIsProcessRGBOnly = Input { Value = 0, },
+				IsNoTemporalFramesReqd = Input { Value = 0, },
+				srcProcessingAlphaMode = Input { Value = -1, },
+				dstProcessingAlphaMode = Input { Value = -1, },
+				resolvefxVersion = Input { Value = "1.4", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 220, 181.197 } },
+		},
+		Left_Stack2_Vintage8mm = Loader {
+			NameSet = true,
+			CustomData = { MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MediaProps = { MEDIA_PAR = 1, MEDIA_NUM_LAYERS = 0, MEDIA_FORMAT_TYPE = "PNG", MEDIA_START_FRAME = 0, MEDIA_HEIGHT = 1086, MEDIA_LAYER_DESC = {
+					}, MEDIA_NAME = "Vintage 8mm Film.png", MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png", MEDIA_SRC_FRAME_RATE = 24, MEDIA_IS_SOURCE_RES = true, MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MEDIA_MARK_OUT = 0, MEDIA_WIDTH = 1448, MEDIA_NUM_FRAMES = 1, MEDIA_MARK_IN = 0, __Queried = true }, },
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "85583b41-424d-4433-9be0-3060e9420f5d", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 220, 131.697 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		object_2_left = MultiMerge {
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { {
+							[0] = 1,
+							3,
+							2
+						} }, },
+				Background = Input {
+					SourceOp = "Left_Stack2_Background",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "Media_file2_Frame",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "image3", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "Left_Stack2_Vintage8mm",
+					Source = "Output",
+				},
+				["Layer2.Size"] = Input { Value = 0.6308958, },
+				["Layer2.Blend"] = Input { Value = 0.37, },
+				LayerName2 = Input { Value = "MediaIn1: Vintage 8mm Film.png Layer", },
+				["Layer3.Center"] = Input { Value = { 0.405015037593985, 0.810280279503105 }, },
+				LayerName3 = Input { Value = "t1_left_blur", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 392.026, 183.592 } },
+		},
+		Left_Stack2_Main_Placement = Merge {
+			NameSet = true,
+			Inputs = {
+				Background = Input {
+					SourceOp = "Left_Stack2_Blur_Placement",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "object_2_left",
+					Source = "Output",
+				},
+				Center = Input {
+					SourceOp = "object2_left",
+					Source = "Position",
+				},
+				Size = Input { Value = 3.22, },
+				PerformDepthMerge = Input { Value = 0, }
+			},
+			ViewInfo = OperatorInfo { Pos = { 548.244, 286.584 } },
+		},
+		object2_left = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { -1.173033, 1.583609 }, },
+				Size = Input { Value = 4.055, },
+				Displacement = Input {
+					Value = 0,
+					Expression = "object1_left.Displacement - 0.50",
+				},
+				PolyLine = Input {
+					SourceOp = "Publish1",
+					Source = "Value",
+				}
+			},
+		},
+		p_left = PolylineMask {
+			DrawMode = "InsertAndModify",
+			DrawMode2 = "InsertAndModify",
+			NameSet = true,
+			Inputs = {
+				Filter = Input { Value = FuID { "Fast Gaussian" }, },
+				Solid = Input { Value = 0, },
+				JoinStyle = Input { Value = 0, },
+				WritePosition = Input { Value = 1.286, },
+				WriteLength = Input { Value = 0.131, },
+				MaskWidth = Input { Value = 3840, },
+				MaskHeight = Input { Value = 2160, },
+				PixelAspect = Input { Value = { 1, 1 }, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				ClippingMode = Input { Value = FuID { "None" }, },
+				Center = Input { Value = { -1.47984346456693, 1.81909697359531 }, },
+				Size = Input { Value = 4.921, },
+				Polyline = Input {
+					SourceOp = "Publish1",
+					Source = "Value",
+				},
+				Polyline2 = Input {
+					Value = Polyline {
+					},
+					Disabled = true,
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 60.1112, 376.125 } },
+		},
+		Background1_1 = Background {
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				Width = Input { Value = 3840, },
+				Height = Input { Value = 2160, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				EffectMask = Input {
+					SourceOp = "p_left",
+					Source = "Mask",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 233.174, 377.602 } },
+		},
+		MultiMerge1 = MultiMerge {
+			EnabledRegion = TimeRegion { { Start = 0, End = 837.9999, FrameLength = 1 } },
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { {
+							[0] = 6,
+							1,
+							8,
+							3,
+							4,
+							2,
+							5
+						} }, },
+				Background = Input {
+					SourceOp = "Main_Transparent_Background",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "Background1",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "right-path", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "MultiMerge3",
+					Source = "Output",
+				},
+				["Layer2.Center"] = Input { Value = { -0.0393222481283449, 1.44947021225342 }, },
+				["Layer2.Size"] = Input { Value = 3.22, },
+				LayerName2 = Input { Value = "v3", },
+				["Layer3.Foreground"] = Input {
+					SourceOp = "object_1_right",
+					Source = "Output",
+				},
+				["Layer3.Center"] = Input {
+					SourceOp = "object1_right",
+					Source = "Position",
+				},
+				["Layer3.Size"] = Input { Value = 3.22, },
+				LayerName3 = Input { Value = "opject_1_right", },
+				["Layer4.Foreground"] = Input {
+					SourceOp = "object_1_left",
+					Source = "Output",
+				},
+				["Layer4.Center"] = Input {
+					SourceOp = "object1_left",
+					Source = "Position",
+				},
+				["Layer4.Size"] = Input { Value = 3.22, },
+				LayerName4 = Input { Value = "object_1_left", },
+				["Layer5.Foreground"] = Input {
+					SourceOp = "MultiMerge2",
+					Source = "Output",
+				},
+				["Layer5.Center"] = Input { Value = { -0.0393220481283451, 1.44947061493798 }, },
+				["Layer5.Size"] = Input { Value = 3.22, },
+				LayerName5 = Input { Value = "v4", },
+				["Layer6.Foreground"] = Input {
+					SourceOp = "Left_Stack2_Main_Placement",
+					Source = "Output",
+				},
+				LayerName6 = Input { Value = "Left cards and depth", },
+				LayerName7 = Input { Value = "MultiMerge2_3 Layer", },
+				["Layer8.Foreground"] = Input {
+					SourceOp = "Background1_1",
+					Source = "Output",
+				},
+				["Layer8.Center"] = Input {
+					SourceOp = "left_path",
+					Source = "Value",
+				},
+				LayerName8 = Input { Value = "left-path", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 715, 362.697 } },
+		},
+		object1_right = PolyPath {
+			DrawMode = "InsertAndModify",
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { 0.341070726915521, 1.58698601398601 }, },
+				Size = Input { Value = 4.056, },
+				Displacement = Input {
+					SourceOp = "object1_rightDisplacement",
+					Source = "Value",
+				},
+				PolyLine = Input {
+					SourceOp = "right_path",
+					Source = "Value",
+				}
+			},
+		},
+		object1_left = PolyPath {
+			DrawMode = "InsertAndModify",
+			CtrlWZoom = false,
+			NameSet = true,
+			Inputs = {
+				Center = Input { Value = { -1.173033, 1.583609 }, },
+				Size = Input { Value = 4.055, },
+				Displacement = Input {
+					SourceOp = "object1_leftDisplacement",
+					Source = "Value",
+				},
+				PolyLine = Input {
+					SourceOp = "Publish1",
+					Source = "Value",
+				}
+			},
+		},
+		left_path = PublishPoint {
+			NameSet = true,
+		},
+		object1_leftDisplacement = BezierSpline {
+			SplineColor = { Red = 255, Green = 0, Blue = 255 },
+			NameSet = true,
+			KeyFrames = {
+				[0] = { 0.25, RH = { 3.33333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+				[10] = { 0.5, LH = { 6.66666666666667, 0.416666666666667 }, RH = { 31.3333333333333, 0.5 }, Flags = { Linear = true } },
+				[74] = { 0.5, LH = { 52.6666666666667, 0.5 }, RH = { 77.3333333333333, 0.583333333333333 }, Flags = { Linear = true } },
+				[84] = { 0.75, LH = { 80.6666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		object1_rightDisplacement = BezierSpline {
+			SplineColor = { Red = 255, Green = 0, Blue = 255 },
+			NameSet = true,
+			KeyFrames = {
+				[0] = { -0.25, RH = { 3.33333333333333, -0.166666666666667 }, Flags = { Linear = true } },
+				[10] = { 0, LH = { 6.66666666666667, -0.0833333333333333 }, RH = { 31.3333333333333, 0 }, Flags = { Linear = true } },
+				[74] = { 0, LH = { 52.6666666666667, 0 }, RH = { 77.3333333333333, 0.0833333333333333 }, Flags = { Linear = true } },
+				[84] = { 0.25, LH = { 80.6666666666667, 0.166666666666667 }, Flags = { Linear = true } }
+			}
+		},
+		right_path = PublishPolyLine {
+			NameSet = true,
+			Inputs = {
+				Value = Input {
+					Value = Polyline {
+						Closed = true,
+						Points = {
+							{ Linear = true, X = 0.100935828877005, Y = -0.267220902612827, LX = 8.45442188872723e-18, LY = 0.122729944406843, RX = -8.45442188872723e-18, RY = -0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.489443124835049, LX = -0.0690355937288492, LY = 2.25451250366059e-17, RX = 0.0690355937288492, RY = -2.25451250366059e-17 },
+							{ Linear = true, X = 0.350935828877005, Y = -0.267220902612827, LX = -1.69088437774545e-17, LY = -0.122729944406843, RX = 1.69088437774545e-17, RY = 0.122729944406843 },
+							{ Linear = true, X = 0.225935828877005, Y = -0.0449986803906044, LX = 0.0690355937288492, LY = -3.75752083943432e-17, RX = -0.0690355937288492, RY = 3.75752083943432e-17 }
+						}
+					},
+				}
+			},
+		},
+		MediaOut1 = Saver {
+			Inputs = {
+				Index = Input { Value = "0", },
+				Input = Input {
+					SourceOp = "MultiMerge1",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 716.756, 483.787 } },
+		},
+		MediaIn2 = Loader {
+			ExtentSet = true,
+			CustomData = { MediaProps = {
+					MEDIA_AUDIO_TRACKS_DESC = {
+						{
+							MEDIA_AUDIO_BIT_DEPTH = 32,
+							MEDIA_AUDIO_FRAME_RATE = 24,
+							MEDIA_AUDIO_NUM_CHANNELS = 2,
+							MEDIA_AUDIO_SAMPLE_RATE = 48000,
+							MEDIA_AUDIO_START_TIME = -46,
+							MEDIA_AUDIO_TRACK_ID = "Timeline Audio",
+							MEDIA_AUDIO_TRACK_NAME = "Timeline Audio [Timeline 1]"
+						}
+					},
+					MEDIA_AUDIO_TRACKS_NUM = 1,
+					MEDIA_HAS_AUDIO = true,
+					MEDIA_HEIGHT = 2160,
+					MEDIA_ID = "",
+					MEDIA_IS_SOURCE_RES = false,
+					MEDIA_MARK_IN = -46,
+					MEDIA_MARK_OUT = 837,
+					MEDIA_NAME = "china-wrong-1-child-old",
+					MEDIA_NUM_FRAMES = 884,
+					MEDIA_PAR = 1,
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = -46,
+					MEDIA_WIDTH = 3840,
+				}, },
+			Inputs = {
+				GlobalIn = Input { Value = -46, },
+				GlobalOut = Input { Value = 837, },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "1", },
+				ClipTimeStart = Input { Value = -46, },
+				ClipTimeEnd = Input { Value = 837, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 1375, 214.197 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Length = 884,
+					LengthSetManually = true,
+					GlobalStart = -46,
+					GlobalEnd = 837,
+					TrimIn = -46,
+					TrimOut = 837,
+				}
+			}
+		}
+	},
+	Frames = {
+		{
+			FrameTypeID = "ChildFrame",
+			Mode = 3,
+			LayoutPreset = 0,
+			PresetName = "Default",
+			Left = 0,
+			Top = 0,
+			Width = 1920,
+			Height = 959,
+			ZoneInfo = {
+				AuxRight = { Expanded = true },
+				Right = { Expanded = true, },
+				Left = { Expanded = false, },
+				AuxLeft = { Expanded = true },
+				["!Left"] = {
+				},
+				["!Right"] = {
+				}
+			},
+			ViewInfo = {
+				Keyframes = { Show = false, Adjust = true, RatioX = 1.0002337134914, RatioY = 100, MRU = 0 },
+				LayoutStrip = { Show = true, },
+				Inspector = { Show = true, Adjust = false, RatioX = 100, RatioY = 1, MRU = 20 },
+				Effects = { Show = false, Adjust = true, RatioX = 1, RatioY = 99.8384491114701, MRU = 0 },
+				Viewer2 = { Show = true, RatioX = 0.946976744186046, RatioY = 0.01, },
+				Comments = { Show = false },
+				Clips = { Show = false, },
+				ActionStrip = { Show = true, RatioX = 100, },
+				Time = { Show = true, RatioX = 100, },
+				MediaPool = { Show = true, Adjust = false, RatioX = 1, RatioY = 100.16155088853, MRU = 27 },
+				Nodes = { Show = true, RatioX = 1.0002337134914, RatioY = 100, },
+				Metadata = { Show = false, },
+				Viewer1 = { Show = false, Adjust = true, RatioX = 1.05302325581395, RatioY = 0.01, MRU = 0 },
+				Spline = { Show = false, Adjust = true, RatioX = 0.999532573017197, RatioY = 100, MRU = 0 },
+				OuterColumns = {
+					RatioX = 100,
+					RatioY = 1,
+				},
+				OuterLeft = {
+				},
+				CenterSplit = {
+					RatioX = 1,
+					RatioY = 100,
+				},
+				OuterRight = {
+					PixelX = 420,
+					RatioY = 100,
+				},
+				InnerColumns = {
+					RatioX = 100,
+					RatioY = 2.29801324503311,
+				},
+				MainSplit = {
+					RatioX = 100,
+					RatioY = 0.701986754966887,
+				},
+				InnerLeft = {
+					PixelX = 420,
+					RatioY = 100,
+				},
+				InnerRight = {
+				},
+				ViewerSplit = {
+					RatioX = 100,
+					RatioY = 1,
+				}
+			},
+			Views = ordered() {
+				MediaPool = "MediaPoolView",
+				Effects = MultiView {
+					Active = "EffectView",
+					ViewList = ordered() {
+						EffectView = "EffectView"
+					},
+				},
+				Nodes = MultiView {
+					Active = "FlowView",
+					ViewList = ordered() {
+						FlowView = "FlowView"
+					},
+					FlowView = FlowView {
+						Flags = {
+							Navigator = true,
+							AutoHideNavigator = true,
+							AutoSnap = true,
+							RemoveRouters = true
+						},
+						NavigatorSize = { 200, 140 },
+						Direction = "Horizontal",
+						PipeStyle = "Direct",
+						RootScale = 0.608395,
+						RootOffset = { 173.732, -121.886 }
+					}
+				},
+				Keyframes = MultiView {
+					Active = "TimelineView",
+					ViewList = ordered() {
+						TimelineView = "TimelineView"
+					},
+					TimelineView = TimelineView {
+						TreeControlState = {
+							{ "MultiMerge1", Expanded = true }
+						},
+						DisplayMode = "All Tools",
+						ShowCurrentTimeTools = false,
+						Filter = "Show All",
+						ShowSelectedTools = true,
+						ShowAnimatedToolsOnly = false,
+						ShowEditBoxes = false,
+						KeyFrameView = {
+							Position = { Left = 232, Bottom = 224 },
+							ScaleX = 0.063177774339535,
+							OffsetX = -4.61197752678606,
+							OffsetY = 0,
+							AutoScaling = "scroll",
+							AutoSnapTo = "frame",
+							AutoSnapToGuidelines = false,
+							GuidelinesGrabEnabled = true,
+							GuidelinesSnapTo = "none"
+						},
+						Spreadsheet = { LeftPos = 232, Visible = false }
+					}
+				},
+				Spline = MultiView {
+					Active = "SplineView",
+					ViewList = ordered() {
+						SplineView = "SplineEditorView"
+					},
+					SplineView = SplineEditorView {
+						LeftPos = 264,
+						ScaleX = 0.2,
+						ScaleY = 0.00335570469798658,
+						OffsetX = 190.6,
+						OffsetY = 0,
+						AutoScaling = "scroll",
+						AutoSnapTo = "frame",
+						AutoSnapToGuidelines = false,
+						GuidelinesSnapTo = "frame",
+						ShowKeyMarkers = false,
+						IndependentHandles = false,
+						ShowNonSplineModifiers = false,
+						GuidelinesGrabEnabled = true,
+						ShowOneToolOnly = false,
+						ShowSelectedTools = true,
+						ShowAllInputs = false,
+						Filter = "Show All"
+					}
+				},
+				Inspector = MultiView {
+					Active = "Tools",
+					ViewList = ordered() {
+						Tools = "ControlView",
+						Modifiers = "ModifierView"
+					},
+				},
+				Viewer1 = MultiView {
+					Active = "LeftView",
+					ViewList = ordered() {
+						LeftView = "PreviewContainer"
+					},
+				},
+				Viewer2 = MultiView {
+					Active = "RightView",
+					ViewList = ordered() {
+						RightView = "PreviewContainer"
+					},
+				},
+				Time = "TimeView",
+				ActionStrip = "ActionStripView",
+				LayoutStrip = "LayoutStripView",
+				Clips = "ClipsView",
+				Metadata = "MetadataView"
+			},
+			Layout = {
+				{ ID = "LayoutStrip", FixedY = 36, Resolve = false, Flat = true },
+				{
+					{
+						{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+						{ ID = "Effects", RatioX = 1 },
+						Zone = "Left",
+						Rows = 2,
+						PaneID = "OuterLeft",
+						PixelX = 420
+					},
+					{
+						{
+							{
+								{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+								{ ID = "Effects", RatioX = 1 },
+								PaneID = "InnerLeft",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Left"
+							},
+							{
+								{
+									{ ID = "Viewer1", RatioY = 0.01, RatioX = 1 },
+									{ ID = "Viewer2", RatioX = 1 },
+									RatioY = 1,
+									Columns = 2,
+									PaneID = "ViewerSplit"
+								},
+								{ ID = "Time", FixedY = 83, Photo = false, Flat = true },
+								RatioX = 1,
+								Rows = 2
+							},
+							{
+								{ ID = "Inspector", RatioY = 1 },
+								{ ID = "Metadata", RatioY = 1, Fusion = false },
+								PaneID = "InnerRight",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Right"
+							},
+							RatioY = 2,
+							Columns = 3,
+							PaneID = "InnerColumns"
+						},
+						{ ID = "ActionStrip", FixedY = 50, Flat = true },
+						{
+							{ ID = "Nodes", RatioX = 1 },
+							{ ID = "Spline", Photo = false, RatioX = 1 },
+							{ ID = "Keyframes", Photo = false, RatioX = 1 },
+							RatioY = 1,
+							Columns = 3,
+							PaneID = "MainSplit"
+						},
+						{ Fusion = false, ID = "Clips", LARGE_FixedY = 160, MEDIUM_FixedY = 138, SMALL_FixedY = 110 },
+						RatioX = 1,
+						Rows = 4,
+						PaneID = "CenterSplit"
+					},
+					{
+						{ ID = "Inspector", RatioY = 1 },
+						{ ID = "Metadata", RatioY = 1, Fusion = false },
+						Zone = "Right",
+						Rows = 2,
+						PaneID = "OuterRight",
+						PixelX = 420
+					},
+					RatioY = 1,
+					Columns = 3,
+					PaneID = "OuterColumns"
+				},
+				RatioX = 1,
+				Rows = 2,
+				RatioY = 1
+			},
+			TopBar = {
+				Left = { "Left", "MediaPool", "Effects", "Clips", "Nodes", "Console" },
+				Right = { "Spline", "Keyframes", "Metadata", "Inspector", "Right" }
+			}
+		}
+	},
+	Prefs = {
+		Comp = {
+			Interactive = {
+				Proxy = {
+					Scale = 1,
+				},
+			},
+			Views = {
+				RightView = {
+					Viewer = {
+						ScaleMode = 1,
+						Layer = ":Default",
+						ShowControls = true,
+						LUTSelected = "Fusion View LUT",
+						DoD = {
+							Show = true
+						}
+					},
+					Guides = { Center = true, Show = true, Snap = false, FrameAspect = "Default", },
+					ViewLUT = { {
+							Tools = ordered() {
+								FusionViewLUT1 = ViewLUTOp {
+									CtrlWZoom = false,
+									NameSet = true,
+									Inputs = {
+									},
+								}
+							},
+							ID = "FusionViewLUT"
+						}, SelectedPlugin = "FusionViewLUT", SelectedName = "Fusion View LUT", Recent = {
+							FusionViewLUT = {
+								Tools = ordered() {
+									FusionViewLUT1 = ViewLUTOp {
+										CtrlWZoom = false,
+										NameSet = true,
+										Inputs = {
+										},
+									}
+								}
+							},
+							SelectedPlugin = "FusionViewLUT",
+							SelectedName = "Fusion View LUT",
+							GamutViewLUT = {
+								Tools = ordered() {
+									GamutViewLUT = ViewOperator {
+										CtrlWZoom = false,
+										NameSet = true,
+									}
+								}
+							}
+						} },
+					Controls = {
+						SnapPixel = false,
+					},
+				},
+				LeftView = {
+					Viewer = {
+						LUTSelected = "",
+						DoD = { Show = false },
+						CheckerUnderlay = true,
+						Normalise = false,
+						ID = "GLImageViewer",
+						OverlayColor = 7,
+						Smooth = true,
+						SmoothThreshold = 1000000,
+						View360 = 0,
+						Region = { Show = true, Bottom = 0, Auto = false, Lock = false, Enable = false, Right = 1, Left = 0, Top = 1 },
+						ShowControls = true,
+						Layer = ":Default",
+						ShowLabels = true,
+						OverlayOpacity = 100,
+						PixelGrid = false,
+						Channel = -1,
+						One2One = false,
+						AlphaOverlay = false,
+						ScaleMode = 0,
+						FollowActive = false
+					},
+					MaterialViewer = { Options = { RendererType = "RendererOpenGL", LightPosition = 0, SurfaceType = 0, LightingEnabled = true }, Camera = { Rotation = { Y = -20, X = 15, Z = 0 } } },
+					["3DHistogram"] = { Proxy = 4, Log = false, Transparent = true, LoopLines = true, DrawStyles = 0 },
+					Color = { SortDescending = false, SortSamples = false, FullPrecision = false },
+					CheckerUnderlay = false,
+					ViewHydra = { Options = { SkyDome = true, Shadows = false, Lighting = true, PickMode = "prim", DrawMode = "shaded_smooth", Materials = true, CamLight = true, Renderer = "", Complexity = 1.2, SceneLights = false, Purposes = 6 }, CamRight = { Rotation = { Y = -90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamLeft = { Rotation = { Y = 90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamFront = { Rotation = { Y = 0, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamTop = { Rotation = { Y = 0, X = 90, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamPersp = { Rotation = { Y = 0, X = 30, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CameraName = "Perspective" },
+					SubView = { Enabled = false, Navigator = false, Magnifier = false, ID = "GLHistogramViewer", MagnifierScale = 8 },
+					FullScreen = false,
+					QuadLayoutName = "4-Way",
+					Backend = "Metal",
+					QuadView = false,
+					Waveform = { OneLine = false, SubSampling = 4, Mode = 0, LoopLines = true, ColorSpace = 0 },
+					Dither = false,
+					BgColor = -1,
+					Vectorscope = { DrawStyles = 1, OneLine = false, Color = false, LoopLines = true, SubSampling = 4, ColorSpace = 0 },
+					Controls = { Hiding = 0, Autofade = false, FadeSpeed = 1, SnapPixel = false, Opacity = 100, FadeDelay = 2000, SnapPixelMode = 0, StippleHidden = true },
+					VideoOut = false,
+					Toolbar = { Style = 0, Size = 0 },
+					AlwaysOnTop = true,
+					Mirror = { Enable = false, StereoMethod = "Auto", Device = "" },
+					Histogram = { DrawStyles = 0, Channels = 7, Scale = 0, Transparent = false },
+					View3D = { Options = { SelectionBoxStipple = 65520, ShowTextureMemory = false, SelectionBoxStippleHidden = 52416, ShowLights = true, Lighting = false, Shadows = false, ShowPointClouds = true, Grid = true, ShowFastLabel = false, ShowVertexNormals = false, ShowMatteObjects = false, DefaultLight = true, Culling = false, ShowCameras = true, Wireframe = false, ShowVertexTangents = false }, CamLeft = { Rotation = { Y = 90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamPersp = { Rotation = { Y = 0, X = 30, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamRight = { Rotation = { Y = -90, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CamFront = { Rotation = { Y = 0, X = 0, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, SortMethod = "ZBuffer", OverscanMode = 0, CustomOverscan = 1.37, CamTop = { Rotation = { Y = 0, X = 90, Z = 0 }, Scale = 1, Position = { Y = 0, X = 0, Z = 0 } }, CameraName = "Perspective" },
+					ShowClipFrameNumbers = true,
+					Guides = { User = "", SafeImage = false, Show = false, Center = false, FrameAspect = "Default", SafeTitle = false, Resolve = true, Film = false, Snap = false },
+					BufferLUT = { Enable = false, Selected = "", Plugin = "FusionViewLUT" },
+					Stereo = { Enabled = false, Swap = false, Source = 0, AnaglyphMethod = "Color", Sync = true, Stack = false, OffsetX = { QuadB = 0, Stack = 0 }, ABSource = false, DisplayMethod = "Quad Buffer", OffsetY = { QuadB = 0, Stack = 0 }, StackMethod = "Horizontal", AnaglyphColor = "Red/Cyan" },
+					OpToolbar = { Style = 0, Size = 0 }
+				},
+				Defaults = {
+					Guides = {
+						SafeTitle = true,
+						SafeImage = true,
+						Center = true,
+					},
+				},
+			},
+			Paths = {
+				Map = {
+					["ResolveCaches:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/CacheClip/183a48b1-e370-4f2e-abab-3436724e95f9/e7f36db5-4c2d-4a18-96a1-ad9db423a2fc/d6d22fea-3177-45a4-b884-aac161970647/Fusion",
+				},
+			},
+			FrameFormat = {
+				Width = 3840,
+				Height = 2160,
+				Rate = 24,
+				GuideRatio = 1.77777777777778,
+				DepthFull = 3,
+				DepthPreview = 3,
+				DepthInteractive = 3,
+			},
+			LastFile = "/Users/naseemtoumeh/edit-projects/general/icons/",
+			PolyKeyListDlg = {
+				Window = {
+					Left = 4294966285,
+					Top = 25
+				}
+			},
+			Unsorted = {
+				GlobalStart = 4294967250,
+				GlobalEnd = 837
+			},
+			FreehandPrecDlg = {
+				Window = {
+					Left = 820,
+					Top = 448
+				}
+			},
+			SpellCheck = {
+				Language = "auto"
+			},
+		}
+	},
+}

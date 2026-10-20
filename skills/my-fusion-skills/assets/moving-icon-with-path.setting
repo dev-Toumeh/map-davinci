@@ -1,0 +1,224 @@
+{
+	Tools = ordered() {
+		MacroTool1 = GroupOperator {
+			CtrlWZoom = false,
+			Inputs = ordered() {
+				MainInput1 = InstanceInput {
+					SourceOp = "MultiMerge1",
+					Source = "Layer2.Foreground",
+				}
+			},
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "MultiMerge1",
+					Source = "Output",
+				},
+				Output1 = InstanceOutput {
+					SourceOp = "Path1",
+					Source = "Heading",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				Polygon1 = PolylineMask {
+					DrawMode = "ModifyOnly",
+					DrawMode2 = "InsertAndModify",
+					CtrlWShown = false,
+					Inputs = {
+						Filter = Input { Value = FuID { "Fast Gaussian" }, },
+						WriteLength = Input {
+							SourceOp = "Polygon1Length",
+							Source = "Value",
+						},
+						MaskWidth = Input { Value = 1920, },
+						MaskHeight = Input { Value = 1080, },
+						PixelAspect = Input { Value = { 1, 1 }, },
+						UseFrameFormatSettings = Input { Value = 1, },
+						ClippingMode = Input { Value = FuID { "None" }, },
+						Polyline = Input {
+							SourceOp = "Publish1",
+							Source = "Value",
+						},
+						Polyline2 = Input {
+							Value = Polyline {
+							},
+							Disabled = true,
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 7752.45, 222.751 } },
+				},
+				Polygon1Length = BezierSpline {
+					SplineColor = { Red = 249, Green = 211, Blue = 49 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[81] = { 0, RH = { 114.666666666667, 0 } },
+						[182] = { 1, LH = { 148.333333333333, 1 } }
+					}
+				},
+				Publish1 = PublishPolyLine {
+					CtrlWZoom = false,
+					Inputs = {
+						Value = Input {
+							Value = Polyline {
+								Points = {
+									{ Linear = true, X = -0.374125874125874, Y = 0.37551867219917, RX = 0.500903456728654, RY = -0.593560621858013 },
+									{ X = 0.308857808857809, Y = -0.172199170124481, LX = -0.399506683215938, LY = -0.254364889114679 }
+								}
+							},
+						}
+					},
+				},
+				Background1 = Background {
+					CtrlWShown = false,
+					Inputs = {
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						PixelAspect = Input { Value = { 2.5, 2.5 }, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						TopLeftAlpha = Input { Value = 0.331, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 7865.48, 244.121 } },
+				},
+				Background2 = Background {
+					CtrlWShown = false,
+					Inputs = {
+						EffectMask = Input {
+							SourceOp = "Polygon1",
+							Source = "Mask",
+						},
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						PixelAspect = Input { Value = { 2.5, 2.5 }, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 7866.05, 220.967 } },
+				},
+				MediaIn2 = MediaIn {
+					CtrlWShown = false,
+					CustomData = {
+						MediaProps = {
+							MEDIA_FORMAT_TYPE = "PNG",
+							MEDIA_HEIGHT = 1254,
+							MEDIA_ID = "9ce6f085-2f3c-428a-97c9-a7f48bea7547",
+							MEDIA_IS_SOURCE_RES = true,
+							MEDIA_LAYER_DESC = {
+							},
+							MEDIA_MARK_IN = 0,
+							MEDIA_MARK_OUT = 0,
+							MEDIA_NAME = "Oil Tanker Ship.png",
+							MEDIA_NUM_FRAMES = 1,
+							MEDIA_NUM_LAYERS = 0,
+							MEDIA_PAR = 1,
+							MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/icons/Oil Tanker Ship.png",
+							MEDIA_SRC_FRAME_RATE = 24,
+							MEDIA_START_FRAME = 0,
+							MEDIA_WIDTH = 1254,
+							__Queried = true
+						},
+						MEDIA_ID = "9ce6f085-2f3c-428a-97c9-a7f48bea7547",
+					},
+					Inputs = {
+						MediaSource = Input { Value = FuID { "MediaPool" }, },
+						MediaID = Input { Value = "9ce6f085-2f3c-428a-97c9-a7f48bea7547", },
+						AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+						Layer = Input { Value = "", },
+						ClipTimeEnd = Input { Value = 0, },
+						Loop = Input { Value = 1, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						DeepOutputMode = Input {
+							Value = 0,
+							Disabled = true,
+						},
+						LeftAudio = Input {
+							SourceOp = "Left_1",
+							Source = "Data",
+						},
+						RightAudio = Input {
+							SourceOp = "Right_1",
+							Source = "Data",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 7862.56, 271.358 } },
+					Version = 1
+				},
+				Left_1 = AudioDisplay {
+					CtrlWZoom = false,
+				},
+				Right_1 = AudioDisplay {
+					CtrlWZoom = false,
+				},
+				MultiMerge1 = MultiMerge {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					Inputs = {
+						LayerOrder = Input { Value = ScriptVal { {
+									[0] = 1,
+									3,
+									2
+								} }, },
+						Background = Input {
+							SourceOp = "Background1",
+							Source = "Output",
+						},
+						["Layer1.Foreground"] = Input {
+							SourceOp = "Background2",
+							Source = "Output",
+						},
+						LayerName1 = Input { Value = "Polygon1 Layer", },
+						["Layer2.Center"] = Input { Value = { 0.91, 0.444 }, },
+						LayerName2 = Input { Value = "MediaIn4: stop-sign.png Layer", },
+						["Layer3.Foreground"] = Input {
+							SourceOp = "MediaIn2",
+							Source = "Output",
+						},
+						["Layer3.Center"] = Input {
+							SourceOp = "Path1",
+							Source = "Position",
+						},
+						["Layer3.Angle"] = Input {
+							SourceOp = "MultiMerge1MediaIn2OilTankerShippngLayerLayer3Angle",
+							Source = "Value",
+						},
+						LayerName3 = Input { Value = "MediaIn2: Oil Tanker Ship.png Layer", }
+					},
+					ViewInfo = OperatorInfo { Pos = { 7998.41, 237.07 } },
+				},
+				Path1 = PolyPath {
+					DrawMode = "InsertAndModify",
+					CtrlWZoom = false,
+					Inputs = {
+						Displacement = Input {
+							SourceOp = "Path1Displacement",
+							Source = "Value",
+						},
+						PolyLine = Input {
+							SourceOp = "Publish1",
+							Source = "Value",
+						}
+					},
+				},
+				Path1Displacement = BezierSpline {
+					SplineColor = { Red = 255, Green = 0, Blue = 255 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[107] = { 0, RH = { 141.666666666667, 0.333333333333333 }, Flags = { Linear = true } },
+						[211] = { 1, LH = { 176.333333333333, 0.666666666666667 }, Flags = { Linear = true } }
+					}
+				},
+				MultiMerge1MediaIn2OilTankerShippngLayerLayer3Angle = BezierSpline {
+					SplineColor = { Red = 232, Green = 81, Blue = 217 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[143] = { 232.2, RH = { 150.333333333333, 235.6940171 }, Flags = { Linear = true } },
+						[165] = { 242.6820513, LH = { 157.666666666667, 239.1880342 }, RH = { 170.666666666667, 249.754700866667 }, Flags = { Linear = true } },
+						[182] = { 263.9, LH = { 176.333333333333, 256.827350433333 }, RH = { 186, 268.633333333333 }, Flags = { Linear = true } },
+						[194] = { 278.1, LH = { 190, 273.366666666667 }, RH = { 196.666666666667, 279.766666666667 }, Flags = { Linear = true } },
+						[202] = { 283.1, LH = { 199.333333333333, 281.433333333333 }, RH = { 204.666666666667, 285.5 }, Flags = { Linear = true } },
+						[210] = { 290.3, LH = { 207.333333333333, 287.9 }, Flags = { Linear = true } }
+					}
+				}
+			},
+		}
+	},
+	ActiveTool = "MacroTool1"
+}

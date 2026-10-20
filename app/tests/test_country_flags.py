@@ -62,12 +62,8 @@ class CountryFlagTests(unittest.TestCase):
             self.assertNotEqual(
                 next((package / "images/flags").glob("USA_cover_*.png")).read_bytes(),
                 next((package / "images/flags").glob("CAN_cover_*.png")).read_bytes())
-            self.assertIn("Pos = { 1330, 360 }", text.split(
-                "USA_Flag_Color_Flag = Switch", 1)[1].split(
-                "Country_Edit_01_Enabled", 1)[0])
-            self.assertIn("Pos = { 1330, 670 }", text.split(
-                "CAN_Flag_Color_Flag = Switch", 1)[1].split(
-                "Country_Edit_02_Enabled", 1)[0])
+            self.assertNotIn('Country_Edit_Controller', text)
+            self.assertNotIn('CustomTool', text)
             self.assertIn('Input1 = Input { SourceOp = "Country_Edit_01_Render"', text)
             self.assertIn('Input0 = Input { SourceOp = "USA_Flag_With_Border"', text)
             self.assertIn('Input1 = Input { SourceOp = "Country_Edit_02_Render"', text)
@@ -78,17 +74,10 @@ class CountryFlagTests(unittest.TestCase):
             self.assertNotIn("Country_Raster_Camera_Path", text)
             self.assertIn("Point(0.5 + (Map_Animation.Center.X - 0.5)", text)
             self.assertIn('Size = Input { Expression = "Map_Animation.Size /', text)
-            self.assertIn("USA_Flag_Adjust = CustomTool", text)
-            self.assertIn('LINKS_Name = "Horizontal Position"', text)
-            self.assertIn('LINKS_Name = "Vertical Position"', text)
-            self.assertIn('LINKS_Name = "Flag Scale"', text)
-            self.assertIn('LINKS_Name = "Flag Opacity"', text)
-            self.assertIn("USA_Flag_Adjust.Offset_X", text)
-            self.assertIn("USA_Flag_Adjust.Offset_Y", text)
-            self.assertIn("USA_Flag_Adjust.Scale", text)
-            self.assertIn("USA_Flag_Adjust.Opacity", text)
-            self.assertIn(
-                'Blend = Input { Expression = "USA_Flag_Adjust.Opacity"', text)
+            self.assertIn("USA_Flag_Local_Transform = Transform", text)
+            self.assertIn('Input = Input { SourceOp = "USA_Flag_Loader"', text)
+            self.assertNotIn("USA_Flag_Adjust", text)
+            self.assertIn('Blend = Input { Value = 1,', text)
             self.assertIn('EffectMask = Input { SourceOp = "Country_Edit_01_Render"', text)
             self.assertIn("USA_Flag_Masked_On_Working_Canvas = Merge", text)
             self.assertEqual(warnings, [])

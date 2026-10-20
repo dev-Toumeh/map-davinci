@@ -1,0 +1,322 @@
+00:00 Hey guys, in today's video I'll show you
+00:02 
+
+00:02 how to add an animated glowing line
+00:04 
+
+00:04 around any object using Da Vinci
+00:06 
+
+00:06 Resolve. Let's get started. Once you've
+00:08 
+
+00:08 got your clip in the timeline, head over
+00:09 
+
+00:09 to the Fusion page. I want to animate
+00:12 
+
+00:12 around this specific area. So, first
+00:14 
+
+00:14 I'll open the search tool by pressingtrl
+00:16 
+
+00:16 + space. Then type in planer tracker and
+00:19 
+
+00:19 click add. Navigate to the inspector
+00:22 
+
+00:22 panel and click set to define zero as
+00:24 
+
+00:24 the reference point. You can select any
+00:26 
+
+00:26 reference point depending on where you
+00:27 
+
+00:27 wish to begin. With the planer tracker
+00:30 
+
+00:30 selected, draw a mask around the area
+00:32 
+
+00:32 you want to track. Precision isn't
+00:34 
+
+00:34 necessary as the mask is only for
+00:36 
+
+00:36 tracking the portion. Once the mask is
+00:38 
+
+00:38 drawn, go to the tracking section and
+00:40 
+
+00:40 click track to end. Da Vinci will
+00:42 
+
+00:42 automatically track the motion. You can
+00:44 
+
+00:44 click the stop button any time to end
+00:46 
+
+00:46 the tracking. Once that's done, select
+00:48 
+
+00:48 create planer transform. You will now
+00:50 
+
+00:50 see a planer transform node here. You
+00:52 
+
+00:52 can now delete the planer tracker. Now
+00:54 
+
+00:54 connect the output of the planer
+00:56 
+
+00:56 transform node to the input of the
+00:57 
+
+00:57 median in node to create a merge
+01:01 
+
+01:01 node. Next, bring in the background node
+01:03 
+
+01:03 and connect it to the planer transform.
+01:06 
+
+01:06 Now, I'll just make some room for the
+01:07 
+
+01:07 other nodes. If the background isn't
+01:09 
+
+01:09 covering the video, open the search
+01:11 
+
+01:11 tool, add a transform node. Now, with
+01:14 
+
+01:14 the transform node selected, increase
+01:16 
+
+01:16 the size in the inspector panel to cover
+01:18 
+
+01:18 up the space. Now, let's go to the
+01:20 
+
+01:20 background node and set your desired
+01:22 
+
+01:22 color in the inspector panel.
+01:24 
+
+01:24 I'll set mine to blue. Next, add a
+01:27 
+
+01:27 beplline node to draw the mask, then
+01:29 
+
+01:29 connect it to the background node. If
+01:31 
+
+01:31 you notice that the planer transform is
+01:33 
+
+01:33 displaying errors in red. To fix this,
+01:35 
+
+01:35 navigate to the background node and in
+01:37 
+
+01:37 the inspector panel under image options,
+01:39 
+
+01:39 set the process mode to NTSC fields.
+01:42 
+
+01:42 Now, you should be able to see the image
+01:44 
+
+01:44 to draw the mask. Now, I'll zoom in and
+01:46 
+
+01:46 carefully draw a mask around this
+01:48 
+
+01:48 portion. Make sure to select the
+01:50 
+
+01:50 beplline node to draw the mask. Take
+01:53 
+
+01:53 your time with this step as accuracy is
+01:55 
+
+01:55 crucial. Any mistakes here can affect
+01:56 
+
+01:56 the animation causing it to look
+01:58 
+
+01:58 unnatural or out of
+02:00 
+
+02:00 sync. The better the mask, the smoother
+02:03 
+
+02:03 the final result will be. Once you've
+02:06 
+
+02:06 completed the masking, go to the
+02:07 
+
+02:07 inspector panel and disable the solid
+02:09 
+
+02:09 button. This will bring your video back
+02:11 
+
+02:11 to its original state. After that,
+02:13 
+
+02:13 navigate to the border width parameter
+02:15 
+
+02:15 and adjust the value according to your
+02:16 
+
+02:16 preference. I'll set mine to 0.005.
+02:21 
+
+02:21 Next, make sure you're on the first
+02:22 
+
+02:22 frame of your video. Set a key frame for
+02:25 
+
+02:25 both the position and length parameters.
+02:27 
+
+02:27 Then, set their values to zero. The
+02:29 
+
+02:29 position parameter controls how many
+02:31 
+
+02:31 times the animation moves around the
+02:33 
+
+02:33 path. Next, drag the playhead forward in
+02:36 
+
+02:36 the timeline to the point where you want
+02:37 
+
+02:37 the animation to end. Then, set the
+02:39 
+
+02:39 position value to three and the length
+02:41 
+
+02:41 value to
+02:44 
+
+02:44 one. Now, if you play the timeline,
+02:46 
+
+02:46 you'll see the animation in action. Now
+02:49 
+
+02:49 I'll add a glow effect to the animation.
+02:51 
+
+02:51 Select the background node, open the
+02:53 
+
+02:53 search tool, type soft glow, and click
+02:55 
+
+02:55 add. Now I'll slightly increase the
+02:58 
+
+02:58 threshold and reduce the gain to achieve
+02:60 
+
+02:60 a more balanced glow effect. I'm going
+03:02 
+
+03:02 to zoom out to view the entire node
+03:04 
+
+03:04 structure more clearly. Next, I'm going
+03:06 
+
+03:06 to add a fast noise node. Just grab it
+03:08 
+
+03:08 from the search tool.
+03:11 
+
+03:11 Now, let's disconnect the B spline node,
+03:13 
+
+03:13 connect it to the fast noise node, and
+03:16 
+
+03:16 then link the fast noise back into the
+03:17 
+
+03:17 node
+03:19 
+
+03:19 tree. I'll quickly adjust these
+03:23 
+
+03:23 nodes. I'm going to add another soft
+03:25 
+
+03:25 glow node right after the fast noise as
+03:29 
+
+03:29 well. With the fast noise node selected,
+03:32 
+
+03:32 go to the inspector panel and adjust the
+03:34 
+
+03:34 detail, brightness, and contrast. Feel
+03:37 
+
+03:37 free to tweak the parameters to get the
+03:38 
+
+03:38 look you want.
+03:44 
+
+03:44 Also reduce the gain on the second soft
+03:46 
+
+03:46 glow node for a more subtle
+03:49 
+
+03:49 effect. And that's it. Head over to the
+03:52 
+
+03:52 edit page to preview the final
+03:55 
+
+03:55 result. If you found this helpful, give
+03:58 
+
+03:58 it a like, subscribe for more, and don't
+03:60 
+
+03:60 forget to tap the bell.

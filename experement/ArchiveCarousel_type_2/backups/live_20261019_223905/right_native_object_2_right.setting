@@ -1,0 +1,27 @@
+{
+ Tools = ordered() {
+		object_2_right = MultiMerge {
+			NameSet = true,
+			Inputs = {
+				LayerOrder = Input { Value = ScriptVal { { [0] = 1, 2 } }, },
+				Background = Input {
+					SourceOp = "Right_Stack2_Background",
+					Source = "Output",
+				},
+				["Layer1.Foreground"] = Input {
+					SourceOp = "Media_file4_Frame",
+					Source = "Output",
+				},
+				LayerName1 = Input { Value = "t1 Layer", },
+				["Layer2.Foreground"] = Input {
+					SourceOp = "Right_Stack2_Vintage8mm",
+					Source = "Output",
+				},
+				["Layer2.Size"] = Input { Value = 0.63, },
+				["Layer2.Blend"] = Input { Value = 0.37, },
+				LayerName2 = Input { Value = "MediaIn1: Vintage 8mm Film.png Layer", }
+			},
+			ViewInfo = OperatorInfo { Pos = { 1045, 16.197 } },
+		},
+ },
+}

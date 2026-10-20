@@ -9,16 +9,28 @@
   const applyButton = document.getElementById("motionapply");
   const discardButton = document.getElementById("motiondiscard");
   const review = document.getElementById("motionreview");
+  const body = document.getElementById("motionbody");
+  const filename = document.getElementById("motionfilename");
+  const toggle = document.getElementById("motiontoggle");
+  const uploadButton = document.getElementById("motionupload");
+  const uploadInput = document.getElementById("motionuploadfile");
   let previous = null;
   let scanning = false;
+  let uploading = false;
+  let visible = false;
+  let videoCount = 0;
+  let videoVersion = 0;
   let videoFollowing = false;
   let lastEditorFrame = -1;
 
   function controls() {
-    choice.disabled = scanning || !choice.options.length;
-    scanButton.disabled = scanning || !choice.value;
+    choice.disabled = scanning || uploading || !videoCount;
+    scanButton.disabled = scanning || uploading || !visible || !choice.value || !anim;
     applyButton.disabled = !previous || scanning;
     discardButton.disabled = !previous || scanning;
+    toggle.disabled = scanning || uploading || !videoCount;
+    toggle.textContent = visible ? "Hide" : "Show";
+    uploadButton.disabled = scanning || uploading;
     for (const id of ["save", "fusion", "format", "fps", "duration"]) {
       document.getElementById(id).disabled = !!previous || scanning;
     }
@@ -26,12 +38,15 @@
 
   function chooseVideo() {
     if (previous) discardPreview();
-    if (!choice.value) {
+    filename.textContent = choice.value || "No reference video";
+    body.classList.toggle("hidden", !visible);
+    if (!visible || !choice.value) {
+      video.pause();
       compare.classList.add("hidden");
       video.removeAttribute("src");
       video.load();
     } else {
-      video.src = `/exports/${encodeURIComponent(pkg)}/videos/${encodeURIComponent(choice.value)}`;
+      video.src = `/exports/${encodeURIComponent(pkg)}/videos/${encodeURIComponent(choice.value)}?v=${videoVersion}`;
       compare.classList.remove("hidden");
       video.load();
     }
@@ -40,10 +55,12 @@
     if (anim) render();
   }
 
-  async function loadVideos() {
+  async function loadVideos({preferredName = null, forceVisible = false} = {}) {
     previous = null;
     motionPreviewActive = false;
     scanning = false;
+    visible = false;
+    videoCount = 0;
     choice.textContent = "";
     controls();
     const packageName = pkg;
@@ -53,22 +70,73 @@
       if (!response.ok || data.error) throw Error(data.error || "Could not list videos");
       if (pkg !== packageName) return;
       choice.textContent = "";
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "Choose a video";
+      choice.append(placeholder);
       for (const item of data.videos) {
         const option = document.createElement("option");
         option.value = item.name;
         option.textContent = item.name;
         choice.append(option);
       }
-      choice.disabled = !data.videos.length;
+      videoCount = data.videos.length;
+      const hasDefault = data.videos.some(item => item.name === "reference.mp4");
+      visible = forceVisible || (hasDefault && localStorage.getItem(`map-video-editor:hide-reference:${pkg}`) !== "1");
+      choice.value = preferredName && data.videos.some(item => item.name === preferredName)
+        ? preferredName : hasDefault ? "reference.mp4" : "";
       review.textContent = data.videos.length
         ? "Scan a video to preview its pan and zoom as editable camera keyframes."
-        : "No MP4, MOV, M4V, or WebM video is in this export's videos folder.";
+        : "Upload reference.mp4 to compare and scan its movement.";
       chooseVideo();
     } catch (error) {
       choice.textContent = "";
-      choice.disabled = true;
+      videoCount = 0;
+      visible = false;
       review.textContent = error.message;
       chooseVideo();
+    }
+  }
+
+  function toggleVideo() {
+    if (scanning || uploading) return;
+    if (previous) discardPreview();
+    visible = !visible;
+    if (visible && !choice.value && videoCount) choice.selectedIndex = 1;
+    localStorage.setItem(`map-video-editor:hide-reference:${pkg}`, visible ? "0" : "1");
+    chooseVideo();
+  }
+
+  async function uploadVideo() {
+    const file = uploadInput.files?.[0];
+    if (!file) return;
+    if (!/\.mp4$/i.test(file.name)) {
+      status("Choose an MP4 reference video.", "err");
+      uploadInput.value = "";
+      return;
+    }
+    const packageName = pkg;
+    uploading = true;
+    controls();
+    status(`Uploading ${file.name} as reference.mp4…`);
+    try {
+      const response = await fetch(`/api/animation/${encodeURIComponent(packageName)}/reference-video`, {
+        method: "POST", headers: {"Content-Type": "video/mp4"}, body: file,
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) throw Error(data.error || "Reference upload failed");
+      if (pkg !== packageName) return;
+      if (previous) discardPreview();
+      videoVersion = Date.now();
+      localStorage.removeItem(`map-video-editor:hide-reference:${pkg}`);
+      await loadVideos({preferredName: data.name, forceVisible: true});
+      status(`${file.name} uploaded as reference.mp4.`, "ok");
+    } catch (error) {
+      status("Reference upload failed: " + error.message, "err");
+    } finally {
+      uploading = false;
+      uploadInput.value = "";
+      controls();
     }
   }
 
@@ -173,6 +241,9 @@
   }
 
   choice.addEventListener("change", chooseVideo);
+  toggle.addEventListener("click", toggleVideo);
+  uploadButton.addEventListener("click", () => uploadInput.click());
+  uploadInput.addEventListener("change", uploadVideo);
   scanButton.addEventListener("click", scanVideo);
   applyButton.addEventListener("click", applyPreview);
   discardButton.addEventListener("click", discardPreview);

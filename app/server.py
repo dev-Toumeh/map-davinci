@@ -7,6 +7,8 @@ Local web app server (stdlib only). Binds to 127.0.0.1 only.
 
 Endpoints:
   GET  /                          -> static/index.html
+  GET  /gif                       -> GIF-to-Fusion converter
+  POST /api/gif?name=<name>&fps=<fps> -> raw GIF upload and loop package
   GET  /static/*                  -> UI assets
   GET  /exports/*                 -> exported files (for inspection)
   GET  /api/health                -> ok
@@ -20,6 +22,7 @@ Endpoints:
    GET  /api/exports                -> available export packages
    GET/POST /api/animation/<name>   -> read/save a shot animation
    GET  /api/animation/<name>/reference-videos -> list package videos
+   POST /api/animation/<name>/reference-video -> upload videos/reference.mp4
    POST /api/animation/<name>/scan-motion -> propose camera keyframes
    POST /api/animation/<name>/fusion -> generate scene.comp
    POST /api/export/<name>/delete     -> permanently remove one package
@@ -38,10 +41,12 @@ import traceback
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import quote, unquote
+from urllib.parse import quote, unquote, parse_qs, urlsplit
 
 from core import animation_schema, exporter, motion_scan, package_layout, regions, settings as app_settings
 from fusion import generator as fusion_generator
+from core import gif_loop
+from core import archive_carousel_service
 
 APP_ROOT = Path(__file__).resolve().parent
 STATIC_DIR = APP_ROOT / "static"
@@ -57,12 +62,16 @@ PORT = 8787
 JOBS: dict = {}          # job_id -> {"status": {...}, "result": {...} | None}
 JOBS_LOCK = threading.Lock()
 EXPORT_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,119}")
+MAX_REFERENCE_UPLOAD_BYTES = 1024 * 1024 * 1024
 
 MIME = {
     ".html": "text/html; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
     ".css": "text/css; charset=utf-8",
     ".png": "image/png",
+    ".gif": "image/gif",
+    ".setting": "application/octet-stream",
+    ".zip": "application/zip",
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
     ".json": "application/json",
@@ -387,6 +396,24 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 self._file(STATIC_DIR / "index.html", STATIC_DIR)
+            elif path in ("/gif", "/gif/"):
+                self._file(STATIC_DIR / "gif.html", STATIC_DIR)
+            elif path in ("/archive-carousel", "/archive-carousel/"):
+                port = self.server.server_address[1]
+                address = archive_carousel_service.start(
+                    app_settings.exports_dir(), f"http://127.0.0.1:{port}/")
+                self.send_response(302)
+                self.send_header("Location", address + "/")
+                self.send_header("Content-Length", "0")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+            elif path == "/api/gif/settings":
+                self._json({"path": str(app_settings.gif_exports_dir()),
+                            "default_path": str(app_settings.exports_dir().resolve() / "gif-loops"),
+                            "using_default": not bool(app_settings.load().get("gif_exports_path"))})
+            elif path.startswith("/api/gif/files/"):
+                root = app_settings.gif_exports_dir()
+                self._file(root / unquote(path[len("/api/gif/files/"):]), root)
             elif path.startswith("/static/"):
                 self._file(STATIC_DIR / path[len("/static/"):], STATIC_DIR)
             elif path.startswith("/exports/"):
@@ -474,10 +501,82 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):  # noqa: N802
         path = self.path.split("?", 1)[0]
         try:
+            if path == "/api/gif":
+                try:
+                    length = int(self.headers.get("Content-Length", 0))
+                    if not 6 <= length <= gif_loop.MAX_UPLOAD_BYTES:
+                        self.close_connection = True
+                        self._json({"error": "Choose a GIF file up to 25 MB"}, 413)
+                        return
+                    query = parse_qs(urlsplit(self.path).query)
+                    raw = self.rfile.read(length)
+                    if len(raw) != length:
+                        raise ValueError("GIF upload ended early")
+                    result = gif_loop.create_gif_loop_group(
+                        raw, app_settings.exports_dir(),
+                        group_name=query.get("name", ["GIFLoop"])[0],
+                        timeline_fps=query.get("fps", ["24"])[0],
+                        output_dir=app_settings.gif_exports_dir())
+                    result["setting_url"] = "/api/gif/files/" + quote(result.pop("setting_relative"), safe="/")
+                    result["zip_url"] = "/api/gif/files/" + quote(result.pop("zip_relative"), safe="/")
+                    self._json(result)
+                except ValueError as exc:
+                    self._json({"error": str(exc)}, 400)
+                return
+            if (m := re.fullmatch(r"/api/animation/([A-Za-z0-9_.-]+)/reference-video", path)):
+                package = self._package(m.group(1))
+                length = int(self.headers.get("Content-Length", 0))
+                if not 12 <= length <= MAX_REFERENCE_UPLOAD_BYTES:
+                    raise ValueError("reference MP4 must be between 12 bytes and 1 GB")
+                video_dir = package / package_layout.VIDEOS_DIR
+                video_dir.mkdir(parents=True, exist_ok=True)
+                target = video_dir / "reference.mp4"
+                temporary = video_dir / f".reference-{uuid.uuid4().hex}.tmp"
+                try:
+                    with temporary.open("wb") as destination:
+                        header = self.rfile.read(12)
+                        if len(header) != 12 or header[4:8] != b"ftyp":
+                            raise ValueError("upload an MP4 video")
+                        destination.write(header)
+                        remaining = length - len(header)
+                        while remaining:
+                            chunk = self.rfile.read(min(1024 * 1024, remaining))
+                            if not chunk:
+                                raise ValueError("reference video upload ended early")
+                            destination.write(chunk)
+                            remaining -= len(chunk)
+                    temporary.replace(target)
+                finally:
+                    temporary.unlink(missing_ok=True)
+                self._json({"ok": True, "name": target.name})
+                return
             length = int(self.headers.get("Content-Length", 0))
             raw_body = self.rfile.read(length)
-            # The audio upload is multipart; only JSON routes parse JSON here.
+            # Audio uses multipart; the reference upload is streamed above.
             config = json.loads(raw_body or b"{}") if not path.endswith("/audio") else {}
+            if path == "/api/gif/settings":
+                saved = app_settings.load()
+                if config.get("use_default"):
+                    saved.pop("gif_exports_path", None)
+                else:
+                    raw = str(config.get("path") or "").strip()
+                    if not raw:
+                        self._json({"error": "GIF export folder path is required"}, 400)
+                        return
+                    target = Path(raw).expanduser()
+                    if not target.is_absolute():
+                        target = APP_ROOT.parent / target
+                    target = target.resolve()
+                    if target.exists() and not target.is_dir():
+                        self._json({"error": "Choose a folder, not a file"}, 400)
+                        return
+                    target.mkdir(parents=True, exist_ok=True)
+                    saved["gif_exports_path"] = str(target)
+                app_settings.save(saved)
+                self._json({"path": str(app_settings.gif_exports_dir()),
+                            "default_path": str(app_settings.exports_dir().resolve() / "gif-loops"),
+                            "using_default": not bool(saved.get("gif_exports_path"))})
+                return
             if path == "/api/client-log":
                 LOGGER.error("CLIENT package=%s message=%s stack=%s",
                              str(config.get("package", ""))[:120],

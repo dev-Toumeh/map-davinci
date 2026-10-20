@@ -132,7 +132,7 @@ def ensure_images(package: Path, metadata: dict, animation: dict,
     """Generate missing close-up plates and reuse deterministic cached files."""
     if not plans:
         return plans
-    source_key = metadata.get("imagery", {}).get("source", "google_satellite")
+    source_key = metadata.get("imagery", {}).get("source", "esri_world_imagery")
     source = exporter.SOURCES[source_key]
     output = animation["output"]
     image_dir = package / package_layout.closeups_relative(package)

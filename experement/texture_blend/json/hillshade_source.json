@@ -1,0 +1,13 @@
+{
+  "service": "https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/export",
+  "parameters": {
+    "bbox": "4658577.133019739,2576752.645970212,7048358.935517214,3921004.9098750413",
+    "bboxSR": 3857,
+    "imageSR": 3857,
+    "size": "3840,2160",
+    "format": "png",
+    "f": "image"
+  },
+  "attribution": "Sources: Esri, Vantor, Airbus DS, USGS, NGA, NASA, CGIAR, N Robinson, NCEAS, NLS, OS, NMA, Geodatastyrelsen, Rijkswaterstaat, GSA, Geoland, FEMA, Intermap, and the GIS user community",
+  "method": "Esri geographic hillshade exported with the identical EPSG:3857 extent as the satellite image"
+}

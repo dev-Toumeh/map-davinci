@@ -51,6 +51,17 @@ def google_maps_api_key() -> str:
                load().get("google_maps_api_key") or "").strip()
 
 
+def gif_exports_dir() -> Path:
+    """GIF-specific override; otherwise use the current map export folder."""
+    raw = str(load().get("gif_exports_path") or "").strip()
+    if not raw:
+        return exports_dir().resolve() / "gif-loops"
+    path = Path(raw).expanduser()
+    if not path.is_absolute():
+        path = APP_ROOT.parent / path
+    return path.resolve()
+
+
 def has_google_maps_api_key() -> bool:
     return bool(google_maps_api_key())
 

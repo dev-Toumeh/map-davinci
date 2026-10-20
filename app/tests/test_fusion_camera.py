@@ -109,13 +109,45 @@ class CameraProjectionTests(unittest.TestCase):
         self.assertIn('Map_3D_Camera = Camera3D', content)
         self.assertIn('Map_3D_Renderer = Renderer3D', content)
         self.assertIn('Country_Edit_01_Plane = ImagePlane3D', content)
-        self.assertIn('MaterialInput = Input { SourceOp = "Country_Edit_01_Mode"', content)
+        self.assertIn('TST_Local_Elements_MultiMerge = MultiMerge', content)
+        self.assertIn('Background = Input { SourceOp = "Country_Edit_01_Enabled"', content)
+        self.assertIn('TST_Border_Highlight_Group = GroupOperator', content)
+        self.assertNotIn('TST_Border_Settings', content)
+        self.assertNotIn('TST_Flag_Adjust', content)
+        self.assertIn('TST_Border_Highlight_Path = PolylineMask', content)
+        self.assertIn('Blend = Input { Value = 0,', content)
+        highlight = content.split("TST_Border_Highlight_Merge = Merge", 1)[1]
+        self.assertIn('SourceOp = "TST_Local_Elements_MultiMerge"', highlight)
+        self.assertIn('MaterialInput = Input { SourceOp = "TST_Border_Highlight_Merge"', content)
         self.assertIn('SceneInput3 = Input { SourceOp = "Country_Edit_01_Plane"', content)
         self.assertNotIn('Country_Vector_Canvas = Background', content)
         self.assertIn('Width = Input { Value = 2160', content)
         self.assertIn('Height = Input { Value = 3840', content)
         self.assertNotIn('Map_Animation = Transform', content)
         self.assertNotIn('Final_Composite = Merge', content)
+
+    def test_3d_camera_uses_only_authored_frames(self):
+        animation = {"output": {"width": 2160, "height": 3840,
+                                "duration_frames": 121},
+                     "keyframes": [
+                         {"frame": 0, "center": {"x": .5, "y": .5},
+                          "view_width": .3},
+                         {"frame": 48, "center": {"x": .55, "y": .46},
+                          "view_width": .12, "easing": "smooth"},
+                         {"frame": 120, "center": {"x": .6, "y": .4},
+                          "view_width": .08, "easing": "linear"}],
+                     "connections": []}
+        metadata = {"output": {"width": 3840, "height": 2160,
+                               "wide_factor": 2}, "countries": []}
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("fusion.generator.closeup_lod.plan_closeups", return_value=[]):
+                content = generate(Path(tmp), metadata, animation, mode="3d").read_text()
+        for axis in ("X", "Y", "Z", "Target_X", "Target_Y"):
+            section = content.split(f"Map_3D_Camera_{axis} = BezierSpline", 1)[1].split("\n\t\t\t} },", 1)[0]
+            self.assertEqual([int(frame) for frame in re.findall(r"\[(\d+)\] = \{", section)],
+                             [0, 48, 120])
+            self.assertIn("RH =", section)
+            self.assertIn("LH =", section)
 
     def test_browser_projection_at_every_frame(self):
         for output in [(2160, 3840), (1920, 1080), (1080, 1080)]:

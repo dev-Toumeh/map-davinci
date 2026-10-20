@@ -1,0 +1,713 @@
+Composition {
+	CurrentTime = 158,
+	RenderRange = { 0, 2159 },
+	GlobalRange = { 0, 2159 },
+	CurrentID = 42,
+	PlaybackUpdateMode = 0,
+	StereoMode = false,
+	Version = "DaVinci Resolve 21.1.0.0015",
+	SavedOutputs = 0,
+	HeldTools = 0,
+	DisabledTools = 0,
+	LockedTools = 0,
+	AudioOffset = 0,
+	Resumable = true,
+	OutputClips = {
+	},
+	Tools = {
+		MediaIn1 = Loader {
+			CustomData = {
+				MediaProps = {
+					MEDIA_FORMAT_TYPE = "PNG",
+					MEDIA_HEIGHT = 2160,
+					MEDIA_ID = "40d3285c-9505-4a81-8f21-4c328ced9c82",
+					MEDIA_IS_SOURCE_RES = true,
+					MEDIA_LAYER_DESC = {
+					},
+					MEDIA_MARK_IN = 0,
+					MEDIA_MARK_OUT = 0,
+					MEDIA_NAME = "satellite_wide.png",
+					MEDIA_NUM_FRAMES = 1,
+					MEDIA_NUM_LAYERS = 0,
+					MEDIA_PAR = 1,
+					MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/qatar_2/images/satellite_wide.png",
+					MEDIA_SRC_FRAME_RATE = 24,
+					MEDIA_START_FRAME = 0,
+					MEDIA_WIDTH = 3840
+				},
+				MEDIA_ID = "40d3285c-9505-4a81-8f21-4c328ced9c82",
+			},
+			Inputs = {
+				GlobalOut = Input { Value = 2159, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "40d3285c-9505-4a81-8f21-4c328ced9c82", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { -107.023, 279.901 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/qatar_2/images/satellite_wide.png",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalEnd = 2159,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+		Left = AudioDisplay {
+		},
+		Right = AudioDisplay {
+			CtrlWZoom = false,
+		},
+		Qatar_Terrain_GradeLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Terrain_GradeLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Terrain_GradeLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Terrain_GradeLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		Qatar_Paper_BlendLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Paper_BlendLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Paper_BlendLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Paper_BlendLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		Qatar_Archival_OutputLUTIn1 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Archival_OutputLUTIn2 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Archival_OutputLUTIn3 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			NameSet = true,
+		},
+		Qatar_Archival_OutputLUTIn4 = LUTBezier {
+			KeyColorSplines = {
+				[0] = {
+					[0] = { 0, RH = { 0.333333333333333, 0.333333333333333 }, Flags = { Linear = true } },
+					[1] = { 1, LH = { 0.666666666666667, 0.666666666666667 }, Flags = { Linear = true } }
+				}
+			},
+			SplineColor = { Red = 0, Green = 0, Blue = 0 },
+			CtrlWZoom = false,
+			NameSet = true,
+		},
+		MediaOut1 = Saver {
+			Inputs = {
+				Index = Input { Value = "0", },
+				Input = Input {
+					SourceOp = "Qatar_Archival_Output",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 1169.85, 188.645 } },
+		},
+		Qatar_Archival_v002 = GroupOperator {
+			Inputs = ordered() {
+				Control2 = InstanceInput {
+					SourceOp = "Qatar_Terrain_Grade",
+					Source = "NumberIn2",
+					Name = "Land warmth",
+				},
+				Vignette = InstanceInput {
+					SourceOp = "Qatar_Archival_Output",
+					Source = "NumberIn1",
+					Name = "Edge shading",
+				},
+				Control3 = InstanceInput {
+					SourceOp = "Qatar_Terrain_Grade",
+					Source = "NumberIn3",
+					Name = "Teal water",
+				},
+				Control4 = InstanceInput {
+					SourceOp = "Qatar_Terrain_Grade",
+					Source = "NumberIn4",
+					Name = "Brightness gamma",
+				},
+				MainInput1 = InstanceInput {
+					SourceOp = "Qatar_Terrain_Grade",
+					Source = "Image1",
+				},
+				Control1 = InstanceInput {
+					SourceOp = "Qatar_Terrain_Grade",
+					Source = "NumberIn1",
+					Name = "Terrain contrast",
+				},
+				Texture = InstanceInput {
+					SourceOp = "Qatar_Paper_Blend",
+					Source = "NumberIn1",
+					Name = "Paper texture",
+				}
+			},
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "Qatar_Archival_Output",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo {
+				Pos = { 500.722, 186.931 },
+				Flags = {
+					Expanded = true,
+					AllowPan = false,
+					AutoSnap = true,
+					RemoveRouters = true
+				},
+				Size = { 593.843, 261.839, 310.843, 21.0785 },
+				Direction = "Horizontal",
+				PipeStyle = "Direct",
+				Scale = 1,
+				Offset = { 0, 0 }
+			},
+			Tools = ordered() {
+				Qatar_Paper_Texture = Loader {
+					Clips = {
+						Clip {
+							ID = "Clip1",
+							Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/archival_map_effect_test/images/paper_texture.png",
+							FormatID = "PNGFormat",
+							StartFrame = -1,
+							LengthSetManually = true,
+							TrimIn = 0,
+							TrimOut = 0,
+							ExtendFirst = 0,
+							ExtendLast = 0,
+							Loop = 1,
+							AspectMode = 0,
+							Depth = 0,
+							TimeCode = 0,
+							GlobalStart = 0,
+							GlobalEnd = 1000000
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { -220, 148.758 } },
+				},
+				Qatar_Paper_Canvas = Background {
+					Inputs = {
+						GlobalOut = Input { Value = 2159, },
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						TopLeftAlpha = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { -223.48, 101.566 } },
+				},
+				Qatar_Paper_Fit = Merge {
+					Inputs = {
+						Background = Input {
+							SourceOp = "Qatar_Paper_Canvas",
+							Source = "Output",
+						},
+						Foreground = Input {
+							SourceOp = "Qatar_Paper_Texture",
+							Source = "Output",
+						},
+						Size = Input { Value = 3.0622009569378, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 0, 148.758 } },
+				},
+				Qatar_Terrain_Grade = Custom {
+					Inputs = {
+						NumberIn1 = Input { Value = 1, },
+						NumberIn3 = Input { Value = 1.144, },
+						NumberIn4 = Input { Value = 1.427, },
+						NumberIn5 = Input { Value = 0.319, },
+						LUTIn1 = Input {
+							SourceOp = "Qatar_Terrain_GradeLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "Qatar_Terrain_GradeLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "Qatar_Terrain_GradeLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "Qatar_Terrain_GradeLUTIn4",
+							Source = "Value",
+						},
+						Intermediate1 = Input { Value = ".2126*r1+.7152*g1+.0722*b1", },
+						Intermediate2 = Input { Value = "min(1,max(0,(b1-r1-.025)*14))", },
+						RedExpression = Input { Value = "min(1,max(0,(((max(r1,0)^n4-.45)*n1+.45)+n2*1*(1-i2))*(1-n3*i2)+(i1*0.35)*n3*i2+n5*0.3*i2))", },
+						GreenExpression = Input { Value = "min(1,max(0,(((max(g1,0)^n4-.45)*n1+.45)+n2*0.3*(1-i2))*(1-n3*i2)+(i1*0.85)*n3*i2+n5*1*i2))", },
+						BlueExpression = Input { Value = "min(1,max(0,(((max(b1,0)^n4-.45)*n1+.45)+n2*-0.7*(1-i2))*(1-n3*i2)+(i1*0.9)*n3*i2+n5*1*i2))", },
+						Image1 = Input {
+							SourceOp = "MediaIn1",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { -215.36, 202.124 } },
+				},
+				Qatar_Paper_Blend = Custom {
+					Inputs = {
+						NumberIn1 = Input { Value = 0.45, },
+						LUTIn1 = Input {
+							SourceOp = "Qatar_Paper_BlendLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "Qatar_Paper_BlendLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "Qatar_Paper_BlendLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "Qatar_Paper_BlendLUTIn4",
+							Source = "Value",
+						},
+						Intermediate1 = Input { Value = "min(1,max(0,((r2+g2+b2)/3-.90)*7+.5))", },
+						RedExpression = Input { Value = "r1*(1-n1)+(if(i1<.5,r1-(1-2*i1)*r1*(1-r1),r1+(2*i1-1)*(sqrt(max(r1,0))-r1)))*n1", },
+						GreenExpression = Input { Value = "g1*(1-n1)+(if(i1<.5,g1-(1-2*i1)*g1*(1-g1),g1+(2*i1-1)*(sqrt(max(g1,0))-g1)))*n1", },
+						BlueExpression = Input { Value = "b1*(1-n1)+(if(i1<.5,b1-(1-2*i1)*b1*(1-b1),b1+(2*i1-1)*(sqrt(max(b1,0))-b1)))*n1", },
+						Image1 = Input {
+							SourceOp = "Qatar_Terrain_Grade",
+							Source = "Output",
+						},
+						Image2 = Input {
+							SourceOp = "Qatar_Paper_Fit",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 4.64044, 202.124 } },
+				},
+				Qatar_Archival_Output = Custom {
+					Inputs = {
+						NumberIn1 = Input { Value = 0.12, },
+						LUTIn1 = Input {
+							SourceOp = "Qatar_Archival_OutputLUTIn1",
+							Source = "Value",
+						},
+						LUTIn2 = Input {
+							SourceOp = "Qatar_Archival_OutputLUTIn2",
+							Source = "Value",
+						},
+						LUTIn3 = Input {
+							SourceOp = "Qatar_Archival_OutputLUTIn3",
+							Source = "Value",
+						},
+						LUTIn4 = Input {
+							SourceOp = "Qatar_Archival_OutputLUTIn4",
+							Source = "Value",
+						},
+						Intermediate1 = Input { Value = "min(1,((x-.5)*(x-.5)+(y-.5)*(y-.5))*2)", },
+						RedExpression = Input { Value = "r1*(1-n1*i1)", },
+						GreenExpression = Input { Value = "g1*(1-n1*i1)", },
+						BlueExpression = Input { Value = "b1*(1-n1*i1)", },
+						Image1 = Input {
+							SourceOp = "Qatar_Paper_Blend",
+							Source = "Output",
+						}
+					},
+					ViewInfo = OperatorInfo { Pos = { 224.64, 202.124 } },
+				}
+			},
+		}
+	},
+	Frames = {
+		{
+			FrameTypeID = "ChildFrame",
+			Mode = 3,
+			LayoutPreset = 0,
+			PresetName = "Default",
+			Left = 0,
+			Top = 0,
+			Width = 1920,
+			Height = 959,
+			ZoneInfo = {
+				AuxRight = { Expanded = true },
+				Right = { Expanded = true, },
+				Left = { Expanded = false, },
+				AuxLeft = { Expanded = true },
+				["!Left"] = {
+				},
+				["!Right"] = {
+				}
+			},
+			ViewInfo = {
+				Keyframes = { Show = false, },
+				LayoutStrip = { Show = true, },
+				Inspector = { Show = true, Adjust = false, RatioX = 100, RatioY = 1, MRU = 4 },
+				Effects = { Show = true, Adjust = false, RatioX = 1, RatioY = 99.835255354201, MRU = 3 },
+				Viewer2 = { Show = true, RatioX = 0.954418604651163, RatioY = 0.01, },
+				Comments = { Show = false },
+				Clips = { Show = false, },
+				ActionStrip = { Show = true, RatioX = 100, },
+				Time = { Show = true, RatioX = 100, },
+				MediaPool = { Show = false, Adjust = true, RatioX = 1, RatioY = 100.164744645799, MRU = 0 },
+				Nodes = { Show = true, RatioX = 1, RatioY = 100, },
+				Metadata = { Show = false, },
+				Viewer1 = { Show = true, Adjust = false, RatioX = 1.04558139534884, RatioY = 0.01, MRU = 5 },
+				Spline = { Show = false, },
+				OuterColumns = {
+					RatioX = 100,
+					RatioY = 1,
+				},
+				OuterLeft = {
+				},
+				CenterSplit = {
+					RatioX = 1,
+					RatioY = 100,
+				},
+				OuterRight = {
+					PixelX = 420,
+					RatioY = 100,
+				},
+				InnerColumns = {
+					RatioX = 100,
+					RatioY = 2.01655629139073,
+				},
+				MainSplit = {
+					RatioX = 100,
+					RatioY = 0.983443708609272,
+				},
+				InnerLeft = {
+					PixelX = 420,
+					RatioY = 100,
+				},
+				InnerRight = {
+				},
+				ViewerSplit = {
+					RatioX = 100,
+					RatioY = 1,
+				}
+			},
+			Views = ordered() {
+				MediaPool = "MediaPoolView",
+				Effects = MultiView {
+					Active = "EffectView",
+					ViewList = ordered() {
+						EffectView = "EffectView"
+					},
+				},
+				Nodes = MultiView {
+					Active = "FlowView",
+					ViewList = ordered() {
+						FlowView = "FlowView"
+					},
+					FlowView = FlowView {
+						Flags = {
+							AutoHideNavigator = true,
+							AutoSnap = true,
+							RemoveRouters = true
+						},
+						NavigatorSize = { 200, 140 },
+						Direction = "Horizontal",
+						PipeStyle = "Direct",
+						RootScale = 0.245987,
+						RootOffset = { 1440.08, 91.2049 }
+					}
+				},
+				Keyframes = MultiView {
+					Active = "TimelineView",
+					ViewList = ordered() {
+						TimelineView = "TimelineView"
+					},
+					TimelineView = TimelineView {
+						TreeControlState = {
+						},
+						DisplayMode = "All Tools",
+						ShowCurrentTimeTools = false,
+						Filter = "Show All",
+						ShowSelectedTools = false,
+						ShowAnimatedToolsOnly = false,
+						ShowEditBoxes = false,
+						KeyFrameView = {
+							Position = { Left = 232, Bottom = 323 },
+							ScaleX = 2.69031007751938,
+							OffsetX = -61.8771317829458,
+							OffsetY = 0,
+							AutoScaling = "scroll",
+							AutoSnapTo = "frame",
+							AutoSnapToGuidelines = true,
+							GuidelinesGrabEnabled = true,
+							GuidelinesSnapTo = "none"
+						},
+						Spreadsheet = { LeftPos = 232, Visible = false }
+					}
+				},
+				Spline = MultiView {
+					Active = "SplineView",
+					ViewList = ordered() {
+						SplineView = "SplineEditorView"
+					},
+					SplineView = SplineEditorView {
+						LeftPos = 264,
+						ScaleX = 0.2,
+						ScaleY = 0.00335570469798658,
+						OffsetX = -3.39999999999999,
+						OffsetY = 0,
+						AutoScaling = "scroll",
+						AutoSnapTo = "frame",
+						AutoSnapToGuidelines = true,
+						GuidelinesSnapTo = "frame",
+						ShowKeyMarkers = false,
+						IndependentHandles = false,
+						ShowNonSplineModifiers = false,
+						GuidelinesGrabEnabled = true,
+						ShowOneToolOnly = false,
+						ShowSelectedTools = false,
+						ShowAllInputs = false,
+						Filter = "Show All"
+					}
+				},
+				Inspector = MultiView {
+					Active = "Tools",
+					ViewList = ordered() {
+						Tools = "ControlView",
+						Modifiers = "ModifierView"
+					},
+				},
+				Viewer1 = MultiView {
+					Active = "LeftView",
+					ViewList = ordered() {
+						LeftView = "PreviewContainer"
+					},
+				},
+				Viewer2 = MultiView {
+					Active = "RightView",
+					ViewList = ordered() {
+						RightView = "PreviewContainer"
+					},
+				},
+				Time = "TimeView",
+				ActionStrip = "ActionStripView",
+				LayoutStrip = "LayoutStripView",
+				Clips = "ClipsView",
+				Metadata = "MetadataView"
+			},
+			Layout = {
+				{ ID = "LayoutStrip", FixedY = 36, Resolve = false, Flat = true },
+				{
+					{
+						{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+						{ ID = "Effects", RatioX = 1 },
+						Zone = "Left",
+						Rows = 2,
+						PaneID = "OuterLeft",
+						PixelX = 420
+					},
+					{
+						{
+							{
+								{ ID = "MediaPool", Fusion = false, RatioX = 1 },
+								{ ID = "Effects", RatioX = 1 },
+								PaneID = "InnerLeft",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Left"
+							},
+							{
+								{
+									{ ID = "Viewer1", RatioY = 0.01, RatioX = 1 },
+									{ ID = "Viewer2", RatioX = 1 },
+									RatioY = 1,
+									Columns = 2,
+									PaneID = "ViewerSplit"
+								},
+								{ ID = "Time", FixedY = 83, Photo = false, Flat = true },
+								RatioX = 1,
+								Rows = 2
+							},
+							{
+								{ ID = "Inspector", RatioY = 1 },
+								{ ID = "Metadata", RatioY = 1, Fusion = false },
+								PaneID = "InnerRight",
+								MaxViews = 1,
+								PixelX = 420,
+								Rows = 2,
+								Zone = "!Right"
+							},
+							RatioY = 2,
+							Columns = 3,
+							PaneID = "InnerColumns"
+						},
+						{ ID = "ActionStrip", FixedY = 50, Flat = true },
+						{
+							{ ID = "Nodes", RatioX = 1 },
+							{ ID = "Spline", Photo = false, RatioX = 1 },
+							{ ID = "Keyframes", Photo = false, RatioX = 1 },
+							RatioY = 1,
+							Columns = 3,
+							PaneID = "MainSplit"
+						},
+						{ Fusion = false, ID = "Clips", LARGE_FixedY = 160, MEDIUM_FixedY = 138, SMALL_FixedY = 110 },
+						RatioX = 1,
+						Rows = 4,
+						PaneID = "CenterSplit"
+					},
+					{
+						{ ID = "Inspector", RatioY = 1 },
+						{ ID = "Metadata", RatioY = 1, Fusion = false },
+						Zone = "Right",
+						Rows = 2,
+						PaneID = "OuterRight",
+						PixelX = 420
+					},
+					RatioY = 1,
+					Columns = 3,
+					PaneID = "OuterColumns"
+				},
+				RatioX = 1,
+				Rows = 2,
+				RatioY = 1
+			},
+			TopBar = {
+				Left = { "Left", "MediaPool", "Effects", "Clips", "Nodes", "Console" },
+				Right = { "Spline", "Keyframes", "Metadata", "Inspector", "Right" }
+			}
+		}
+	},
+	Prefs = {
+		Comp = {
+			Interactive = {
+				Proxy = {
+					Scale = 1,
+				},
+			},
+			Views = {
+				RightView = {
+					Viewer = {
+						ScaleMode = 1,
+						Layer = ":Default",
+					},
+				},
+				LeftView = {
+					Viewer = {
+						ScaleMode = 1,
+						Layer = ":Default",
+					},
+				},
+			},
+			Paths = {
+				Map = {
+					["ResolveCaches:"] = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/exports/CacheClip/b2c6716b-ce13-4f40-b4be-fa9d1bc17852/8fb5b325-5f6c-40b5-aa52-717aa7a82683/2eab5a86-c6c5-4963-96c9-f33e9b27b651/Fusion",
+				},
+			},
+			FrameFormat = {
+				Rate = 24,
+				DepthFull = 3,
+				DepthPreview = 3,
+				DepthInteractive = 3,
+			},
+			Unsorted = {
+				GlobalEnd = 2159
+			},
+			SpellCheck = {
+			},
+		}
+	},
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Archive Carousel — Fusion</title><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+ <header><div><h1>Archive Carousel</h1><p>Videos and photos, framed and moving along one shared route.</p></div><a id="back" href="http://127.0.0.1:8787/">Back to map</a></header>
+ <form id="form">
+ <fieldset id="editor">
+ <section class="settings" aria-labelledby="settings-heading">
+  <h2 id="settings-heading">Composition</h2>
+  <div class="grid">
+   <label>Group name<input id="name" value="ArchiveCarousel" maxlength="56" required></label>
+   <label>Card aspect ratio<select id="aspect"><option>4:3</option><option>16:9</option><option>1:1</option><option>9:16</option></select></label>
+   <label>Timeline FPS<input id="fps" type="number" min="1" max="120" step="any" value="24" required></label>
+   <label>Movement (frames)<input id="movement" type="number" min="1" max="240" step="1" value="10" required></label>
+  </div>
+  <p class="note">Transparent 3840 × 2160 output. The first entrance, later entrances, and exits all use the movement length above. Match the FPS in Fusion.</p>
+ </section>
+ <section class="sequence" aria-labelledby="sequence-heading">
+  <div class="section-head"><h2 id="sequence-heading">Your sequence</h2><button type="button" id="add">Add video or photo</button></div>
+  <p class="note">Choose files in playback order. Section duration includes movement; adjacent cards move together at each handoff. Photos default to 2 seconds.</p>
+  <div id="items"></div>
+  <div class="timeline"><strong id="total">0 seconds</strong><span id="timing-note">Select media to prepare the sequence.</span></div>
+ </section>
+ <section class="destination" aria-labelledby="export-heading">
+  <h2 id="export-heading">Export</h2>
+  <label>Export folder<input id="folder" placeholder="Loading destination…" required></label>
+  <div class="actions"><button type="button" id="save-folder">Save folder</button><button type="button" id="default-folder">Use default</button></div>
+  <p class="note">The tool includes your selected media ranges and film artwork. Keep the generated folder in place, or relink its Loaders after moving it.</p>
+  <button class="primary" id="generate" type="submit">Generate Fusion group</button>
+ </section>
+ </fieldset>
+ </form>
+ <div id="feedback" role="status" aria-live="polite"><p id="status">Ready. Add your media to begin.</p><progress id="progress" max="100" value="0" hidden></progress></div>
+ <section id="result" hidden aria-labelledby="result-heading">
+  <h2 id="result-heading">Fusion group ready</h2><p id="details"></p>
+  <div class="actions"><a class="button primary" id="setting" download>Download setting</a><a class="button" id="package" download>Download package</a><button id="copy" type="button">Copy setting path</button></div>
+  <code id="path"></code><p class="note">Drag the .setting into Fusion. Set the composition’s global start to frame 0 and use the FPS and end frame shown above. Open the group to edit native nodes. Output is silent; the last card stays centered.</p>
+ </section>
+</main>
+<template id="item-template">
+ <article class="item">
+  <div class="item-head"><h3></h3><div class="actions reorder"><button type="button" data-action="up">Move up</button><button type="button" data-action="down">Move down</button><button type="button" data-action="remove">Remove</button></div></div>
+  <div class="item-body"><div class="thumb"><img alt="" hidden><span>No media selected</span></div><div class="item-fields">
+   <label>Video or photo<input class="file" type="file" accept="video/*,image/png,image/jpeg,image/webp,image/tiff,image/bmp" required></label>
+   <p class="metadata">Videos: MP4, MOV, MKV, WebM, AVI. Photos: PNG, JPEG, WebP, TIFF, BMP.</p>
+   <div class="fields"><label>Source start (seconds)<input class="start" type="number" min="0" step="0.001" value="0" required></label><label>Section duration (seconds)<input class="duration" type="number" min="0.001" step="0.001" value="5" required></label><label>Media fitting<select class="fit"><option value="fill">Fill / center crop</option><option value="fit">Fit / black padding</option></select></label></div>
+   <p class="range"></p>
+  </div></div>
+ </article>
+</template>
+<script src="/app.js"></script>
+</body></html>

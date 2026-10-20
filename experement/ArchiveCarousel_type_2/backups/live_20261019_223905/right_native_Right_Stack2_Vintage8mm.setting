@@ -1,0 +1,44 @@
+{
+ Tools = ordered() {
+		Right_Stack2_Vintage8mm = MediaIn {
+			CustomData = { MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MediaProps = { __Queried = true, MEDIA_NUM_LAYERS = 0, MEDIA_FORMAT_TYPE = "PNG", MEDIA_PATH = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png", MEDIA_START_FRAME = 0, MEDIA_LAYER_DESC = {
+					}, MEDIA_NAME = "Vintage 8mm Film.png", MEDIA_HEIGHT = 1086, MEDIA_SRC_FRAME_RATE = 24, MEDIA_IS_SOURCE_RES = true, MEDIA_ID = "85583b41-424d-4433-9be0-3060e9420f5d", MEDIA_MARK_OUT = 0, MEDIA_WIDTH = 1448, MEDIA_NUM_FRAMES = 1, MEDIA_MARK_IN = 0, MEDIA_PAR = 1 }, },
+			Inputs = {
+				GlobalOut = Input { Value = 837, },
+				MediaSource = Input { Value = FuID { "MediaPool" }, },
+				MediaID = Input { Value = "85583b41-424d-4433-9be0-3060e9420f5d", },
+				AudioTrack = Input { Value = FuID { "Timeline Audio" }, },
+				Layer = Input { Value = "", },
+				ClipTimeEnd = Input { Value = 0, },
+				Loop = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				DeepOutputMode = Input {
+					Value = 0,
+					Disabled = true,
+				},
+				LeftAudio = Input {
+					SourceOp = "Left",
+					Source = "Data",
+				},
+				RightAudio = Input {
+					SourceOp = "Right",
+					Source = "Data",
+				},
+			},
+			ViewInfo = OperatorInfo { Pos = { 1726.49, 78.1753 } },
+			Version = 1,
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Multiframe = true,
+					Filename = "/Users/naseemtoumeh/edit-projects/general/VFX assets/frames/Vintage 8mm Film.png",
+					Length = 1,
+					LengthSetManually = true,
+					GlobalEnd = 837,
+					TrimOut = 0,
+					Loop = 0
+				}
+			}
+		},
+ },
+}

@@ -1,0 +1,132 @@
+{
+	Tools = ordered() {
+		dotedmovinglines = MacroOperator {
+			CtrlWZoom = false,
+			Outputs = {
+				MainOutput1 = InstanceOutput {
+					SourceOp = "MultiMerge3_1_1_1",
+					Source = "Output",
+				}
+			},
+			ViewInfo = GroupInfo { Pos = { 0, 0 } },
+			Tools = ordered() {
+				Dots_On_Path_2 = TextPlus {
+					CtrlWShown = false,
+					NameSet = true,
+					Inputs = {
+						Width = Input { Value = 1920, },
+						Height = Input { Value = 1080, },
+						UseFrameFormatSettings = Input { Value = 1, },
+						LayoutType = Input { Value = 3, },
+						Center = Input { Value = { 0.559585492227979, 0.457787481804949 }, },
+						PositionOnPath = Input {
+							Value = 0.0105,
+							Expression = "(time % 24) * 0.0015",
+						},
+						AngleZ = Input { Value = -29.7146860586863, },
+						Path = Input {
+							Value = Polyline {
+								Points = {
+									{ X = -0.111155262782833, Y = -0.103532753804665, RX = 0.0753770926873075, RY = 0.105525130948363 },
+									{ X = 0, Y = 0.1, LX = -0.0117833297624318, LY = -0.0560316692612833, RX = 0.00686137163521317, RY = 0.0326269495884602 },
+									{ X = -0.00427500094351231, Y = 0.209871531481914, LX = 0.0336400891950538, LY = -0.0396365414059345 }
+								}
+							},
+						},
+						StyledText = Input { Value = "●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●   ●", },
+						Font = Input { Value = "Arial", },
+						Style = Input { Value = "Regular", },
+						Size = Input { Value = 0.028, },
+						VerticalJustificationNew = Input { Value = 3, },
+						HorizontalJustificationNew = Input { Value = 3, }
+					},
+					ViewInfo = OperatorInfo { Pos = { -154.554, -602.618 } },
+					Version = 1
+				},
+				Merge1_2 = Merge {
+					CtrlWShown = false,
+					Inputs = {
+						Background = Input {
+							SourceOp = "Dots_On_Path_2",
+							Source = "Output",
+						},
+						PerformDepthMerge = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { -32.1354, -602.62 } },
+				},
+				MultiMerge3_1_1_1 = MultiMerge {
+					CtrlWShown = false,
+					Inputs = {
+						LayerOrder = Input { Value = ScriptVal { { [0] = 1, 2, 4 } }, },
+						Background = Input {
+							SourceOp = "Background3_1_1_1",
+							Source = "Output",
+						},
+						["Layer1.Foreground"] = Input {
+							SourceOp = "Merge1_2",
+							Source = "Output",
+						},
+						["Layer1.Blend"] = Input {
+							SourceOp = "MultiMerge3_1_1_1Dots_On_PathLayerLayer1Blend",
+							Source = "Value",
+						},
+						LayerName1 = Input { Value = "Dots_On_Path Layer", },
+						["Layer2.Center"] = Input { Value = { 0.686, 0.364 }, },
+						["Layer2.Size"] = Input { Value = 0.48, },
+						["Layer2.Blend"] = Input {
+							SourceOp = "MultiMerge3_1_1_1indea_FlagLayer2Blend",
+							Source = "Value",
+						},
+						LayerName2 = Input { Value = "indea_Flag", },
+						["Layer4.Center"] = Input { Value = { 0.478, 0.391 }, },
+						["Layer4.Size"] = Input { Value = 0.543, },
+						["Layer4.Blend"] = Input {
+							SourceOp = "MultiMerge3_1_1_1MediaIn4Pirate_FlagsvgwebpLayerLayer4Blend",
+							Source = "Value",
+						},
+						LayerName4 = Input { Value = "MediaIn4: Pirate_Flag.svg.webp Layer", }
+					},
+					ViewInfo = OperatorInfo { Pos = { 107.096, -595.597 } },
+				},
+				MultiMerge3_1_1_1Dots_On_PathLayerLayer1Blend = BezierSpline {
+					SplineColor = { Red = 229, Green = 94, Blue = 98 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[999] = { 0, RH = { 1011.66666666667, 0.333333333333333 }, Flags = { Linear = true } },
+						[1037] = { 1, LH = { 1024.33333333333, 0.666666666666667 }, Flags = { Linear = true } }
+					}
+				},
+				MultiMerge3_1_1_1indea_FlagLayer2Blend = BezierSpline {
+					SplineColor = { Red = 227, Green = 94, Blue = 229 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[1136] = { 0, RH = { 1138.66666666667, 0.333333333333333 }, Flags = { Linear = true } },
+						[1144] = { 1, LH = { 1141.33333333333, 0.666666666666667 }, Flags = { Linear = true } }
+					}
+				},
+				MultiMerge3_1_1_1MediaIn4Pirate_FlagsvgwebpLayerLayer4Blend = BezierSpline {
+					SplineColor = { Red = 229, Green = 94, Blue = 186 },
+					CtrlWZoom = false,
+					KeyFrames = {
+						[1136] = { 0, RH = { 1138.66666666667, 0.333333333333333 }, Flags = { Linear = true } },
+						[1144] = { 1, LH = { 1141.33333333333, 0.666666666666667 }, Flags = { Linear = true } }
+					}
+				},
+				Background3_1_1_1 = Background {
+					CtrlWZoom = false,
+					CtrlWShown = false,
+					Inputs = {
+						Width = Input { Value = 3840, },
+						Height = Input { Value = 2160, },
+						PixelAspect = Input { Value = { 1, 1.424 }, },
+						Depth = Input { Value = 2, },
+						["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+						TopLeftAlpha = Input { Value = 0, }
+					},
+					ViewInfo = OperatorInfo { Pos = { 250.682, -591.904 } },
+				}
+			},
+		}
+	},
+	ActiveTool = "dotedmovinglines"
+}
