@@ -1,0 +1,94 @@
+{
+	Tools = ordered() {
+		Curve_Reveal_2D = GroupOperator {
+ NameSet = true,
+ Inputs = ordered() {
+  MainInput1 = InstanceInput { SourceOp = "Reveal_Image", Source = "Input", Name = "Image", },
+  StartFrame = InstanceInput { SourceOp = "Reveal_Output", Source = "StartFrame", Name = "Start Frame", },
+  Duration = InstanceInput { SourceOp = "Reveal_Output", Source = "Duration", Name = "Duration (frames)", },
+  Reverse = InstanceInput { SourceOp = "Reveal_Output", Source = "Reverse", Name = "Reverse", },
+  StrokeWidth = InstanceInput { SourceOp = "Reveal_Path", Source = "BorderWidth", Name = "Reveal Width", },
+  Softness = InstanceInput { SourceOp = "Reveal_Path", Source = "SoftEdge", Name = "Edge Softness", },
+  CanvasWidth = InstanceInput { SourceOp = "Reveal_Canvas", Source = "Width", Name = "Canvas Width", },
+  CanvasHeight = InstanceInput { SourceOp = "Reveal_Canvas", Source = "Height", Name = "Canvas Height", },
+ },
+ Outputs = { MainOutput1 = InstanceOutput { SourceOp = "Reveal_Complete", Source = "Output", }, },
+ ViewInfo = GroupInfo { Pos = { 0, 0 } },
+ Tools = ordered() {
+  Reveal_Image = Transform {
+   NameSet = true,
+   Inputs = { Input = Input { }, Size = Input { Value = 1, }, },
+   ViewInfo = OperatorInfo { Pos = { 0, 0 } },
+  },
+  Reveal_Canvas = Background {
+   NameSet = true,
+   Inputs = {
+    Width = Input { Value = 512, }, Height = Input { Value = 512, },
+    UseFrameFormatSettings = Input { Value = 0, },
+    TopLeftAlpha = Input { Value = 0, },
+   },
+   ViewInfo = OperatorInfo { Pos = { 0, 90 } },
+  },
+  Reveal_Path = PolylineMask {
+   NameSet = true,
+   DrawMode = "ClickAppend",
+   Inputs = {
+    Solid = Input { Value = 0, },
+    BorderWidth = Input { Value = 0.56, },
+    SoftEdge = Input { Value = 0.006, },
+    MaskWidth = Input { Value = 512, Expression = "Reveal_Canvas.Width", },
+    MaskHeight = Input { Value = 512, Expression = "Reveal_Canvas.Height", },
+    UseFrameFormatSettings = Input { Value = 0, },
+    PixelAspect = Input { Value = { 1, 1 }, },
+    ClippingMode = Input { Value = FuID { "None" }, },
+    Level = Input { Expression = "iif(time < Reveal_Output.StartFrame, 0, 1)", },
+    WriteLength = Input { Expression = "Reveal_Output.Progress * Reveal_Output.Progress * (3 - 2 * Reveal_Output.Progress)", },
+    WritePosition = Input { Expression = "iif(Reveal_Output.Reverse > 0.5, 1 - Reveal_Path.WriteLength, 0)", },
+    Polyline = Input {
+     Value = Polyline {
+      Closed = false,
+      Points = {
+       { X = -0.40, Y = 0.72, RX = 0, RY = -0.18 },
+       { X = -0.39, Y = 0.12, LX = -0.015, LY = 0.20, RX = 0.04, RY = -0.15 },
+       { X = -0.18, Y = -0.16, LX = -0.10, LY = 0.07, RX = 0.12, RY = -0.08 },
+       { X = 0.20, Y = -0.23, LX = -0.12, LY = 0, RX = 0.15, RY = 0 },
+       { X = 0.68, Y = -0.23, LX = -0.16, LY = 0 },
+      },
+     },
+    },
+   },
+   ViewInfo = OperatorInfo { Pos = { 220, -90 } },
+  },
+  Reveal_Output = Merge {
+   NameSet = true,
+   Inputs = {
+    Background = Input { SourceOp = "Reveal_Canvas", Source = "Output", },
+    Foreground = Input { SourceOp = "Reveal_Image", Source = "Output", },
+    EffectMask = Input { SourceOp = "Reveal_Path", Source = "Mask", },
+    StartFrame = Input { Value = 429, },
+    Duration = Input { Value = 24, },
+    Reverse = Input { Value = 0, },
+    Progress = Input { Expression = "min(1, max(0, (time - Reveal_Output.StartFrame) / max(1, Reveal_Output.Duration)))", },
+   },
+   UserControls = ordered() {
+    StartFrame = { LINKS_Name = "Start Frame", LINKID_DataType = "Number", INPID_InputControl = "SliderControl", INP_Default = 0, INP_MinScale = 0, INP_MaxScale = 1262, ICS_ControlPage = "Controls", },
+    Duration = { LINKS_Name = "Duration (frames)", LINKID_DataType = "Number", INPID_InputControl = "SliderControl", INP_Default = 24, INP_MinAllowed = 1, INP_MinScale = 1, INP_MaxScale = 120, ICS_ControlPage = "Controls", },
+    Reverse = { LINKS_Name = "Reverse", LINKID_DataType = "Number", INPID_InputControl = "CheckboxControl", INP_Default = 0, ICS_ControlPage = "Controls", },
+    Progress = { LINKS_Name = "Progress (automatic)", LINKID_DataType = "Number", INPID_InputControl = "SliderControl", INP_Default = 0, INP_MinScale = 0, INP_MaxScale = 1, ICS_ControlPage = "Controls", },
+   },
+   ViewInfo = OperatorInfo { Pos = { 220, 0 } },
+  },
+  Reveal_Complete = Dissolve {
+   NameSet = true,
+   Inputs = {
+    Background = Input { SourceOp = "Reveal_Output", Source = "Output", },
+    Foreground = Input { SourceOp = "Reveal_Image", Source = "Output", },
+    Mix = Input { Expression = "min(1, max(0, Reveal_Output.Progress * 10 - 9))", },
+   },
+   ViewInfo = OperatorInfo { Pos = { 440, 0 } },
+  },
+ },
+}
+	},
+	ActiveTool = "Curve_Reveal_2D"
+}

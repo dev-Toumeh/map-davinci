@@ -91,19 +91,26 @@ def _local_points(content: str, country_prefix: str,
 
 def _nodes(country_prefix: str, points: list[tuple[float, float]],
            duration: int, width: int, height: int,
-           mode_name: str = "Country_Edit_01_Mode", row: int = 360) -> str:
+           mode_name: str | None = None, row: int = 360,
+           overlay_only: bool = False) -> str:
+    mode_name = mode_name or f"{country_prefix}_Enabled"
     point_text = ", ".join(
         f"{{ Linear = true, X = {x:.12g}, Y = {y:.12g}, LX = 0, LY = 0, RX = 0, RY = 0 }}"
         for x, y in points)
-    path = f"{country_prefix}_Border_Highlight_Path"
-    core = f"{country_prefix}_Border_Highlight_Core"
-    transparent = f"{country_prefix}_Border_Highlight_Transparent"
-    inner = f"{country_prefix}_Border_Highlight_Inner_Glow"
-    outer = f"{country_prefix}_Border_Highlight_Outer_Glow"
-    outer_merge = f"{country_prefix}_Border_Highlight_Outer_Merge"
-    inner_merge = f"{country_prefix}_Border_Highlight_Inner_Merge"
-    layers = f"{country_prefix}_Border_Highlight_Layers"
-    final = f"{country_prefix}_Border_Highlight_Merge"
+    # Resolve can bind duplicate child IDs across different groups on import.
+    # Keep every ID globally unique, without the redundant Highlight label.
+    path = f"{country_prefix}_Path"
+    core = f"{country_prefix}_Core"
+    transparent = f"{country_prefix}_Transparent"
+    inner = f"{country_prefix}_Inner_Glow"
+    outer = f"{country_prefix}_Outer_Glow"
+    outer_merge = f"{country_prefix}_Outer_Merge"
+    inner_merge = f"{country_prefix}_Inner_Merge"
+    layers = f"{country_prefix}_Layers"
+    final = f"{country_prefix}_Merge"
+    # App exports use an independent RGBA overlay, not a country passthrough.
+    # It can feed a Local MultiMerge foreground without creating a cycle.
+    background = transparent if overlay_only else mode_name
     inner = f'''\t\t{path} = PolylineMask {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
@@ -132,10 +139,10 @@ def _nodes(country_prefix: str, points: list[tuple[float, float]],
 \t\t{outer_merge} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{transparent}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{outer}", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1680, 900 }} }}, }},
 \t\t{inner_merge} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{outer_merge}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{inner}", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1810, 850 }} }}, }},
 \t\t{layers} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{inner_merge}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{core}", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1940, 800 }} }}, }},
-\t\t{final} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{mode_name}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{layers}", Source = "Output", }}, Blend = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1940, 700 }} }}, }},
+\t\t{final} = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "{background}", Source = "Output", }}, Foreground = Input {{ SourceOp = "{layers}", Source = "Output", }}, Blend = Input {{ Value = 0, }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 1940, 700 }} }}, }},
 '''
     for suffix, (x, y) in REFERENCE_HIGHLIGHT_POSITIONS.items():
-        node = f"{country_prefix}_Border_Highlight_{suffix}"
+        node = f"{country_prefix}_{suffix}"
         y += row - 360
         pattern = (rf"({re.escape(node)} = \w+ \{{.*?"
                    rf"ViewInfo = OperatorInfo \{{ Pos = \{{ )[^}}]+( \}} \}})")
@@ -175,21 +182,31 @@ def _nodes(country_prefix: str, points: list[tuple[float, float]],
 
 def build(source: Path, target: Path, country_prefix: str = "EGY") -> dict:
     content = source.read_text(encoding="utf-8")
-    if f"{country_prefix}_Border_Highlight_Control" in content:
+    if (f"{country_prefix}_Border_Highlight_Control" in content or
+            f"{country_prefix}_Border_Highlight_Group = " in content):
         raise ValueError("source composition already contains the border highlight prototype")
-    canvas = _tool_block(content, "Country_Edit_01_Canvas")
+    # New exports use country prefixes; keep the original prototype fixture
+    # supported without imposing its numbered names on future exports.
+    native_names = f"{country_prefix}_Canvas = " in content
+    base = country_prefix if native_names else "Country_Edit_01"
+    canvas = _tool_block(content, f"{base}_Canvas")
     duration = round(_value(canvas, "GlobalOut"))
     width = round(_value(canvas, "Width"))
     height = round(_value(canvas, "Height"))
     points = _local_points(content, country_prefix, width, height)
-    marker = "\t\tCountry_Edit_01_Plane = ImagePlane3D"
+    marker = f"\t\t{base}_Plane = ImagePlane3D"
     if content.count(marker) != 1:
-        raise ValueError("expected one Country_Edit_01_Plane insertion point")
+        raise ValueError(f"expected one {base}_Plane insertion point")
+    plane = _tool_block(content, f"{base}_Plane")
+    material = re.search(r'MaterialInput = Input \{ SourceOp = "([^"]+)"', plane)
+    if not material:
+        raise ValueError(f"{base}_Plane has no material source")
+    material_source = material.group(1)
     content = content.replace(marker, _nodes(
-        country_prefix, points, duration, width, height) + marker, 1)
-    old_material = 'MaterialInput = Input { SourceOp = "Country_Edit_01_Mode", Source = "Output", },'
-    new_material = (f'MaterialInput = Input {{ SourceOp = "{country_prefix}_Border_Highlight_Merge", '
-                    'Source = "Output", },')
+        country_prefix, points, duration, width, height, mode_name=material_source) + marker, 1)
+    old_material = f'MaterialInput = Input {{ SourceOp = "{material_source}", Source = "Output", }},'
+    new_material = (f'MaterialInput = Input {{ SourceOp = "{country_prefix}_Border_Highlight_Group", '
+                    'Source = "MainOutput1", },')
     if content.count(old_material) != 1:
         raise ValueError("expected one country plane material connection")
     content = content.replace(old_material, new_material, 1)

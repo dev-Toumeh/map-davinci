@@ -1,16 +1,31 @@
 # Backlog
 
-## Add a scripts folder to every exported project
+## Completed: readable country-stack prefixes
 
-Create a `scripts/` folder inside each exported project's root, alongside its
-existing export folders, for project-specific scripts.
+New 2D/3D map exports use country ISO prefixes for their canvas, local transform,
+render, enabled switch, and 3D plane instead of numbered `Country_Edit_XX_*`
+names. Sub-territories include their own territory name. Links and mirrored
+layout ownership use those names too. Existing compositions are unchanged.
 
-## Shorten border-highlight child-node labels
+## Completed: scripts folder in exported projects
 
-Remove the `$countryShotName_Border` prefix from the labels of child nodes
-inside `$countryShotName_Border_Highlight_Group`. Keep the group label unchanged.
-This is a label cleanup only: preserve node connections and animation. If the
-implementation also changes internal node IDs, update all references safely.
+New map projects include a `scripts/` folder at the project root. Generating
+a new Fusion comp for an older project also creates it without replacing any
+existing scripts.
+
+## Completed: short border-highlight child-node names
+
+Country groups retain `$countryShotName_Border_Highlight_Group`; their native
+children use short globally unique IDs such as `SAU_Path`, `SAU_Core`,
+and `SAU_Merge`, without the redundant `Highlight_` label. Native inspection
+confirmed duplicate child IDs in different groups can resolve to another
+country's nodes. Internal links therefore retain the country prefix; the group
+publishes `MainOutput1`, but app wiring does not rely on that port: the final
+native Merge produces a transparent overlay and feeds Local MultiMerge layer 1.
+Local MultiMerge remains directly connected to Plane; the highlight never
+receives Local as an input. Native Merge Blend controls visibility (default 0).
+Geometry and timings are unchanged. This routing is covered by generator tests;
+native import/save/reopen verification of the new overlay design is pending.
 
 ## Add an unkeyframed editing camera to the 3D map scene
 

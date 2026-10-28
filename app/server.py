@@ -45,6 +45,7 @@ from urllib.parse import quote, unquote, parse_qs, urlsplit
 
 from core import animation_schema, exporter, motion_scan, package_layout, regions, settings as app_settings
 from fusion import generator as fusion_generator
+from fusion import region_closeup
 from core import gif_loop
 from core import archive_carousel_service
 
@@ -554,6 +555,30 @@ class Handler(BaseHTTPRequestHandler):
             raw_body = self.rfile.read(length)
             # Audio uses multipart; the reference upload is streamed above.
             config = json.loads(raw_body or b"{}") if not path.endswith("/audio") else {}
+            if (m := re.fullmatch(r"/api/closeups/([A-Za-z0-9_.-]+)/region", path)):
+                package = self._package(m.group(1))
+                # Parse and validate synchronously, report expensive work through existing jobs.
+                name = config.get("name", "Region")
+                if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,79}", name):
+                    self._json({"error": "Name must be a Fusion identifier"}, 400)
+                    return
+                try:
+                    import math
+                    mpp = float(config["mpp"])
+                    if not math.isfinite(mpp) or mpp <= 0:
+                        raise ValueError("m/px must be positive and finite")
+                    area = config["area"]
+                    region_closeup.area_geometry(area, self._metadata(package))
+                except (KeyError, TypeError, ValueError, OSError) as exc:
+                    self._json({"error": str(exc)}, 400)
+                    return
+                job_id = str(uuid.uuid4())
+                with JOBS_LOCK:
+                    JOBS[job_id] = {"status": {"stage": "queued", "pct": 0, "message": "queued"}, "result": None}
+                threading.Thread(target=self._run_region_job,
+                                 args=(job_id, package, name, area, mpp), daemon=True).start()
+                self._json({"job_id": job_id}, 202)
+                return
             if path == "/api/gif/settings":
                 saved = app_settings.load()
                 if config.get("use_default"):
@@ -709,6 +734,22 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"error": str(exc)}, 500)
 
     # ---- job runner ------------------------------------------------------
+
+    def _run_region_job(self, job_id, package, name, area, mpp):
+        def progress(stage, pct, message):
+            with JOBS_LOCK:
+                JOBS[job_id]["status"] = {"stage": stage, "pct": round(pct, 1), "message": message}
+        try:
+            result = region_closeup.build_region_closeup(package, name, area, mpp, progress=progress)
+            for key in ("setting_path", "manifest_path"):
+                relative = Path(result[key]).relative_to(app_settings.exports_dir().resolve())
+                result[key.replace("_path", "_url")] = "/exports/" + quote(relative.as_posix(), safe="/")
+            with JOBS_LOCK:
+                JOBS[job_id]["result"] = result
+                JOBS[job_id]["status"] = {"stage": "done", "pct": 100, "message": "region close-up complete"}
+        except Exception as exc:
+            LOGGER.exception("Region close-up failed")
+            progress("error", 100, str(exc))
 
     def _run_job(self, job_id: str, config: dict) -> None:
         def progress(stage: str, pct: float, message: str) -> None:

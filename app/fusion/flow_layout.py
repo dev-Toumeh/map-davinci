@@ -17,8 +17,7 @@ GROUP_SIZE = re.compile(
     rf"({NUMBER}),\s*({NUMBER}),\s*({NUMBER}),\s*({NUMBER})(\s*\}})", re.S)
 
 
-def arrange_country_stacks(content: str, countries: list[str],
-                           territory_countries: list[str], *, center_x: int) -> str:
+def arrange_country_stacks(content: str, countries: list[str], *, center_x: int) -> str:
     """First ceil(N/2) countries left, remainder right, in saved country order.
 
     Left stacks flow left-to-right; right stacks flow right-to-left into the
@@ -38,9 +37,6 @@ def arrange_country_stacks(content: str, countries: list[str],
     for match, block in zip(matches, blocks):
         name = match.group(1)
         owner = next((iso for iso in countries if name.startswith(iso + "_")), None)
-        indexed = re.match(r"Country_Edit_(\d+)_", name)
-        if indexed:
-            owner = territory_countries[int(indexed.group(1)) - 1]
         owners.append(owner)
         if owner is None:
             continue

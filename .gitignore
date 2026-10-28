@@ -10,3 +10,6 @@ app/exports/
 
 # macOS
 .DS_Store
+
+# Personal local notes and tools
+/naseem-local/

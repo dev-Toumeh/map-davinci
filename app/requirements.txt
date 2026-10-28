@@ -1,0 +1,6 @@
+Pillow
+numpy
+requests
+CairoSVG
+opencv-python
+scipy>=1.9

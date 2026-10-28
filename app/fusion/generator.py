@@ -801,7 +801,7 @@ def _three_d_country_nodes(territories: list[dict], flag_plans: list[dict],
     plane_names = []
     source_aspect = native["width"] / native["height"]
     for index, plan in enumerate(territories, 1):
-        base = f"Country_Edit_{index:02d}"
+        base = plan["node_prefix"]
         x0, y0, x1, y1 = plan["footprint"]["bbox"]
         bw, bh = x1 - x0, y1 - y0
         cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
@@ -848,10 +848,18 @@ def _three_d_country_nodes(territories: list[dict], flag_plans: list[dict],
             (1550, row)))
         local_prefix = plan.get("highlight_prefix", base)
         local_elements_name = f"{local_prefix}_Local_Elements_MultiMerge"
+        highlight_layer = ""
+        if plan.get("highlight_ring"):
+            # Use the unique native child output, not a published group port.
+            # The highlight is an independent transparent foreground; the
+            # country remains on Background and Local stays wired to Plane.
+            highlight_layer = f'''\t\t\t\t["Layer1.Foreground"] = Input {{ SourceOp = "{local_prefix}_Merge", Source = "Output", }},
+\t\t\t\tLayerName1 = Input {{ Value = "Border highlight", }},'''
         nodes.append(f'''\t\t{local_elements_name} = MultiMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
 \t\t\t\tBackground = Input {{ SourceOp = "{enabled_name}", Source = "Output", }},
+{highlight_layer}
 \t\t\t}},
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ 2050, {row} }} }},
 \t\t}},''')
@@ -867,8 +875,7 @@ def _three_d_country_nodes(territories: list[dict], flag_plans: list[dict],
             prefix = plan["highlight_prefix"]
             nodes.append(border_highlight_group(
                 prefix, local_points, duration, width, height,
-                mode_name=local_elements_name, row=row))
-            material_source = f"{prefix}_Border_Highlight_Merge"
+                row=row, overlay_only=True))
         plane_name = f"{base}_Plane"
         nodes.append(f'''\t\t{plane_name} = ImagePlane3D {{ NameSet = true, Inputs = {{
 \t\t\t\t["Transform3DOp.Scale.X"] = Input {{ Value = {4 * bw:.12g}, }},
@@ -1100,7 +1107,7 @@ def generate(package: Path, metadata: dict, animation: dict,
         tools.append(f'''\t\tPlace_Detail = Transform {{ Inputs = {{ Size = Input {{ Value = {1 / factor:.12g}, }}, Input = Input {{ SourceOp = "Map_Detail", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ -480, 130 }} }}, }},''')
     vector_layers = []
     country_shape_sources: list[str] = []
-    country_edit_inputs: list[tuple[str, str, int]] = []
+    country_inputs: list[tuple[str, str, int, str]] = []
     territory_plans: list[dict] = []
     flag_plans: list[dict] = []
     countries = {country["iso3"]: country for country in metadata.get("countries", [])}
@@ -1124,6 +1131,8 @@ def generate(package: Path, metadata: dict, animation: dict,
         border_red, border_green, border_blue = _rgb(country.get("border_color", "#ffffff"))
         for child in group.get("children", []):
             child_base = _territory_base(group["iso3"], child)
+            node_prefix = (_name(group["iso3"]) if child.get("category") == "country"
+                           else child_base)
             geometry = _child_geometry(package, country, child)
             row = row_cursor
             ring_limit = RING_LIMITS.get(child["id"], DEFAULT_RING_LIMIT)
@@ -1157,7 +1166,8 @@ def generate(package: Path, metadata: dict, animation: dict,
                                        "warnings": flag_warnings,
                                        "border_sources": [f"{child_base}_Ring_{index:02d}_Border"
                                                           for index in active_indexes],
-                                       "edit_index": len(country_edit_inputs) + 1,
+                                       "edit_index": len(country_inputs) + 1,
+                                       "node_prefix": node_prefix,
                                        "layout_y": row})
                     if warnings is not None:
                         warnings.extend(flag_warnings)
@@ -1165,11 +1175,12 @@ def generate(package: Path, metadata: dict, animation: dict,
                     warnings.append(f"{group['iso3']}: no matching flag asset; using color fill")
             safe_name = _territory_label(child).replace('"', "'")
             label = f"{group['iso3']} - {safe_name}"
-            country_edit_inputs.append((label, shape_output, row))
+            country_inputs.append((label, shape_output, row, node_prefix))
             if mode == "3d":
                 active_rings = [rings[index - 1] for index in active_indexes]
                 territory_plans.append({
                     "label": label, "shape_source": shape_output, "row": row,
+                    "node_prefix": node_prefix,
                     "highlight_prefix": (group["iso3"] if child.get("category") == "country"
                                          else child_base),
                     "highlight_ring": max(
@@ -1291,7 +1302,7 @@ def generate(package: Path, metadata: dict, animation: dict,
             size_expression = f"Map_Animation.Size / {texture_scale:.12g}"
             country_nodes.append(f'''\t\t{prefix}_Loader = Loader {{ NameSet = true, Clips = {{ Clip {{ ID = "Clip1", Filename = "{_lua_path(plan['texture'])}", Length = 1, GlobalEnd = {duration}, TrimOut = 0, Loop = 1 }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 450, {flag_y + 80} }} }}, }},
 \t\t{prefix}_Local_Transform = Transform {{ NameSet = true, Inputs = {{ Center = Input {{ Value = {{ 0.5, 0.5 }}, }}, Size = Input {{ Value = 1.02, }}, Input = Input {{ SourceOp = "{prefix}_Loader", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 650, {flag_y + 180} }} }}, }},
-\t\t{prefix}_Masked_On_Working_Canvas = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Local_Transform", Source = "Output", }}, Center = Input {{ Expression = "{center_expression}", }}, Size = Input {{ Expression = "{size_expression}", }}, Blend = Input {{ Value = 1, }}, EffectMask = Input {{ SourceOp = "Country_Edit_{plan['edit_index']:02d}_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 850, {flag_y + 100} }} }}, }},''')
+\t\t{prefix}_Masked_On_Working_Canvas = Merge {{ NameSet = true, Inputs = {{ Background = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }}, Foreground = Input {{ SourceOp = "{prefix}_Local_Transform", Source = "Output", }}, Center = Input {{ Expression = "{center_expression}", }}, Size = Input {{ Expression = "{size_expression}", }}, Blend = Input {{ Value = 1, }}, EffectMask = Input {{ SourceOp = "{plan['node_prefix']}_Render", Source = "Output", }} }}, ViewInfo = OperatorInfo {{ Pos = {{ 850, {flag_y + 100} }} }}, }},''')
             border_inputs = "\n".join(
                 f'\t\t\t\tInput{index} = Input {{ SourceOp = "{source}", Source = "Output", }},'
                 for index, source in enumerate(plan["border_sources"], 1))
@@ -1303,9 +1314,9 @@ def generate(package: Path, metadata: dict, animation: dict,
                 canvas_width, canvas_height, y_aspect, (670, flag_y + 220),
                 static_map=mode == "3d")
             country_nodes.append(border_nodes)
-        for index, (label, shape_source, country_y) in enumerate(country_edit_inputs, 1):
+        for index, (label, shape_source, country_y, node_prefix) in enumerate(country_inputs, 1):
             render_nodes, render_output = _shape_camera_render(
-                f"Country_Edit_{index:02d}", shape_source, duration,
+                node_prefix, shape_source, duration,
                 canvas_width, canvas_height, y_aspect,
                 (450, country_y), static_map=mode == "3d")
             country_nodes.append(render_nodes)
@@ -1321,7 +1332,7 @@ def generate(package: Path, metadata: dict, animation: dict,
                 ], (1330, country_y)))
                 render_output = switch_name
             deployment_render_inputs.append((label, render_output))
-            select_name = f"Country_Edit_{index:02d}_Enabled"
+            select_name = f"{node_prefix}_Enabled"
             country_nodes.append(_switch_tool(select_name, [
                 (label, render_output),
                 ("OFF", "Country_Vector_Canvas"),
@@ -1343,7 +1354,7 @@ def generate(package: Path, metadata: dict, animation: dict,
             f'''\t\t\t\t["Layer{index}.Foreground"] = Input {{ SourceOp = "{source}", Source = "Output", }},
 \t\t\t\tLayerName{index} = Input {{ Value = "{label.replace(chr(34), chr(39))}", }},'''
             for index, (label, source) in enumerate(edit_render_inputs, 1))
-        country_nodes.append(f'''\t\tCountry_Edit_Selected = MultiMerge {{
+        country_nodes.append(f'''\t\tCountry_Visible_Layers = MultiMerge {{
 \t\t\tNameSet = true,
 \t\t\tInputs = {{
 \t\t\t\tBackground = Input {{ SourceOp = "Country_Vector_Canvas", Source = "Output", }},
@@ -1352,7 +1363,7 @@ def generate(package: Path, metadata: dict, animation: dict,
 \t\t\tViewInfo = OperatorInfo {{ Pos = {{ {EDIT_SELECTED_X}, 440 }} }},
 \t\t}},''')
         country_nodes.append(_switch_tool("Country_Mode_Switch", [
-            ("EDIT MODE - native territory switches", "Country_Edit_Selected"),
+            ("EDIT MODE - native territory switches", "Country_Visible_Layers"),
             ("DEPLOYMENT - all countries and territories", deployment_output),
         ], (EDIT_MODE_X, 445)))
         if mode == "2d":
@@ -1403,7 +1414,6 @@ def generate(package: Path, metadata: dict, animation: dict,
     tool_content = arrange_country_stacks(
         "\n".join(tools),
         [group["iso3"] for group in groups if group.get("children")],
-        [label.split(" - ", 1)[0] for label, _source, _row in country_edit_inputs],
         center_x=_three_d_scene_x(len(closeup_plans)) if mode == "3d" else 2620,
     )
     content = f'''Composition {{
@@ -1415,6 +1425,9 @@ def generate(package: Path, metadata: dict, animation: dict,
 '''
     fusion_dir = package / package_layout.FUSION_DIR
     fusion_dir.mkdir(exist_ok=True)
+    # Also provision the project-script workspace when generating a new
+    # composition for an older export; never overwrite scripts already there.
+    (package / package_layout.SCRIPTS_DIR).mkdir(exist_ok=True)
     versions = [int(m.group(1)) for path in fusion_dir.glob("scene_v*.comp")
                 if (m := re.fullmatch(r"scene_v(\d+)(?:_[A-Za-z0-9_-]+)?\.comp", path.name))]
     suffix = "_3d" if mode == "3d" else ""

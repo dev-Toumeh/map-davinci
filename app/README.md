@@ -9,7 +9,7 @@ pixel-aligned assets ready to import into DaVinci Resolve Fusion.
 ```bash
 # from the project root (one-time setup if .venv doesn't exist yet)
 python3 -m venv .venv
-.venv/bin/pip install Pillow numpy requests CairoSVG opencv-python
+.venv/bin/pip install -r app/requirements.txt
 
 # start the app
 .venv/bin/python app/server.py
@@ -70,6 +70,7 @@ No country-specific placements or visibility keyframes are copied. Upload limits
 | `fusion/scene_vNNN.comp` | Versioned editable 2D Fusion graph |
 | `fusion/scene_vNNN_3d.comp` | Versioned Fusion scene with map planes and an animated 3D camera |
 | `videos/` | Folder for rendered videos from the project |
+| `scripts/` | Project-specific scripts; also created on the next Fusion export for older projects |
 
 Repeated names use numeric suffixes: `saudi_arabia`, `saudi_arabia_2`,
 `saudi_arabia_3`, and so on. Existing flat packages remain supported.
@@ -89,6 +90,22 @@ use the pinned Flag Icons v7.5.0 SVGs in `resources/flag_icons/` and are created
 inside the package when a new composition is generated. If a flag is unavailable,
 the generation result reports that its color fill was kept. On macOS, CairoSVG
 also needs the Homebrew `cairo` library (`brew install cairo`).
+
+Every country stack uses its ISO prefix throughout: for example `PAK_Canvas`,
+`PAK_Local`, `PAK_Render`, `PAK_Enabled`, and `PAK_Plane`, not numbered
+`Country_Edit_04_*` names. Child territories include their territory name
+(for example `PAK_Sindh_Plane`), keeping their identity stable when country
+order changes. Existing manually edited compositions are not renamed.
+
+Border-highlight group names keep their country prefix, while children use
+short, globally unique names such as `SAU_Path`, `SAU_Core`, and `SAU_Inner_Glow`.
+Each group publishes its own output. Country prefixes are required even inside
+groups: native Resolve can cross-wire duplicate child IDs on import.
+In app-generated 3D comps the highlight is a standalone transparent overlay.
+Its uniquely named final native Merge feeds layer 1 of the country's Local
+MultiMerge; Local feeds the Plane directly. No country image passes through
+the highlight group and no published group output is required for this wiring.
+Set the highlight's native `*_Merge` Blend above 0 to show it (default: off).
 
 ## Animation editor
 
@@ -176,3 +193,52 @@ sampled at integer frames where needed; native Resolve import/render remains a v
   your framing and records `tile_zoom_upscaled` if the source is coarser than
   requested. For deep zoom-ins, frame at a higher map zoom.
 - Exports are rendered from raw tiles + raw geometry — never screenshots.
+
+## Region close-ups
+
+Open **Region close-up** on the landing page, select an existing package, enter a
+Fusion-safe name, a longitude/latitude bbox, and Mercator m/px, then Run. Alternatively
+upload a GeoJSON Polygon/MultiPolygon or LineString/MultiLineString (including Feature
+collections), or a railway `{"paths": [[[detail_x, detail_y], ...]]}` JSON file.
+Lines use the corridor half-width (default 25 ground km; Mercator buffer uses mean latitude).
+The same operation is available as:
+
+```bash
+PYTHONPATH=app .venv/bin/python -m fusion.region_closeup exports/PACKAGE Coast \
+  --area area.json --mpp 62
+```
+
+`area.json` also accepts `{"bbox": [west,south,east,north]}`,
+`{"polylines": [[[lon,lat], ...]], "half_width_km": 25}` or
+`{"polygons": [[[[lon,lat], ...]]]}` (polygon rings, including holes).
+A local API/CLI caller can use `{"file": "/absolute/path/to/paths.json", "half_width_km": 25}`.
+`--plan plan.json` accepts predefined `{"centres": [[merc_x,merc_y,mpp], ...]}`.
+
+`POST /api/closeups/<package>/region` takes `{"name":"Coast","area":{...},"mpp":62}`
+and returns HTTP 202 with `job_id`. Poll `/api/export/status/<job_id>`; `done` includes
+`setting_url`, `manifest_url` and tile metadata. Restart an already running app to load
+the endpoint. Work runs in a background job; failures appear in job status.
+
+The planner minimizes a finite overlapping candidate grid with an integer solver and
+checks every region raster cell, adding coverage if needed; this is not a proof of a
+global geometric minimum. Region masks use a 500 m planning raster (adaptively coarser
+for huge regions). Pixels are square; plates stay at most 3840×2160. Resolution is
+EPSG:3857 metres per pixel; ground resolution equals this times cos(latitude).
+
+Outputs are content-addressed under the package's close-up folder: RGBA plates, cached
+source plates, manifest and one editable GroupOperator `.setting` with one Merge3D
+output. Keep the folder in place for absolute Loader paths. Drag the setting into
+Fusion and connect its 3D output to your scene. It is always visible, without keys.
+No live composition is changed. Each plane has its own Z in 0.00049–0.00051.
+
+Imagery comes from the package source via the existing tile cache. Black and Esri
+no-data grey are softly filled from the detail image (the Bahrain repair method).
+Low spatial frequencies are matched to detail-map colours; high-frequency texture is
+retained on land; blue/green water texture is reduced to suppress source scene colour blocks. A soft region boundary and normalized overlap weights converted to ordered
+over alpha prevent double opacity. Render the planes back to front (ascending Z,
+with transparency sorting) to reproduce the checks; Z-buffer-only transparency can
+occlude the lower tiles. No renderer settings are changed by this tool.
+
+Offline verification (no imagery downloads):
+` .venv/bin/pip install pytest ` then
+`PYTHONPATH=app .venv/bin/python -m pytest app/tests/test_region_closeup.py app/tests/test_closeup_lod.py -q`.

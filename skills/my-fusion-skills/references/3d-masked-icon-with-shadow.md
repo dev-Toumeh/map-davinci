@@ -1,6 +1,6 @@
 # 3D masked icon with shadow
 
-Current template: [3d_masked_icon_with_shadow.setting](/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/3d_masked_icon_with_shadow.setting).
+Current template: [3d_masked_icon_with_shadow.setting](/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/3d/3d_masked_icon_with_shadow.setting).
 
 This user-updated asset supersedes the earlier `app/fusion/templates/nodes/map_3d_icon_shadow_object.setting` for this workflow. Inspect the current asset before editing; do not replace it with the older file or move either template as part of a documentation update.
 
@@ -14,6 +14,9 @@ This user-updated asset supersedes the earlier `app/fusion/templates/nodes/map_3
 - `Map_Icon_3D_Parent_1` combines the shadow plane on SceneInput1 and icon plane on SceneInput2. Its translation, rotation, and pivot inputs link to saved BezierSplines. Scale X is 0.1; Y/Z are approximately 0.03729685.
 
 ## Use and adaptation
+
+For two of these icons merged and animated as a pair, see the [3D icon pair](moving-icons.md#3d-icon-pair).
+
 
 Drag the setting into empty Fusion Node Editor space. Connect its output to a scene input on the target Merge3D (for example the map's scene merge), then use that scene's existing Renderer3D to view the rendered result. It is a 3D scene output, not a 2D foreground image for Merge/MultiMerge.
 

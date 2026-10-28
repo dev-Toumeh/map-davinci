@@ -1,6 +1,6 @@
 # Flowing dotted line
 
-Template: [flowing-dotted-line.setting](/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/flowing-dotted-line.setting).
+Template: [doted-moving-line.setting](/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/doted-moving-line.setting).
 
 The template is an editable `GroupOperator` named `Flowing_Dotted_Line`. Its 2D output comes from `Dots_On_Path`, a `TextPlus` with repeated circular glyphs and Path layout. The background is transparent; the route itself is an editing guide rather than a rendered stroke.
 

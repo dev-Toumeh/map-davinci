@@ -11,9 +11,10 @@ DATA_DIR = Path("data")
 SOUNDS_DIR = Path("sounds")
 FUSION_DIR = Path("fusion")
 VIDEOS_DIR = Path("videos")
+SCRIPTS_DIR = Path("scripts")
 CLOSEUPS_DIR = IMAGES_DIR / "closeups"
 LEGACY_CLOSEUPS_DIR = Path("closeups")
-STRUCTURED_DIRS = (IMAGES_DIR, JSON_DIR, DATA_DIR, SOUNDS_DIR, FUSION_DIR, VIDEOS_DIR)
+STRUCTURED_DIRS = (IMAGES_DIR, JSON_DIR, DATA_DIR, SOUNDS_DIR, FUSION_DIR, VIDEOS_DIR, SCRIPTS_DIR)
 
 METADATA_FILE = JSON_DIR / "metadata.json"
 ANIMATION_FILE = JSON_DIR / "animation.json"
@@ -35,6 +36,7 @@ def manifest() -> dict:
             "images": str(IMAGES_DIR), "json": str(JSON_DIR),
             "data": str(DATA_DIR), "sounds": str(SOUNDS_DIR),
             "fusion": str(FUSION_DIR), "videos": str(VIDEOS_DIR),
+            "scripts": str(SCRIPTS_DIR),
         },
         "files": {"metadata": str(METADATA_FILE), "animation": str(ANIMATION_FILE)},
     }

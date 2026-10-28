@@ -5,7 +5,7 @@ Original timing: 70/60/70/70/60/70/70/60/70/70/60/60 ms; loop = 0.79 seconds.
 
 QUICK INSTALL ON MAC
 For this workspace, drag SwipeUpLoop.setting directly into Fusion. Its PNG
-path is already set to app/fusion/templates/nodes/SwipeUpLoop/Frames.
+path is already set to skills/my-fusion-skills/assets/gif_to_png_loop/Frames.
 Use a fresh group instance after updating the setting. Set Timeline FPS to
 match your composition, then play: the timing expression repeats every
 0.79 source seconds, and the Loader range is extended to frame 1000000.

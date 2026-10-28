@@ -31,3 +31,17 @@
 - View the actual final composite at entrance, hold, and second-row frames. A correct displacement expression or local image preview does not prove the sharp image appears in final output.
 - Check viewer assignment before treating a blank viewer as a failed render. In this experiment, assigning the final MultiMerge to viewer 2 restored the picture without any graph change. Do not claim this explains every black-output failure.
 - Recheck after the last mutation, including cleanup. Visual success before deleting extra tools is not post-cleanup verification. State separately whether save/reopen and full-render tests were performed.
+
+- **Never add tools at AddTool's default position from a script** (`comp:AddTool(id, -32768, -32768)`)
+  while something may be selected: Fusion then wires the new tool to the selected one, as a
+  toolbar click does, and for a MediaIn also creates a Merge. On 2026-10-25 this silently
+  re-fed `SAU_Haramain_Track_Plane` from the new Landbridge colour node and added a stray
+  `Merge1`. Add at real coordinates (then `FlowView:SetPos`), and count the comp's tools
+  before and after to catch anything extra (`(~/edit-projects/davinvi-resolve/naseem-local/archive-claude-codex-bridge-20261026.tar.gz; archived) mkline.py`).
+- **Lay out every node a script adds; never leave them piled up** (user, 2026-10-25: "make sure to
+  sort the nodes … not just throw them"). Follow the comp's existing pattern. In gulf_trains each
+  map line is one horizontal row, left to right `Track_Image → Track_Color → Track_Plane → Merge3D`,
+  columns aligned with the other line rows (x ≈ 15.5 / 16.8 / 18.1 / 19.5), rows stacked
+  vertically, all feeding `Merge3D1` on the right. Read the neighbours' `FlowView:GetPos`, place
+  the new row on the first free band, then take a window screenshot of the Nodes panel to check.
+

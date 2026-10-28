@@ -6,8 +6,8 @@ Use this method when adding a `.gif` animation to this project's Fusion composit
 
 Workspace: `/Users/naseemtoumeh/edit-projects/davinvi-resolve`.
 
-- Example package: [example_gif_to_png_loop](/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/example_gif_to_png_loop).
-- Example node: [SwipeUpLoop.setting](/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/example_gif_to_png_loop/SwipeUpLoop.setting), with `Frames/`, `timing.json`, and `Install_SwipeUpLoop.lua` beside it.
+- Example package: [gif_to_png_loop](/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/gif_to_png_loop).
+- Example node: [SwipeUpLoop.setting](/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/gif_to_png_loop/SwipeUpLoop.setting), with `Frames/`, `timing.json`, and `Install_SwipeUpLoop.lua` beside it.
 - Full method and app workflow: [Fusion-GIF-Loop-Implementation.md](/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/docs/Fusion-GIF-Loop-Implementation.md).
 - Existing converter: `app/core/gif_loop.py`, especially `create_gif_loop_group(data, exports_dir, group_name="GIFLoop", timeline_fps=24, output_dir=None)`. `data` is GIF bytes. Reuse its extraction and timing-expression generation.
 - App export layout reference: `references/nodes/gif-reference.setting`.
@@ -29,11 +29,11 @@ App packages go to the configured Exports folder under `gif-loops/<unique-name>/
 
 ## Example import and relinking
 
-At inspection on 2026-10-06, the example setting and README still referred to the old `app/fusion/templates/nodes/SwipeUpLoop/Frames` location. The actual package is now `example_gif_to_png_loop`. Before using it, relink `PNGFrames` to:
+On 2026-10-24, `PNGFrames` in the example setting and its README were relinked from the old `app/fusion/templates/nodes/SwipeUpLoop/Frames` location to the package in this skill:
 
-`/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/example_gif_to_png_loop/Frames/swipe_0000.png`
+`/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/gif_to_png_loop/Frames/swipe_0000.png`
 
-Ensure it loads all 12 frames, rather than a still. Alternatively use the package's installer and choose the current first PNG. The example currently stores 30 FPS; set it to the composition rate (24 for default project exports). Reinspect these values before future edits in case the template has changed.
+This was a file edit only; confirm the Loader resolves in Resolve. Ensure it loads all 12 frames, rather than a still. Alternatively use the package's installer and choose the current first PNG. The example currently stores 30 FPS; set it to the composition rate (24 for default project exports). Reinspect these values before future edits in case the template has changed.
 
 ## Connections and validation
 

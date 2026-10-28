@@ -13,7 +13,7 @@
     PNGFrames = Loader {
      Clips = {
       Clip {
-       ID = "Clip1", Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/app/fusion/templates/nodes/SwipeUpLoop/Frames/swipe_0000.png", FormatID = "PNGFormat",
+       ID = "Clip1", Filename = "/Users/naseemtoumeh/edit-projects/davinvi-resolve/skills/my-fusion-skills/assets/gif_to_png_loop/Frames/swipe_0000.png", FormatID = "PNGFormat",
        StartFrame = 0, Length = 12, LengthSetManually = true,
        TrimIn = 0, TrimOut = 11, ExtendFirst = 0, ExtendLast = 0,
        Loop = 1, AspectMode = 0, Depth = 0, TimeCode = 0,

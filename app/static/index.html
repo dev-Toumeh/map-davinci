@@ -177,6 +177,17 @@
     </div>
 
     <button id="exportbtn" disabled>Select a country first</button>
+    <details class="sec" id="regioncloseup">
+      <summary>Region close-up</summary>
+      <label for="rcpackage">Export package</label><select id="rcpackage"></select>
+      <label for="rcname">Name</label><input id="rcname" type="text" value="Region" pattern="[A-Za-z][A-Za-z0-9_]*">
+      <label for="rcbbox">Bounding box (west, south, east, north)</label><input id="rcbbox" type="text" placeholder="50.2,25.7,50.9,26.4">
+      <label for="rcfile">Or GeoJSON / railway paths JSON file</label><input id="rcfile" type="file" accept=".json,.geojson">
+      <label for="rcwidth">Corridor half-width (km)</label><input id="rcwidth" type="number" min="1" max="500" value="25">
+      <label for="rcmpp">Mercator metres per pixel</label><input id="rcmpp" type="number" min="1" value="62">
+      <button id="rcrun" type="button" class="smallbtn">Run close-up</button>
+      <p id="rcstatus" role="status" style="overflow-wrap:anywhere"></p>
+    </details>
     <button id="librarybtn">Open export library</button>
     <div id="progress">
       <div id="pbar"><div id="pfill"></div></div>
@@ -690,5 +701,56 @@ settingsElement("settingsmodal").addEventListener("click", event => {
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") settingsElement("settingsmodal").classList.remove("open");
 });
+</script>
+<script>
+(() => {
+  const el = id => document.getElementById(id);
+  el('regioncloseup').addEventListener('toggle', async () => {
+    if (!el('regioncloseup').open || el('rcpackage').options.length) return;
+    try {
+      const response = await fetch('/api/exports');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not load packages');
+      for (const pkg of data.exports) el('rcpackage').add(new Option(pkg.name, pkg.name));
+    } catch (err) { el('rcstatus').textContent = err.message; }
+  });
+  el('rcrun').addEventListener('click', async () => {
+    el('rcrun').disabled = true;
+    el('rcstatus').textContent = 'Planning…';
+    try {
+      let area;
+      const file = el('rcfile').files[0];
+      if (file) area = {...JSON.parse(await file.text()), half_width_km: Number(el('rcwidth').value)};
+      else {
+        const bbox = el('rcbbox').value.split(',').map(v => Number(v.trim()));
+        if (bbox.length !== 4 || !bbox.every(Number.isFinite)) throw new Error('Enter four bbox coordinates or choose a file');
+        area = {bbox};
+      }
+      const response = await fetch('/api/closeups/' + encodeURIComponent(el('rcpackage').value) + '/region', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: el('rcname').value, area, mpp: Number(el('rcmpp').value)})
+      });
+      const job = await response.json();
+      if (!response.ok) throw new Error(job.error || 'Could not start close-up');
+      while (true) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const poll = await fetch('/api/export/status/' + job.job_id);
+        const data = await poll.json();
+        if (!poll.ok) throw new Error(data.error || 'Could not read progress');
+        el('rcstatus').textContent = data.status.message;
+        if (data.status.stage === 'error') throw new Error(data.status.message);
+        if (data.status.stage === 'done') {
+          el('rcstatus').textContent = data.result.tiles.length + ' tiles. ';
+          for (const [key, title] of [['setting_url', 'Fusion setting'], ['manifest_url', 'Manifest']]) {
+            const link = document.createElement('a'); link.href = data.result[key]; link.textContent = title;
+            el('rcstatus').append(link, ' ');
+          }
+          break;
+        }
+      }
+    } catch (err) { el('rcstatus').textContent = 'Failed: ' + err.message; }
+    finally { el('rcrun').disabled = false; }
+  });
+})();
 </script></body>
 </html>

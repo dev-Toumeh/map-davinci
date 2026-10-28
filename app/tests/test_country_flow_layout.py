@@ -67,7 +67,7 @@ class CountryFlowLayoutTests(unittest.TestCase):
                         # Check sources and downstream native tools, not only one anchor.
                         for name in (f'{iso}_Entire_Ring_01_Fill',
                                      f'{iso}_Flag_Loader',
-                                     f'Country_Edit_{index + 1:02d}_Enabled'):
+                                     f'{iso}_Enabled'):
                             country_points.extend(positions(_tool_block(text, name)))
                         if mode == '3d':
                             # Existing exports may also include a native border
@@ -76,17 +76,17 @@ class CountryFlowLayoutTests(unittest.TestCase):
                                 country_points.extend(positions(_tool_block(
                                     text, f'{iso}_Border_Highlight_Group')))
                             country_points.extend(positions(_tool_block(
-                                text, f'Country_Edit_{index + 1:02d}_Plane')))
+                                text, f'{iso}_Plane')))
                         loader_x = positions(_tool_block(text, f'{iso}_Flag_Loader'))[0][0]
                         enabled_x = positions(_tool_block(
-                            text, f'Country_Edit_{index + 1:02d}_Enabled'))[0][0]
+                            text, f'{iso}_Enabled'))[0][0]
                         if side == 0:
                             self.assertLess(loader_x, enabled_x)
                         else:
                             self.assertGreater(loader_x, enabled_x)
                         if mode == '3d':
                             plane_x = positions(_tool_block(
-                                text, f'Country_Edit_{index + 1:02d}_Plane'))[0][0]
+                                text, f'{iso}_Plane'))[0][0]
                             self.assertLess(enabled_x, plane_x) if side == 0 else \
                                 self.assertGreater(enabled_x, plane_x)
                         for x, _y in country_points:
@@ -100,6 +100,8 @@ class CountryFlowLayoutTests(unittest.TestCase):
                     self.assertNotIn('CustomTool', text)
                     self.assertNotIn('UserControls', text)
                     self.assertNotIn('Country_Edit_Controller', text)
+                    self.assertNotRegex(text, r'Country_Edit_\d+_')
+                    self.assertNotIn('Country_Edit_', text)
                     self.assertNotIn('Country_Mode_Switch.Deployment', text)
                     defined = set(re.findall(r'^\s*(\w+) = \w+ \{', text, re.M))
                     self.assertFalse(set(re.findall(r'SourceOp = "([^"]+)"', text)) - defined)
@@ -119,6 +121,34 @@ local env=setmetatable({ordered=function()return function(t)return t end end},
 local f=assert(io.open(PATH));local s=f:read('*a');f:close()
 local fn=assert(loadstring('return '..s));setfenv(fn,env)
 local c=fn();assert(c.Tools.MediaOut1);assert(not c.Tools.Country_Edit_Controller)
+local seen={};for name in pairs(c.Tools)do seen[name]=true end
+for name,t in pairs(c.Tools)do
+ if t.kind=='GroupOperator' and name:match('_Border_Highlight_Group$')then
+  local prefix=name:match('^(.*)_Border_Highlight_Group$')
+  assert(t.Outputs.MainOutput1.SourceOp==prefix..'_Merge')
+  assert(t.Tools[prefix..'_Merge'] and t.Tools[prefix..'_Path'])
+  assert(t.Tools[prefix..'_Merge'].Inputs.Background.SourceOp==prefix..'_Transparent')
+  local localMerge=assert(c.Tools[prefix..'_Local_Elements_MultiMerge'])
+  assert(localMerge.Inputs['Layer1.Foreground'].SourceOp==prefix..'_Merge')
+  assert(localMerge.Inputs['Layer1.Foreground'].Source=='Output')
+  for child,op in pairs(t.Tools)do
+   assert(child:sub(1,#prefix+1)==prefix..'_')
+   assert(not child:match('_Highlight_'))
+   assert(not seen[child],child);seen[child]=true
+   for _,input in pairs(op.Inputs or {})do
+    if input.SourceOp then assert(t.Tools[input.SourceOp],input.SourceOp)end
+   end
+  end
+ end
+ if t.kind=='ImagePlane3D' and t.Inputs.MaterialInput then
+  local input=t.Inputs.MaterialInput;local source=c.Tools[input.SourceOp]
+  if name:match('_Plane$') then
+   assert(source and source.kind=='MultiMerge',name)
+   assert(input.SourceOp:match('_Local_Elements_MultiMerge$'),name)
+   assert(input.Source=='Output')
+  end
+ end
+end
 '''.replace('PATH', json.dumps(str(path)))
                 result = subprocess.run(['luajit', '-'], input=script, text=True,
                                         capture_output=True, check=False)
@@ -141,9 +171,30 @@ local c=fn();assert(c.Tools.MediaOut1);assert(not c.Tools.Country_Edit_Controlle
                     return GROUP_SIZE.sub(r'\g<1>\g<2>, \g<3>, 0, \g<5>\g<6>', text)
                 self.assertEqual(no_positions(actual), no_positions(original))
                 center = _three_d_scene_x(0) if mode == '3d' else 2620
-                for name in ('USA_Local_region_Shapes', 'Country_Edit_02_Enabled'):
+                for name in ('USA_Local_region_Shapes', 'USA_Local_region_Enabled'):
                     self.assertTrue(all(x <= center - 400 for x, _y in positions(
                         _tool_block(actual, name))))
+
+    def test_prefixes_survive_reordering_and_right_side_child_territories(self):
+        for mode in ('2d', '3d'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp:
+                package = Path(tmp)
+                codes, metadata, animation = self.shot(4, child=True)
+                self.write_geometry(package, codes)
+                with patch('fusion.generator.closeup_lod.plan_closeups', return_value=[]):
+                    first = generate(package, metadata, animation, mode=mode).read_text()
+                    animation['region_groups'].reverse()
+                    reordered = generate(package, metadata, animation, mode=mode).read_text()
+                for suffix in ('Canvas', 'Local', 'Render', 'Enabled', 'Plane') if mode == '3d' else ('Render', 'Enabled'):
+                    for prefix in ('USA', 'USA_Local_region', 'IND'):
+                        name = f'{prefix}_{suffix}'
+                        self.assertIn(name + ' = ', first)
+                        self.assertIn(name + ' = ', reordered)
+                center = _three_d_scene_x(0) if mode == '3d' else 2620
+                for name in ('USA_Enabled', 'USA_Local_region_Enabled'):
+                    self.assertTrue(all(x >= center + 1000 for x, _y in positions(
+                        _tool_block(reordered, name))))
+                self.assertNotIn('Country_Edit_', reordered)
 
     def test_expanded_groups_translate_internal_positions_and_inverse_offsets(self):
         text = '''\t\tAAA_Group = GroupOperator {
@@ -157,7 +208,7 @@ local c=fn();assert(c.Tools.MediaOut1);assert(not c.Tools.Country_Edit_Controlle
 \t\tBBB_Render = sRender { ViewInfo = OperatorInfo { Pos = { 10, 20 } } },
 \t\tOther = Merge { ViewInfo = OperatorInfo { Pos = { 0, 0 } } },
 '''
-        result = arrange_country_stacks(text, ['AAA', 'BBB'], [], center_x=1000)
+        result = arrange_country_stacks(text, ['AAA', 'BBB'], center_x=1000)
         group = _tool_block(result, 'AAA_Group')
         group_position = positions(group)[0]
         offset = GROUP_OFFSET.search(group)
@@ -178,7 +229,7 @@ local c=fn();assert(c.Tools.MediaOut1);assert(not c.Tools.Country_Edit_Controlle
 '''
         text = ('\t\tAAA_Render = sRender { ViewInfo = OperatorInfo { Pos = { 30, 40 } } },\n'
                 + group)
-        result = arrange_country_stacks(text, ['AAA', 'BBB'], [], center_x=1000)
+        result = arrange_country_stacks(text, ['AAA', 'BBB'], center_x=1000)
         actual = _tool_block(result, 'BBB_Group')
         pts = positions(actual)
         self.assertEqual((pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]), (-20, 20))

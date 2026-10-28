@@ -26,7 +26,9 @@ class PackageLayoutTests(unittest.TestCase):
             package = Path(folder)
             package_layout.create(package)
             self.assertTrue((package / "videos").is_dir())
+            self.assertTrue((package / "scripts").is_dir())
             self.assertEqual(package_layout.manifest()["directories"]["videos"], "videos")
+            self.assertEqual(package_layout.manifest()["directories"]["scripts"], "scripts")
             metadata = {
                 "package_layout": package_layout.manifest(),
                 "assets": package_layout.default_assets(),
@@ -48,6 +50,23 @@ class PackageLayoutTests(unittest.TestCase):
                              Path("sounds/voice.mp3"))
             self.assertIn(str(package / package_layout.SATELLITE_WIDE_FILE), text)
             self.assertIn(str(package / package_layout.SATELLITE_DETAIL_FILE), text)
+
+    def test_fusion_export_adds_scripts_folder_to_legacy_project_without_overwrite(self):
+        with tempfile.TemporaryDirectory() as folder:
+            package = Path(folder)
+            metadata = {'output': {'width': 1280, 'height': 720, 'wide_factor': 2},
+                        'countries': []}
+            animation = {'output': {'width': 1280, 'height': 720,
+                                    'fps': 24, 'duration_frames': 2},
+                         'keyframes': [{'frame': 0, 'center': {'x': .5, 'y': .5},
+                                        'view_width': 1}], 'connections': []}
+            generate(package, metadata, animation)
+            scripts = package / 'scripts'
+            self.assertTrue(scripts.is_dir())
+            existing = scripts / 'manual.lua'
+            existing.write_text('print("keep my script")')
+            generate(package, metadata, animation, mode='3d')
+            self.assertEqual(existing.read_text(), 'print("keep my script")')
 
     def test_new_export_writes_each_file_type_to_its_directory(self):
         geometry = {"type": "Polygon", "coordinates": [[
