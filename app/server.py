@@ -43,7 +43,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import quote, unquote, parse_qs, urlsplit
 
-from core import animation_schema, exporter, motion_scan, package_layout, regions, settings as app_settings
+from core import animation_schema, exporter, map_snap, motion_scan, package_layout, regions, settings as app_settings
 from fusion import generator as fusion_generator
 from fusion import region_closeup
 from core import gif_loop
@@ -230,9 +230,9 @@ class Handler(BaseHTTPRequestHandler):
         self._json({"ok": True, "exports_path": str(target), "moved": moved,
                     "using_default": use_default})
 
-    def _choose_exports_folder(self) -> None:
+    def _choose_exports_folder(self, prompt: str = "Choose exports folder") -> None:
         """Open the macOS folder picker for this local desktop application."""
-        script = 'POSIX path of (choose folder with prompt "Choose exports folder")'
+        script = f'POSIX path of (choose folder with prompt "{prompt}")'
         result = subprocess.run(
             ["osascript", "-e", script], capture_output=True, text=True, check=False
         )
@@ -397,6 +397,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path in ("/", "/index.html"):
                 self._file(STATIC_DIR / "index.html", STATIC_DIR)
+            elif path in ("/MapSnap", "/MapSnap/"):
+                self._file(STATIC_DIR / "mapsnap.html", STATIC_DIR)
             elif path in ("/gif", "/gif/"):
                 self._file(STATIC_DIR / "gif.html", STATIC_DIR)
             elif path in ("/archive-carousel", "/archive-carousel/"):
@@ -469,6 +471,9 @@ class Handler(BaseHTTPRequestHandler):
                             "google_maps_daily_warning":
                                 app_settings.google_maps_daily_warning(),
                             "google_tile_usage": exporter.google_tile_usage()})
+            elif path == "/api/mapsnap/settings":
+                self._json({"default_output_folder": str((app_settings.exports_dir() / "MapSnap").resolve()),
+                            "google_maps_api_key_configured": app_settings.has_google_maps_api_key()})
             elif path == "/api/exports":
                 packages = []
                 for candidate in sorted(app_settings.exports_dir().iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
@@ -719,6 +724,23 @@ class Handler(BaseHTTPRequestHandler):
             if path == "/api/settings/select-folder":
                 self._choose_exports_folder()
                 return
+            if path == "/api/mapsnap/select-folder":
+                self._choose_exports_folder("Choose MapSnap output folder")
+                return
+            if path == "/api/mapsnap/export":
+                try:
+                    map_snap.validate(config)
+                except (TypeError, ValueError) as exc:
+                    self._json({"error": str(exc)}, 400)
+                    return
+                job_id = str(uuid.uuid4())
+                with JOBS_LOCK:
+                    JOBS[job_id] = {"status": {"stage": "queued", "pct": 0.0, "message": "queued"},
+                                    "result": None}
+                threading.Thread(target=self._run_mapsnap_job,
+                                 args=(job_id, config), daemon=True).start()
+                self._json({"job_id": job_id}, 202)
+                return
             if path != "/api/export":
                 self._json({"error": "not found"}, 404)
                 return
@@ -734,6 +756,20 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"error": str(exc)}, 500)
 
     # ---- job runner ------------------------------------------------------
+
+    def _run_mapsnap_job(self, job_id: str, config: dict) -> None:
+        def progress(stage: str, pct: float, message: str) -> None:
+            with JOBS_LOCK:
+                JOBS[job_id]["status"] = {"stage": stage, "pct": round(pct, 1), "message": message}
+        try:
+            result = map_snap.export_image(config, progress)
+            with JOBS_LOCK:
+                JOBS[job_id]["result"] = result
+                JOBS[job_id]["status"] = {"stage": "done", "pct": 100.0,
+                                          "message": "image export complete"}
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("MapSnap export failed")
+            progress("error", 100.0, str(exc))
 
     def _run_region_job(self, job_id, package, name, area, mpp):
         def progress(stage, pct, message):

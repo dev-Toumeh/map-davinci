@@ -21,6 +21,8 @@ Then open **http://127.0.0.1:8787** in a browser.
 
 Use **Archive Carousel** beside GIF → Fusion, or `/archive-carousel`, after restarting the app. Its Go backend starts automatically; Go is needed for the first build, with FFmpeg/ffprobe for media. Mix videos and photos, choose durations and a shared card ratio, then export one editable Fusion group with packaged media and film artwork. Defaults: UHD transparent output, 24fps, 4:3 cards, and **10 frames for every entrance and exit, including the first entrance**. See [Archive Carousel](tools/archive-carousel/README.md) for startup, timing, export, and testing details.
 
+**MapSnap** (`/MapSnap`) exports one clean PNG of the map inside the red frame. Choose an aspect ratio, long-edge resolution (4K, Full HD, HD, or 750 px), imagery source, name, and output folder; then pan/zoom the map and export. It does not require selecting a country or create a Fusion package. The default folder is `MapSnap` inside the configured exports folder; existing filenames receive a numeric suffix.
+
 ## GIF → Fusion
 
 Use **GIF → Fusion** beside Settings on the landing page, or open

@@ -16,8 +16,8 @@
   #side h1 span { color:var(--acc); }
   .side-head { flex-wrap:wrap; }
   .head-actions { display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
-  #gifbtn, #carouselbtn { display:flex; align-items:center; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:#20252e; color:var(--dim); font-size:11px; text-decoration:none; }
-  #gifbtn:hover, #carouselbtn:hover { border-color:var(--acc); color:var(--acc); }
+  #gifbtn, #carouselbtn, #mapsnapbtn { display:flex; align-items:center; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:#20252e; color:var(--dim); font-size:11px; text-decoration:none; }
+  #gifbtn:hover, #carouselbtn:hover, #mapsnapbtn:hover { border-color:var(--acc); color:var(--acc); }
   #settingsbtn { display:flex; align-items:center; gap:5px; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:#20252e; color:var(--dim); font-size:11px; cursor:pointer; }
   #settingsbtn:hover { border-color:var(--acc); color:var(--acc); }
   .sec { padding:0 16px 12px; border-bottom:1px solid var(--line); }
@@ -119,6 +119,7 @@
     <div class="side-head">
       <h1>Map Asset Prep <span>· Fusion</span></h1>
       <div class="head-actions">
+        <a id="mapsnapbtn" href="/MapSnap">MapSnap</a>
         <a id="gifbtn" href="/gif">GIF → Fusion</a>
         <a id="carouselbtn" href="/archive-carousel">Archive Carousel</a>
         <button id="settingsbtn" type="button"><span aria-hidden="true">⚙</span> Settings</button>
