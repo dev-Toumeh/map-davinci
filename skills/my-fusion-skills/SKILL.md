@@ -104,3 +104,9 @@ Add new topic-specific references only when there is concrete project knowledge 
   tool, use `comp:AddTool(id, -32768, -32768)`, copy a sibling's unconnected Number/Point/FuID/Text
   inputs with `SetInput`, then rewire it and re-set its expressions. That worked for
   `UAE_City_AlGhuwaifat_Plane` (2026-10-26).
+- **`comp:AddTool` with a tool selected splices the new tool in after it** (2026-10-28): a temporary
+  Saver landed between `Vector_Layers` and `MediaOut1`, and deleting it relinked `MediaOut1` to the
+  Saver's source (`ARE_Canvas`): the map output vanished. Before adding any tool from a script, call
+  `comp:SetActiveTool(nil)`, check the new tool's `Output:GetConnectedInputs()` is empty, and after a
+  script edit compare `MediaOut1`'s source with what it was. A Saver also reads trailing digits in its
+  file name as the frame field (`node_123.png` wrote `node_000000001830.png`): name it `..._0000.png`.
